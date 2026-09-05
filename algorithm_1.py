@@ -274,17 +274,27 @@ def run_one(run_dir: Path) -> tuple[list[LogEvent], list[tuple[int, int]]]:
 
 def save_run_output(run_name: str, master_log: list[LogEvent], correlated: list[tuple[int, int]], output_dir: Path) -> None:
     """Writes two files per run:
-      {run_name}_event_table.json         -- every event, kernel + postgres, tagged and sorted
+      {run_name}_event_table.json         -- lookup table for the event_ids
+                                              referenced in the correlation
+                                              CSV below. Only includes events
+                                              Algorithm 1 actually attributed
+                                              to a session -- background OS
+                                              noise that never resolved is
+                                              excluded, since nothing will
+                                              ever look it up by event_id.
       {run_name}_session_correlation.csv  -- (session_key, event_id) pairs Algorithm 1 resolved
     """
     output_dir.mkdir(parents=True, exist_ok=True)
+
+    referenced_ids = {eid for _sk, eid in correlated}
+    lookup_events = sorted((e for e in master_log if e.event_id in referenced_ids), key=lambda e: e.event_id)
 
     event_table_path = output_dir / f"{run_name}_event_table.json"
     with event_table_path.open("w") as f:
         json.dump(
             [
                 {"event_id": e.event_id, "source": e.source, "timestamp": e.timestamp, "pid": e.pid, "raw": e.raw}
-                for e in master_log
+                for e in lookup_events
             ],
             f,
             indent=2,
@@ -296,7 +306,7 @@ def save_run_output(run_name: str, master_log: list[LogEvent], correlated: list[
         writer.writerow(["session_key", "event_id"])
         writer.writerows(correlated)
 
-    print(f"  wrote {event_table_path.relative_to(PROJECT_ROOT)}  ({len(master_log)} events)")
+    print(f"  wrote {event_table_path.relative_to(PROJECT_ROOT)}  ({len(lookup_events)} events, {len(master_log)} read total)")
     print(f"  wrote {correlation_path.relative_to(PROJECT_ROOT)}  ({len(correlated)} correlated pairs)")
 
 
