@@ -2,69 +2,60 @@
 Algorithm 1: Session-Anchored Correlation (SAC)
 ================================================
 
-Correlates raw OS-kernel / PostgreSQL events with the DB session that
-produced them, by walking the OS process tree back to a known session PID.
+Pure functions only -- no driver loop, no output queue. main.py owns the
+event loop and the queue(s) feeding Algorithm 2; this module just:
 
-Design note
------------
-In production this algorithm consumes a live stream of *log records*
-emitted by an eBPF logger (kernel side) and a PostgreSQL logging hook
-(DB side) as they happen. To develop and evaluate it offline, this module
-replays the frozen `kernel_events.json` / `postgres_events.json` files
-from the CASCE dataset as if they were arriving one log line at a time,
-in timestamp order. Every function below (`track_new_session`,
-`link_event_to_session`, `trace_to_parent_session`, ...) operates on a
-single incoming log record at a time -- exactly as it would against a
-live tailer -- so swapping the offline `iter_log_stream()` generator for
-a real-time log tailer later is a drop-in change.
+  1. reads + time-calibrates the kernel and postgres log files into one
+     merged, sorted list of LogEvent (load_master_log) -- stands in for
+     a live tailer's feed during offline development,
+  2. given one event at a time plus Algorithm 1's own running state,
+     returns the session_key(s) resolved by that event
+     (process_event_with_retry).
 
-Expected repo layout (this file lives at the project root):
+Usage from main.py:
 
-    CASCE_IMPLEMENTATION/
-        algorithm_1.py
-        dataset_dev/
-            run_1/  run_2/  run_3/
-        dataset_test/
-            run_1/  run_2/  run_3/
+    from algorithm_1 import load_master_log, process_event_with_retry
+    from collections import deque
 
-    Each run_N/ directory contains:
-        kernel_events.json
-        postgres_events.json
-        labels.csv
-        time_sync.json
-        attack_scripts/
+    active_sessions, parent_map, pending = {}, {}, deque()
+    master_log = load_master_log(run_dir)          # or a live tailer, later
+
+    for event in master_log:
+        for session_key, event_id in process_event_with_retry(
+            event, active_sessions, parent_map, pending
+        ):
+            alg2_queue.put((session_key, event_id))   # main.py's queue, not ours
 """
 
 from __future__ import annotations
 
-import csv
 import json
+from collections import deque
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterator, Optional
+from typing import Any, Dict, Optional
+
+D_MAX = 8  # max ancestor hops when tracing a kernel event up to its session
+
+# Kernel events that fail to correlate on first attempt are held here, not
+# discarded -- a backend's own pre-query OS activity (fork, connect, auth)
+# regularly happens *before* its first Postgres event registers the
+# session. Measured gap across the CASCE dataset runs: 0.4s-9s; padded
+# generously here.
+PENDING_RETRY_WINDOW_SECONDS = 20.0
+
 
 # --------------------------------------------------------------------------
-# Repo layout
-# --------------------------------------------------------------------------
-
-PROJECT_ROOT = Path(__file__).resolve().parent
-DATASET_DEV = PROJECT_ROOT / "dataset_dev"
-DATASET_TEST = PROJECT_ROOT / "dataset_test"
-
-D_MAX = 8  # max ancestor hops TraceToParentSession will walk
-
-
-# --------------------------------------------------------------------------
-# Log record model
+# Log record model -- one shape for both kernel and postgres events
 # --------------------------------------------------------------------------
 
 @dataclass
 class LogEvent:
-    """A single normalized log line, from either source."""
-    source: str                 # "kernel" | "postgres"
-    timestamp: float            # unix epoch seconds, for stream ordering
-    pid: int                    # process id (kernel) / backend pid (postgres)
-    raw: Dict[str, Any]         # original decoded JSON record
+    event_id: int                # stable handle Alg 2 can use to look up this event
+    source: str                  # "kernel" | "postgres"
+    timestamp: float             # unix epoch seconds, post-calibration
+    pid: int                     # process id (kernel) / backend pid (postgres)
+    raw: Dict[str, Any]          # original decoded record
 
     @property
     def is_postgres(self) -> bool:
@@ -72,41 +63,37 @@ class LogEvent:
 
 
 # --------------------------------------------------------------------------
-# Offline log replay (stands in for the live eBPF / PG logger feed)
+# Log reading + time calibration
 # --------------------------------------------------------------------------
 
-def _iter_raw_lines(path: Path) -> Iterator[Dict[str, Any]]:
-    """Read every JSON line in a log file, markers included."""
+def _iter_raw_lines(path: Path):
     if not path.exists():
         return
     with path.open("r") as f:
         for line in f:
             line = line.strip()
-            if not line:
-                continue
-            yield json.loads(line)
+            if line:
+                yield json.loads(line)
 
 
-def _calibrate_kernel_clock(run_dir: Path) -> float:
+def _calibrate_kernel_clock(run_dir: Path, kernel_file: str) -> float:
     """
-    Kernel events are timestamped with a monotonic clock (nanoseconds
-    since some local reference point), not wall-clock time, so they must
-    be converted to unix time before they can be merged with PostgreSQL's
-    wall-clock timestamps.
+    Kernel events are timestamped with a monotonic clock (ns since some
+    local reference point), not wall-clock time. Both logs independently
+    stamp a LOGGING_START marker whose own timestamp IS wall-clock time,
+    at (approximately) the same instant as the first captured kernel
+    event, so:
 
-    `time_sync.json`'s server_boot_unix_time is not reliable for this
-    conversion in this dataset -- on these runs it puts kernel events
-    ~1980s outside the run's own logging window. Both the kernel and
-    postgres logs independently stamp a LOGGING_START marker with the
-    *actual* wall-clock time the run began, and the two agree with each
-    other, so we calibrate off that marker instead: offset = (wall time
-    of LOGGING_START) - (monotonic time of the first captured kernel
-    event). Falls back to time_sync.json only if no marker is present.
+        offset = (wall time of LOGGING_START) - (monotonic time of first event)
+
+    Falls back to time_sync.json's server_boot_unix_time only if no
+    marker is present -- that field has been confirmed unreliable on this
+    dataset otherwise (puts events ~1980s off).
     """
     start_marker: Optional[float] = None
     first_raw_ns: Optional[int] = None
 
-    for rec in _iter_raw_lines(run_dir / "kernel_events.json"):
+    for rec in _iter_raw_lines(run_dir / kernel_file):
         if rec.get("marker") == "LOGGING_START":
             start_marker = float(rec["timestamp"])
         elif "pid" in rec and first_raw_ns is None:
@@ -117,204 +104,128 @@ def _calibrate_kernel_clock(run_dir: Path) -> float:
     if start_marker is not None and first_raw_ns is not None:
         return start_marker - first_raw_ns / 1e9
 
-    # Fallback: trust time_sync.json's recorded boot time.
     with (run_dir / "time_sync.json").open("r") as f:
         return float(json.load(f)["server_boot_unix_time"])
 
 
-def iter_log_stream(run_dir: Path) -> Iterator[LogEvent]:
+def load_master_log(run_dir: Path, kernel_file: str = "kernel_events.json") -> list[LogEvent]:
     """
-    Replay one run's kernel + postgres logs as a single, time-ordered
-    stream of LogEvent records -- as if a logger were emitting them live.
+    Read both logs for one run, calibrate the kernel clock, tag each
+    record with its source, and return one list sorted by timestamp.
+    event_id = index into this list. Reads the RAW kernel log by default
+    (not kernel_events.clean.json) -- production will be tailing raw,
+    uncleaned eBPF output, so developing against raw is the honest test.
     """
-    clock_offset = _calibrate_kernel_clock(run_dir)
-    events = []
+    clock_offset = _calibrate_kernel_clock(run_dir, kernel_file)
+    events: list[LogEvent] = []
 
-    for rec in _iter_raw_lines(run_dir / "kernel_events.json"):
+    for rec in _iter_raw_lines(run_dir / kernel_file):
         if "marker" in rec:
-            continue  # LOGGING_START / LOGGING_STOP framing line, not an event
-        ts = rec["timestamp"] / 1e9 + clock_offset  # monotonic ns -> unix seconds
-        events.append(LogEvent(source="kernel", timestamp=ts, pid=rec["pid"], raw=rec))
+            continue
+        ts = rec["timestamp"] / 1e9 + clock_offset
+        events.append(LogEvent(event_id=-1, source="kernel", timestamp=ts, pid=rec["pid"], raw=rec))
 
     for rec in _iter_raw_lines(run_dir / "postgres_events.json"):
         if "marker" in rec:
             continue
         ts = float(rec["timestamp"])
-        events.append(LogEvent(source="postgres", timestamp=ts, pid=rec["backend_pid"], raw=rec))
+        events.append(LogEvent(event_id=-1, source="postgres", timestamp=ts, pid=rec["backend_pid"], raw=rec))
 
     events.sort(key=lambda e: e.timestamp)
-    yield from events
+    for i, e in enumerate(events):
+        e.event_id = i
+
+    return events
 
 
 # --------------------------------------------------------------------------
-# Algorithm 1: Session-Anchored Correlation
+# Algorithm 1 proper
 # --------------------------------------------------------------------------
 
-class SessionAnchoredCorrelator:
+def _trace_to_parent_session(
+    pid: int,
+    active_sessions: Dict[int, float],
+    parent_map: Dict[int, int],
+    d_max: int = D_MAX,
+) -> Optional[int]:
+    """function TraceToParentSession(pid) -- paper Algorithm 1, lines 16-27."""
+    current_pid = pid
+    depth = 0
+    while current_pid and current_pid != 0 and depth < d_max:
+        if current_pid in active_sessions:
+            return current_pid
+        current_pid = parent_map.get(current_pid)
+        depth += 1
+    return None
+
+
+def process_event(
+    event: LogEvent,
+    active_sessions: Dict[int, float],
+    parent_map: Dict[int, int],
+) -> Optional[int]:
     """
-    Stateful implementation of Algorithm 1. Feed it one LogEvent at a time
-    (via process_event) and it will tag each event with its session key,
-    or drop it as unrelated OS background noise.
+    procedure LinkEventToSession(e) -- paper Algorithm 1, lines 4-15,
+    fused with the ActiveSessions bookkeeping (TrackNewSession /
+    observe_process) a live tailer needs to do per-event anyway.
 
-    State
-    -----
-    active_sessions : dict[pid -> start_time]
-        Mirrors the algorithm's ActiveSessions table of currently running
-        DB backend processes.
-    parent_map : dict[pid -> ppid]
-        Learned on the fly from kernel events, since offline replay has no
-        live /proc to query. GetParentPid(pid) is backed by this map.
+    Returns the session_key, or None if unresolved *right now* -- for a
+    kernel event this does not necessarily mean noise; see
+    process_event_with_retry, which is what main.py should actually call.
     """
-
-    def __init__(self, d_max: int = D_MAX):
-        self.d_max = d_max
-        self.active_sessions: Dict[int, float] = {}
-        self.parent_map: Dict[int, int] = {}
-
-    # ---- ActiveSessions bookkeeping -------------------------------------
-
-    def track_new_session(self, pid: int, start_time: float) -> None:
-        """TrackNewSession(pid, start_time): register a new DB session."""
-        self.active_sessions[pid] = start_time
-
-    def end_session(self, pid: int) -> None:
-        """Not in the paper pseudocode, but needed to keep ActiveSessions
-        accurate over a long-running stream once a backend disconnects."""
-        self.active_sessions.pop(pid, None)
-
-    # ---- process-tree lookups --------------------------------------------
-
-    def observe_process(self, pid: int, ppid: int) -> None:
-        """Learn a pid->ppid edge from a kernel log line, so
-        TraceToParentSession can walk it later."""
-        if pid and ppid:
-            self.parent_map[pid] = ppid
-
-    def get_parent_pid(self, pid: int) -> Optional[int]:
-        """GetParentPid(pid)."""
-        return self.parent_map.get(pid)
-
-    # ---- Algorithm 1, lines 16-27 -----------------------------------------
-
-    def trace_to_parent_session(self, pid: int) -> Optional[int]:
-        """
-        function TraceToParentSession(pid)
-            current_pid <- pid
-            depth <- 0
-            while current_pid != 0 and depth < D_max do
-                if current_pid exists in ActiveSessions then
-                    return current_pid
-                current_pid <- GetParentPid(current_pid)
-                depth <- depth + 1
-            return null
-        """
-        current_pid = pid
-        depth = 0
-        while current_pid and current_pid != 0 and depth < self.d_max:
-            if current_pid in self.active_sessions:
-                return current_pid
-            current_pid = self.get_parent_pid(current_pid)
-            depth += 1
-        return None
-
-    # ---- Algorithm 1, lines 4-15 -------------------------------------------
-
-    def link_event_to_session(self, e: LogEvent) -> Optional[tuple[int, LogEvent]]:
-        """
-        procedure LinkEventToSession(e)
-            if e is a PostgreSQL event then
-                session_key <- e.pid          # DB events come directly from the session
-            else
-                session_key <- TraceToParentSession(e.pid)  # OS events may come from child processes
-            if session_key is found then
-                return (session_key, e)
-            else
-                return null                    # ignore standard OS background noise
-        """
-        if e.is_postgres:
-            session_key = e.pid
-        else:
-            session_key = self.trace_to_parent_session(e.pid)
-
-        if session_key is not None:
-            return (session_key, e)
-        return None
-
-    # ---- top-level driver for one incoming log line ----------------------
-
-    def process_event(self, e: LogEvent) -> Optional[tuple[int, LogEvent]]:
-        """
-        Full per-event pipeline: update state from the event, then attempt
-        correlation. This is the function a live log tailer would call for
-        every line as it arrives.
-        """
-        if e.is_postgres:
-            session_id = e.raw.get("session_id", e.pid)
-            if session_id not in self.active_sessions:
-                self.track_new_session(session_id, e.raw.get("session_start_time", e.timestamp))
-        else:
-            self.observe_process(e.pid, e.raw.get("ppid", 0))
-
-        return self.link_event_to_session(e)
+    if event.is_postgres:
+        session_id = event.raw.get("session_id", event.pid)
+        if session_id not in active_sessions:
+            active_sessions[session_id] = event.raw.get("session_start_time", event.timestamp)
+        return session_id  # DB events come directly from the session -- no tracing needed
+    else:
+        ppid = event.raw.get("ppid", 0)
+        if event.pid and ppid:
+            parent_map[event.pid] = ppid
+        return _trace_to_parent_session(event.pid, active_sessions, parent_map)
 
 
-# --------------------------------------------------------------------------
-# Run-level driver (offline replay over the dataset layout above)
-# --------------------------------------------------------------------------
-
-def load_labels(run_dir: Path) -> Dict[Optional[int], str]:
-    """session_id -> threat label, from labels.csv."""
-    labels: Dict[Optional[int], str] = {}
-    labels_path = run_dir / "labels.csv"
-    if not labels_path.exists():
-        return labels
-    with labels_path.open("r", newline="") as f:
-        for row in csv.DictReader(f):
-            sid_raw = row["session_id"].strip()
-            sid = int(sid_raw) if sid_raw else None
-            labels[sid] = row["label"]
-    return labels
-
-
-def run_correlation(run_dir: Path, d_max: int = D_MAX) -> list[tuple[int, LogEvent]]:
+def process_event_with_retry(
+    event: LogEvent,
+    active_sessions: Dict[int, float],
+    parent_map: Dict[int, int],
+    pending: deque[LogEvent],
+) -> list[tuple[int, int]]:
     """
-    Replay one run directory's logs through Algorithm 1 and return every
-    (session_key, event) pair it managed to correlate.
+    The function main.py should call per incoming event. Never silently
+    drops a kernel event on first failure -- holds it in `pending` and
+    retries whenever a new session registers, since a backend's own
+    pre-query OS activity routinely arrives before its first Postgres
+    event does (see PENDING_RETRY_WINDOW_SECONDS).
+
+    Returns a list of (session_key, event_id) pairs resolved by this
+    call -- usually 0 or 1, but can be more when registering a new
+    session unlocks several previously-pending kernel events at once.
+    main.py is responsible for putting these onto whatever queue/channel
+    feeds Algorithm 2.
     """
-    correlator = SessionAnchoredCorrelator(d_max=d_max)
-    correlated: list[tuple[int, LogEvent]] = []
+    resolved: list[tuple[int, int]] = []
 
-    for event in iter_log_stream(run_dir):
-        result = correlator.process_event(event)
-        if result is not None:
-            correlated.append(result)
+    session_key = process_event(event, active_sessions, parent_map)
+    if session_key is not None:
+        resolved.append((session_key, event.event_id))
+    elif not event.is_postgres:
+        pending.append(event)  # genuinely unresolved kernel event -- hold, don't drop yet
 
-    return correlated
+    if event.is_postgres:
+        # A new session may have just registered -- sweep pending kernel
+        # events and retry them now that active_sessions/parent_map have
+        # more information.
+        still_pending: deque[LogEvent] = deque()
+        for pev in pending:
+            if event.timestamp - pev.timestamp > PENDING_RETRY_WINDOW_SECONDS:
+                continue  # expired -- genuinely unrelated OS background noise
+            retry_key = _trace_to_parent_session(pev.pid, active_sessions, parent_map)
+            if retry_key is not None:
+                resolved.append((retry_key, pev.event_id))
+            else:
+                still_pending.append(pev)
+        pending.clear()
+        pending.extend(still_pending)
 
-
-def summarize_run(run_dir: Path) -> None:
-    correlated = run_correlation(run_dir)
-    labels = load_labels(run_dir)
-
-    by_session: Dict[int, int] = {}
-    for session_key, _event in correlated:
-        by_session[session_key] = by_session.get(session_key, 0) + 1
-
-    kernel_linked = sum(1 for sk, e in correlated if not e.is_postgres)
-    pg_linked = sum(1 for sk, e in correlated if e.is_postgres)
-
-    print(f"\n{run_dir.parent.name}/{run_dir.name}")
-    print(f"  sessions correlated : {len(by_session)}")
-    print(f"  postgres events linked : {pg_linked}")
-    print(f"  kernel events linked to a session : {kernel_linked}")
-    if labels:
-        flagged = {sk for sk in by_session if labels.get(sk, "Normal") != "Normal"}
-        print(f"  sessions with a non-Normal label : {len(flagged)}")
-
-
-if __name__ == "__main__":
-    for dataset_root in (DATASET_DEV, DATASET_TEST):
-        if not dataset_root.exists():
-            continue
-        for run_dir in sorted(dataset_root.glob("run_*")):
-            summarize_run(run_dir)
+    return resolved
