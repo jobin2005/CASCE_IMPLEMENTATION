@@ -5,8 +5,8 @@ from pathlib import Path
 import networkx as nx
 
 from schema import NODE_TYPES
-from sql_facts import extract_query_facts
-from graph_ops import add_or_update_node, add_directed_edge, find_connection_rule
+from sqlfacts import extract_query_facts
+from graphsops import add_or_update_node, add_directed_edge, find_connection_rule
 from loader import load_attributed_events
 
 ORPHAN_LOG: list[dict] = []   # module-level, drained by run() at the end of each run

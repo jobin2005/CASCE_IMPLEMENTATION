@@ -306,8 +306,8 @@ def save_run_output(run_name: str, master_log: list[LogEvent], correlated: list[
         writer.writerow(["session_key", "event_id"])
         writer.writerows(correlated)
 
-    print(f"  wrote {event_table_path.relative_to(PROJECT_ROOT)}  ({len(lookup_events)} events, {len(master_log)} read total)")
-    print(f"  wrote {correlation_path.relative_to(PROJECT_ROOT)}  ({len(correlated)} correlated pairs)")
+    print(f"  wrote {event_table_path.name}  ({len(lookup_events)} events, {len(master_log)} read total)")
+    print(f"  wrote {correlation_path.name}  ({len(correlated)} correlated pairs)")
 
 
 if __name__ == "__main__":

@@ -27,7 +27,7 @@ def initialize_templates():
     g_access = nx.DiGraph()
     g_access.add_node("T_Query", type="Query")
     g_access.add_node("T_Table", type="Table")
-    g_access.add_edge("T_Query", "T_Table", relation="reads_from")
+    g_access.add_edge("T_Query", "T_Table", relation="accesses")
     templates.append(BehaviorTemplate(
         label="DATA_ACCESS", 
         mitre_id="N/A", 
@@ -43,9 +43,9 @@ def initialize_templates():
     g_package.add_node("T_Input", type="File")
     g_package.add_node("T_Archive", type="File")
     
-    g_package.add_edge("T_Process", "T_Utility", relation="executes")
-    g_package.add_edge("T_Process", "T_Input", relation="reads_from")
-    g_package.add_edge("T_Process", "T_Archive", relation="writes_to")
+    g_package.add_edge("T_Process", "T_Utility", relation="opens")
+    g_package.add_edge("T_Process", "T_Input", relation="opens")
+    g_package.add_edge("T_Process", "T_Archive", relation="opens")
     
     templates.append(BehaviorTemplate(
         label="DATA_PACKAGING", 
@@ -72,7 +72,7 @@ def initialize_templates():
     g_destruct = nx.DiGraph()
     g_destruct.add_node("T_Query", type="Query")
     g_destruct.add_node("T_Table", type="Table")
-    g_destruct.add_edge("T_Query", "T_Table", relation="modifies")
+    g_destruct.add_edge("T_Query", "T_Table", relation="accesses")
     templates.append(BehaviorTemplate(
         label="DESTRUCTIVE_DB_OPERATION", 
         mitre_id="T1485", 
@@ -85,7 +85,7 @@ def initialize_templates():
     g_cred_dump = nx.DiGraph()
     g_cred_dump.add_node("T_Process", type="Process")
     g_cred_dump.add_node("T_File", type="File")
-    g_cred_dump.add_edge("T_Process", "T_File", relation="reads_from")
+    g_cred_dump.add_edge("T_Process", "T_File", relation="opens")
     templates.append(BehaviorTemplate(
         label="OS_CREDENTIAL_DUMPING", 
         mitre_id="T1003.008", 
@@ -96,14 +96,14 @@ def initialize_templates():
 
     # 6. UNIX_SHELL_EXECUTION (T1059.004)
     g_shell = nx.DiGraph()
+    g_shell.add_node("T_Query", type="Query")
     g_shell.add_node("T_Process", type="Process")
-    g_shell.add_node("T_File", type="File")
-    g_shell.add_edge("T_Process", "T_File", relation="executes")
+    g_shell.add_edge("T_Query", "T_Process", relation="spawns")
     templates.append(BehaviorTemplate(
         label="UNIX_SHELL_EXECUTION", 
         mitre_id="T1059.004", 
         graph_structure=g_shell, 
-        semantic_keywords=["/bin/bash", "/bin/sh", "bash", "sh", "dash", "ksh", "zsh"], 
+        semantic_keywords=["bash", "sh", "dash", "ksh", "zsh", "program"], 
         temporal_constraints={"max_gap": 10.0}
     ))
 
@@ -111,7 +111,7 @@ def initialize_templates():
     g_account = nx.DiGraph()
     g_account.add_node("T_Query", type="Query")
     g_account.add_node("T_Role", type="Role")
-    g_account.add_edge("T_Query", "T_Role", relation="modifies")
+    g_account.add_edge("T_Query", "T_Role", relation="accesses")
     templates.append(BehaviorTemplate(
         label="ACCOUNT_MANIPULATION", 
         mitre_id="T1098", 
@@ -137,7 +137,7 @@ def initialize_templates():
     g_hist = nx.DiGraph()
     g_hist.add_node("T_Process", type="Process")
     g_hist.add_node("T_File", type="File")
-    g_hist.add_edge("T_Process", "T_File", relation="modifies")
+    g_hist.add_edge("T_Process", "T_File", relation="opens")
     templates.append(BehaviorTemplate(
         label="INDICATOR_REMOVAL_HISTORY", 
         mitre_id="T1070.003", 
@@ -150,7 +150,7 @@ def initialize_templates():
     g_file_del = nx.DiGraph()
     g_file_del.add_node("T_Process", type="Process")
     g_file_del.add_node("T_File", type="File")
-    g_file_del.add_edge("T_Process", "T_File", relation="unlinks")
+    g_file_del.add_edge("T_Process", "T_File", relation="opens")
     templates.append(BehaviorTemplate(
         label="INDICATOR_REMOVAL_FILE", 
         mitre_id="T1070.004", 
@@ -162,8 +162,8 @@ def initialize_templates():
     # 11. DEFENSE_IMPAIRMENT (Project-defined)
     g_def = nx.DiGraph()
     g_def.add_node("T_Query", type="Query")
-    g_def.add_node("T_Configuration", type="Configuration")
-    g_def.add_edge("T_Query", "T_Configuration", relation="modifies")
+    g_def.add_node("T_Table", type="Table")
+    g_def.add_edge("T_Query", "T_Table", relation="accesses")
     templates.append(BehaviorTemplate(
         label="DEFENSE_IMPAIRMENT", 
         mitre_id="N/A", 
