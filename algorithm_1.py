@@ -29,11 +29,26 @@ Usage from main.py:
 
 from __future__ import annotations
 
+import csv
 import json
 from collections import deque
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Optional
+
+# Expected repo layout when running this file directly:
+#
+#   algorithm_1.py
+#   dataset_dev/  run_1/  run_2/  run_3/
+#   dataset_test/ run_1/  run_2/  run_3/
+#   output/                          <- created by this script
+#       run_1_event_table.json
+#       run_1_session_correlation.csv
+#       ...
+PROJECT_ROOT = Path(__file__).resolve().parent
+DATASET_DEV = PROJECT_ROOT / "dataset_dev"
+DATASET_TEST = PROJECT_ROOT / "dataset_test"
+OUTPUT_DIR = PROJECT_ROOT / "output"
 
 D_MAX = 8  # max ancestor hops when tracing a kernel event up to its session
 
@@ -229,3 +244,82 @@ def process_event_with_retry(
         pending.extend(still_pending)
 
     return resolved
+
+
+# --------------------------------------------------------------------------
+# Standalone runner -- for developing/inspecting Algorithm 1 on its own.
+# main.py should NOT import anything below this point; it owns its own
+# event loop and queue, as discussed. This is just so you can run
+#     python3 algorithm_1.py
+# and see what Algorithm 1 produces for each run, saved to disk.
+# --------------------------------------------------------------------------
+
+def run_one(run_dir: Path) -> tuple[list[LogEvent], list[tuple[int, int]]]:
+    """Replay one run directory through Algorithm 1 top to bottom.
+    Returns (master_log, correlated) -- correlated is every
+    (session_key, event_id) pair Algorithm 1 resolved, in the order
+    resolved (not necessarily the same order as master_log, since a
+    kernel event can resolve late via the retry buffer)."""
+    active_sessions: Dict[int, float] = {}
+    parent_map: Dict[int, int] = {}
+    pending: deque[LogEvent] = deque()
+
+    master_log = load_master_log(run_dir)
+    correlated: list[tuple[int, int]] = []
+    for event in master_log:
+        correlated.extend(process_event_with_retry(event, active_sessions, parent_map, pending))
+
+    return master_log, correlated
+
+
+def save_run_output(run_name: str, master_log: list[LogEvent], correlated: list[tuple[int, int]], output_dir: Path) -> None:
+    """Writes two files per run:
+      {run_name}_event_table.json         -- every event, kernel + postgres, tagged and sorted
+      {run_name}_session_correlation.csv  -- (session_key, event_id) pairs Algorithm 1 resolved
+    """
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    event_table_path = output_dir / f"{run_name}_event_table.json"
+    with event_table_path.open("w") as f:
+        json.dump(
+            [
+                {"event_id": e.event_id, "source": e.source, "timestamp": e.timestamp, "pid": e.pid, "raw": e.raw}
+                for e in master_log
+            ],
+            f,
+            indent=2,
+        )
+
+    correlation_path = output_dir / f"{run_name}_session_correlation.csv"
+    with correlation_path.open("w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["session_key", "event_id"])
+        writer.writerows(correlated)
+
+    print(f"  wrote {event_table_path.relative_to(PROJECT_ROOT)}  ({len(master_log)} events)")
+    print(f"  wrote {correlation_path.relative_to(PROJECT_ROOT)}  ({len(correlated)} correlated pairs)")
+
+
+if __name__ == "__main__":
+    run_dirs = sorted(DATASET_DEV.glob("run_*")) + sorted(DATASET_TEST.glob("run_*"))
+
+    if not run_dirs:
+        print(f"No run_* directories found under {DATASET_DEV} or {DATASET_TEST}")
+    else:
+        for run_dir in run_dirs:
+            run_name = f"{run_dir.parent.name}_{run_dir.name}"  # e.g. dataset_dev_run_1
+            print(f"\n{run_name}")
+
+            master_log, correlated = run_one(run_dir)
+
+            kernel_total = sum(1 for e in master_log if not e.is_postgres)
+            pg_total = sum(1 for e in master_log if e.is_postgres)
+            kernel_linked = sum(1 for sk, eid in correlated if not master_log[eid].is_postgres)
+            pg_linked = sum(1 for sk, eid in correlated if master_log[eid].is_postgres)
+            sessions_found = len({sk for sk, _ in correlated})
+
+            print(f"  postgres events linked : {pg_linked}/{pg_total}")
+            print(f"  kernel events linked   : {kernel_linked}/{kernel_total}")
+            print(f"  distinct sessions found: {sessions_found}")
+
+            save_run_output(run_name, master_log, correlated, OUTPUT_DIR)
