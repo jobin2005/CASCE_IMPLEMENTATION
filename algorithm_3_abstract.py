@@ -283,9 +283,16 @@ def calculate_s_sem(matched_nodes, G_s, T_keywords):
 
     factual_values = []
     for n in matched_nodes:
-        label = G_s.nodes[n].get("label", "")
-        if label:
-            factual_values.append(str(label).lower())
+        data = G_s.nodes[n]
+        val = (
+            data.get("query", "") or 
+            data.get("comm", "") or 
+            data.get("arg", "") or
+            data.get("table_name", "") or
+            data.get("label", "")
+        )
+        if val:
+            factual_values.append(str(val).lower())
 
     if not factual_values:
         return 0.0
