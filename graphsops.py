@@ -28,7 +28,7 @@ def add_directed_edge(G, u, v, rel, event_id, ts):
         edge["event_ids"].append(event_id)
         edge["last_seen"] = ts
     else:
-        G.add_edge(u, v, key=rel, rel=rel, count=1,
+        G.add_edge(u, v, key=rel, rel=rel, relation=rel, count=1,
                    event_ids=[event_id], first_seen=ts, last_seen=ts)
 
 
