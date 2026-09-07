@@ -184,6 +184,20 @@ for _t in initialize_templates():
     GLOBAL_CORPUS.append(" ".join(_t.semantic_keywords))
 VECTORIZER = TfidfVectorizer().fit(GLOBAL_CORPUS)
 
+def _relation_between(G, u, v, target_relation=None):
+    """MultiDiGraph-safe relation lookup between two nodes.
+    Returns the set of relation labels present on edges u->v, or (if
+    target_relation is given) a bool for whether that specific relation
+    is present."""
+    edge_data = G.get_edge_data(u, v)
+    if edge_data is None:
+        return False if target_relation else set()
+    if isinstance(G, nx.MultiDiGraph):
+        rels = {d.get("relation") for d in edge_data.values()}
+    else:
+        rels = {edge_data.get("relation")}
+    return (target_relation in rels) if target_relation else rels
+
 def calculate_graded_s_struct(G_s, T, theta_struct=0.6, max_matches=10):
     template = T.structure
 
