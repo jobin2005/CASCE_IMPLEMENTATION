@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Simulating Multi-Stage APT Attack (Single Unified Session)..."
+echo "Simulating Multi-Stage APT Attack..."
 
 # Everything between <<EOF and EOF runs continuously inside the EXACT SAME Postgres Session (same Session ID).
 psql -U postgres -d casce_tpcb <<EOF > /dev/null 2>&1
@@ -17,5 +17,7 @@ EOF
 
 # Stage 4: OS-only Sabotage (Cat 1) happens immediately after DB disconnect
 sh -c "rm -f /tmp/some_fake_log.log 2>/dev/null || true"
+
+/dataset_workspace/logger.sh mark_attack "attack_multi_stage_apt" end
 
 echo "Multi-stage APT simulated successfully inside a unified session."

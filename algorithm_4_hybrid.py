@@ -75,6 +75,71 @@ except ImportError:
     TORCH_AVAILABLE = False
 
 
+def _average_precision_from_scores(y_true, y_scores):
+    """Compute average precision (PR-AUC under the stepwise definition) without extra deps."""
+    if not y_true:
+        return 0.0
+
+    positives = sum(1 for y in y_true if y == 1)
+    if positives == 0:
+        return 0.0
+
+    ranked = sorted(zip(y_scores, y_true), key=lambda item: item[0], reverse=True)
+    true_positives = 0
+    false_positives = 0
+    prev_recall = 0.0
+    ap = 0.0
+
+    for _score, label in ranked:
+        if label == 1:
+            true_positives += 1
+        else:
+            false_positives += 1
+
+        recall = true_positives / positives
+        precision = true_positives / max(1, true_positives + false_positives)
+
+        if recall > prev_recall:
+            ap += precision * (recall - prev_recall)
+            prev_recall = recall
+
+    return float(ap)
+
+
+def _classification_metrics(tp, fp, fn, tn):
+    total = max(1, tp + fp + fn + tn)
+    precision = tp / max(1, tp + fp)
+    recall = tp / max(1, tp + fn)
+    specificity = tn / max(1, tn + fp)
+    fpr = fp / max(1, fp + tn)
+    fnr = fn / max(1, fn + tp)
+    f1 = 2 * precision * recall / max(1e-9, precision + recall)
+    accuracy = (tp + tn) / total
+    balanced_accuracy = (recall + specificity) / 2
+
+    numerator = (tp * tn) - (fp * fn)
+    denominator = math.sqrt(
+        max(1, (tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+    )
+    mcc = numerator / denominator if denominator else 0.0
+    alert_rate = (tp + fp) / total
+    miss_rate = fn / max(1, fn + tp)
+
+    return {
+        "precision": precision,
+        "recall": recall,
+        "specificity": specificity,
+        "fpr": fpr,
+        "fnr": fnr,
+        "f1": f1,
+        "accuracy": accuracy,
+        "balanced_accuracy": balanced_accuracy,
+        "mcc": mcc,
+        "alert_rate": alert_rate,
+        "miss_rate": miss_rate,
+    }
+
+
 # ============================================================================
 # 1. SCHEMA
 #    Base types from the paper's Table I, + Configuration (needed by your
@@ -169,7 +234,7 @@ CHAIN_RULES = [
      "sequence": ["EXTERNAL_TRANSFER"], "match_type": "co_occurrence", "severity": 0.45},
 ]
 
-THETA_A = 0.5   # alert threshold
+THETA_A = 0.65  # alert threshold selected after validation sweep
 THETA_R = 0.8   # response threshold
 W_RULE = 0.75
 W_GAT = 0.75
@@ -836,20 +901,26 @@ def evaluate_model(args):
     fn = sum(1 for t, p in zip(y_true, y_pred) if t == 1 and p == 0)
     tn = sum(1 for t, p in zip(y_true, y_pred) if t == 0 and p == 0)
 
-    precision = tp / max(1, tp + fp)
-    recall = tp / max(1, tp + fn)
-    f1 = 2 * precision * recall / max(1e-9, precision + recall)
-    accuracy = (tp + tn) / max(1, len(y_true))
+    metrics = _classification_metrics(tp, fp, fn, tn)
+    pr_auc = _average_precision_from_scores(y_true, y_scores)
 
     results = {
         'threshold': THETA_A,
         'total_samples': len(y_true),
         'true_positives': tp, 'false_positives': fp,
         'false_negatives': fn, 'true_negatives': tn,
-        'precision': round(precision, 4),
-        'recall': round(recall, 4),
-        'f1_score': round(f1, 4),
-        'accuracy': round(accuracy, 4),
+        'precision': round(metrics['precision'], 4),
+        'recall': round(metrics['recall'], 4),
+        'specificity': round(metrics['specificity'], 4),
+        'false_positive_rate': round(metrics['fpr'], 4),
+        'false_negative_rate': round(metrics['fnr'], 4),
+        'f1_score': round(metrics['f1'], 4),
+        'accuracy': round(metrics['accuracy'], 4),
+        'balanced_accuracy': round(metrics['balanced_accuracy'], 4),
+        'mcc': round(metrics['mcc'], 4),
+        'pr_auc': round(pr_auc, 4),
+        'alert_rate': round(metrics['alert_rate'], 4),
+        'miss_rate': round(metrics['miss_rate'], 4),
         'confusion_matrix': [[tn, fp], [fn, tp]],
     }
 
@@ -857,10 +928,18 @@ def evaluate_model(args):
     print(f"  EVALUATION RESULTS (θ_A = {THETA_A})")
     print(f"{'='*60}")
     print(f"  Samples:   {len(y_true)} ({sum(y_true)} malicious, {len(y_true)-sum(y_true)} normal)")
-    print(f"  Accuracy:  {accuracy:.4f}")
-    print(f"  Precision: {precision:.4f}")
-    print(f"  Recall:    {recall:.4f}")
-    print(f"  F1-Score:  {f1:.4f}")
+    print(f"  Accuracy:        {metrics['accuracy']:.4f}")
+    print(f"  Balanced Acc:    {metrics['balanced_accuracy']:.4f}")
+    print(f"  Precision:       {metrics['precision']:.4f}")
+    print(f"  Recall:          {metrics['recall']:.4f}")
+    print(f"  Specificity:     {metrics['specificity']:.4f}")
+    print(f"  FPR:             {metrics['fpr']:.4f}")
+    print(f"  FNR:             {metrics['fnr']:.4f}")
+    print(f"  F1-Score:        {metrics['f1']:.4f}")
+    print(f"  MCC:             {metrics['mcc']:.4f}")
+    print(f"  PR-AUC:          {pr_auc:.4f}")
+    print(f"  Alert Rate:      {metrics['alert_rate']:.4f}")
+    print(f"  Miss Rate:       {metrics['miss_rate']:.4f}")
     print(f"\n  Confusion Matrix:")
     print(f"              Pred Normal  Pred Malicious")
     print(f"  True Normal     {tn:5d}       {fp:5d}")
