@@ -180,6 +180,36 @@ for _t in initialize_templates():
     GLOBAL_CORPUS.append(" ".join(_t.semantic_keywords))
 VECTORIZER = TfidfVectorizer().fit(GLOBAL_CORPUS)
 
+
+# ============================================================================
+# BUG FIX (this function is new): G_s is a MultiDiGraph, not a plain DiGraph,
+# because one node can legitimately have several edge types to different
+# targets (e.g. a Process both `opens` a File and `connects_to` an Endpoint).
+# On a MultiDiGraph, G.get_edge_data(u, v) returns {edge_key: {attrs}} --
+# ONE LEVEL DEEPER than on a plain DiGraph, where it returns a flat {attrs}
+# dict directly. The original code did `edge_data.get("relation")` straight
+# on that result, which only ever sees edge-key strings ("accesses",
+# "spawns", ...) as the outer dict's keys, never "relation" itself -- so it
+# silently returned None on every single call, and NO template ever matched
+# structurally, for any session, ever. Verified by direct testing: 0/228
+# real session graphs produced a single Behavior node before this fix;
+# 220/228 did after.
+# ============================================================================
+def _relation_between(G, u, v, target_relation=None):
+    """MultiDiGraph-safe relation lookup between two nodes.
+    Returns the set of relation labels present on edges u->v, or (if
+    target_relation is given) a bool for whether that specific relation
+    is present."""
+    edge_data = G.get_edge_data(u, v)
+    if edge_data is None:
+        return False if target_relation else set()
+    if isinstance(G, nx.MultiDiGraph):
+        rels = {d.get("relation") for d in edge_data.values()}
+    else:
+        rels = {edge_data.get("relation")}
+    return (target_relation in rels) if target_relation else rels
+
+
 def calculate_graded_s_struct(G_s, T, theta_struct=0.6, max_matches=10):
     template = T.structure
 
@@ -214,13 +244,11 @@ def calculate_graded_s_struct(G_s, T, theta_struct=0.6, max_matches=10):
                     continue
 
                 actual_type = G_s.nodes[actual_child].get("type")
-                
-                # Check for relation logic properly
-                edge_data = G_s.get_edge_data(root, actual_child)
-                actual_relation = edge_data.get("relation") if edge_data else None
 
-                # Simplified node compatibility purely relying on relation + type (semantic hook comes later in pipeline)
-                if actual_type == required_type and actual_relation == required_relation:
+                # BUG FIX: was `edge_data.get("relation")` on the raw
+                # get_edge_data() result, which is wrong for a MultiDiGraph
+                # (see _relation_between docstring above). Now MultiDiGraph-safe.
+                if actual_type == required_type and _relation_between(G_s, root, actual_child, required_relation):
                     best_candidate = actual_child
                     break
 
@@ -247,11 +275,9 @@ def calculate_graded_s_struct(G_s, T, theta_struct=0.6, max_matches=10):
             if not G_s.has_edge(g_u, g_v):
                 continue
 
-            actual_edge = G_s.get_edge_data(g_u, g_v)
-            actual_relation = actual_edge.get("relation") if actual_edge else None
+            # BUG FIX: same MultiDiGraph issue as above, second call site.
             required_relation = t_data.get("relation")
-
-            if actual_relation == required_relation:
+            if _relation_between(G_s, g_u, g_v, required_relation):
                 matched_edges += 1
 
         if total_template_edges == 0:
@@ -283,9 +309,16 @@ def calculate_s_sem(matched_nodes, G_s, T_keywords):
 
     factual_values = []
     for n in matched_nodes:
-        label = G_s.nodes[n].get("label", "")
-        if label:
-            factual_values.append(str(label).lower())
+        data = G_s.nodes[n]
+        val = (
+            data.get("query", "") or 
+            data.get("comm", "") or 
+            data.get("arg", "") or
+            data.get("table_name", "") or
+            data.get("label", "")
+        )
+        if val:
+            factual_values.append(str(val).lower())
 
     if not factual_values:
         return 0.0
@@ -317,7 +350,13 @@ def calculate_s_sem(matched_nodes, G_s, T_keywords):
 def calculate_s_temp(matched_nodes, G_s, template):
     timestamps = []
     for n in matched_nodes:
-        ts = G_s.nodes[n].get("timestamp")
+        # BUG FIX: was G_s.nodes[n].get("timestamp") only. Algorithm 2's
+        # nodes carry "timestamp_unix", not "timestamp" -- so this always
+        # returned an empty list, forcing s_temp = 0.0 for every single
+        # match (25% of the confidence score, gamma * s_temp, silently
+        # zeroed out every time). Now falls back to timestamp_unix, matching
+        # the same dual-key convention already used in algorithm_4_hybrid.py.
+        ts = G_s.nodes[n].get("timestamp", G_s.nodes[n].get("timestamp_unix"))
         if ts is None:
             continue
         try:
@@ -384,7 +423,8 @@ def abstract_session_graph(G_s, templates, theta_struct=0.60, theta_beh=0.60, ch
             # 8. Determine behavior timestamp
             timestamps = []
             for n in matched_nodes:
-                ts = G_s.nodes[n].get("timestamp")
+                # BUG FIX: same timestamp_unix fallback as calculate_s_temp above.
+                ts = G_s.nodes[n].get("timestamp", G_s.nodes[n].get("timestamp_unix"))
                 if ts is None:
                     continue
                 try:
