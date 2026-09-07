@@ -22,7 +22,7 @@ from sklearn.metrics import precision_score, recall_score, f1_score, confusion_m
 
 try:
     from torch_geometric.data import Data, DataLoader
-    from torch_geometric.nn import GCNConv, SAGEConv, global_mean_pool
+    from torch_geometric.nn import GCNConv, SAGEConv, GATConv, GATv2Conv, global_mean_pool
 except ImportError:
     print("[!] FATAL: PyTorch_Geometric not located on this partition.")
     print("    This occurs due to local disk space limitations (PEP 668).")
@@ -128,6 +128,38 @@ class HomogeneousSAGE(torch.nn.Module):
         x = F.dropout(x, p=0.3, training=self.training)
         return self.lin(x)
 
+class HomogeneousGAT(torch.nn.Module):
+    def __init__(self, in_channels, hidden_channels):
+        super().__init__()
+        self.conv1 = GATConv(in_channels, hidden_channels, heads=2, concat=False)
+        self.conv2 = GATConv(hidden_channels, hidden_channels, heads=1, concat=False)
+        self.lin = torch.nn.Linear(hidden_channels, 2)
+        
+    def forward(self, data):
+        x, edge_index, batch = data.x, data.edge_index, data.batch
+        x = self.conv1(x, edge_index)
+        x = F.relu(x)
+        x = self.conv2(x, edge_index)
+        x = global_mean_pool(x, batch)
+        x = F.dropout(x, p=0.3, training=self.training)
+        return self.lin(x)
+
+class HomogeneousGATv2(torch.nn.Module):
+    def __init__(self, in_channels, hidden_channels):
+        super().__init__()
+        self.conv1 = GATv2Conv(in_channels, hidden_channels, heads=2, concat=False)
+        self.conv2 = GATv2Conv(hidden_channels, hidden_channels, heads=1, concat=False)
+        self.lin = torch.nn.Linear(hidden_channels, 2)
+        
+    def forward(self, data):
+        x, edge_index, batch = data.x, data.edge_index, data.batch
+        x = self.conv1(x, edge_index)
+        x = F.relu(x)
+        x = self.conv2(x, edge_index)
+        x = global_mean_pool(x, batch)
+        x = F.dropout(x, p=0.3, training=self.training)
+        return self.lin(x)
+
 
 def evaluate(model, loader, device):
     model.eval()
@@ -219,6 +251,12 @@ def main():
     
     # Execute Model 2: GraphSAGE
     train_baseline("Homogeneous GraphSAGE", HomogeneousSAGE, train_loader, val_loader, test_loader, device, num_features)
+    
+    # Execute Model 3: GAT
+    train_baseline("Homogeneous GAT", HomogeneousGAT, train_loader, val_loader, test_loader, device, num_features)
+    
+    # Execute Model 4: GATv2
+    train_baseline("Homogeneous GATv2", HomogeneousGATv2, train_loader, val_loader, test_loader, device, num_features)
 
 if __name__ == '__main__':
     import numpy as np
