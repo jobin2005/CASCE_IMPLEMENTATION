@@ -6,11 +6,13 @@ import math
 from sklearn.feature_extraction.text import TfidfVectorizer
 from networkx.algorithms import isomorphism
 
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--input-dir', required=True, help='Path to directory containing input graphml files')
     parser.add_argument('--outdir', required=True, help='Directory to save enriched graphs (GraphML format)')
     return parser.parse_args()
+
 
 class BehaviorTemplate:
     def __init__(self, label, mitre_id, graph_structure, semantic_keywords, temporal_constraints):
@@ -20,19 +22,20 @@ class BehaviorTemplate:
         self.semantic_keywords = semantic_keywords
         self.temporal_constraints = temporal_constraints
 
+
 def initialize_templates():
     templates = []
-    
+
     # 1. DATA_ACCESS (Project-defined Semantic Behavior)
     g_access = nx.DiGraph()
     g_access.add_node("T_Query", type="Query")
     g_access.add_node("T_Table", type="Table")
     g_access.add_edge("T_Query", "T_Table", relation="accesses")
     templates.append(BehaviorTemplate(
-        label="DATA_ACCESS", 
-        mitre_id="N/A", 
-        graph_structure=g_access, 
-        semantic_keywords=["pg_authid", "pg_shadow", "pg_roles", "password", "credential", "secret"], 
+        label="DATA_ACCESS",
+        mitre_id="N/A",
+        graph_structure=g_access,
+        semantic_keywords=["pg_authid", "pg_shadow", "pg_roles", "password", "credential", "secret"],
         temporal_constraints={"max_gap": 5.0}
     ))
 
@@ -42,16 +45,16 @@ def initialize_templates():
     g_package.add_node("T_Utility", type="File")
     g_package.add_node("T_Input", type="File")
     g_package.add_node("T_Archive", type="File")
-    
+
     g_package.add_edge("T_Process", "T_Utility", relation="opens")
     g_package.add_edge("T_Process", "T_Input", relation="opens")
     g_package.add_edge("T_Process", "T_Archive", relation="opens")
-    
+
     templates.append(BehaviorTemplate(
-        label="DATA_PACKAGING", 
-        mitre_id="T1560.001", 
-        graph_structure=g_package, 
-        semantic_keywords=["tar", "gzip", "zip", "7z", "rar"], 
+        label="DATA_PACKAGING",
+        mitre_id="T1560.001",
+        graph_structure=g_package,
+        semantic_keywords=["tar", "gzip", "zip", "7z", "rar"],
         temporal_constraints={"max_gap": 30.0}
     ))
 
@@ -61,10 +64,10 @@ def initialize_templates():
     g_transfer.add_node("T_Endpoint", type="Endpoint")
     g_transfer.add_edge("T_Process", "T_Endpoint", relation="connects_to")
     templates.append(BehaviorTemplate(
-        label="EXTERNAL_TRANSFER", 
-        mitre_id="T1048", 
-        graph_structure=g_transfer, 
-        semantic_keywords=["curl", "wget", "nc", "ncat", "ssh", "scp", "ftp"], 
+        label="EXTERNAL_TRANSFER",
+        mitre_id="T1048",
+        graph_structure=g_transfer,
+        semantic_keywords=["curl", "wget", "nc", "ncat", "ssh", "scp", "ftp"],
         temporal_constraints={"max_gap": 30.0}
     ))
 
@@ -74,10 +77,10 @@ def initialize_templates():
     g_destruct.add_node("T_Table", type="Table")
     g_destruct.add_edge("T_Query", "T_Table", relation="accesses")
     templates.append(BehaviorTemplate(
-        label="DESTRUCTIVE_DB_OPERATION", 
-        mitre_id="T1485", 
-        graph_structure=g_destruct, 
-        semantic_keywords=["drop", "delete", "truncate"], 
+        label="DESTRUCTIVE_DB_OPERATION",
+        mitre_id="T1485",
+        graph_structure=g_destruct,
+        semantic_keywords=["drop", "delete", "truncate"],
         temporal_constraints={"max_gap": 15.0}
     ))
 
@@ -87,10 +90,10 @@ def initialize_templates():
     g_cred_dump.add_node("T_File", type="File")
     g_cred_dump.add_edge("T_Process", "T_File", relation="opens")
     templates.append(BehaviorTemplate(
-        label="OS_CREDENTIAL_DUMPING", 
-        mitre_id="T1003.008", 
-        graph_structure=g_cred_dump, 
-        semantic_keywords=["/etc/shadow", "/etc/passwd"], 
+        label="OS_CREDENTIAL_DUMPING",
+        mitre_id="T1003.008",
+        graph_structure=g_cred_dump,
+        semantic_keywords=["/etc/shadow", "/etc/passwd"],
         temporal_constraints={"max_gap": 15.0}
     ))
 
@@ -100,10 +103,10 @@ def initialize_templates():
     g_shell.add_node("T_Process", type="Process")
     g_shell.add_edge("T_Query", "T_Process", relation="spawns")
     templates.append(BehaviorTemplate(
-        label="UNIX_SHELL_EXECUTION", 
-        mitre_id="T1059.004", 
-        graph_structure=g_shell, 
-        semantic_keywords=["bash", "sh", "dash", "ksh", "zsh", "program"], 
+        label="UNIX_SHELL_EXECUTION",
+        mitre_id="T1059.004",
+        graph_structure=g_shell,
+        semantic_keywords=["bash", "sh", "dash", "ksh", "zsh", "program"],
         temporal_constraints={"max_gap": 10.0}
     ))
 
@@ -113,10 +116,10 @@ def initialize_templates():
     g_account.add_node("T_Role", type="Role")
     g_account.add_edge("T_Query", "T_Role", relation="accesses")
     templates.append(BehaviorTemplate(
-        label="ACCOUNT_MANIPULATION", 
-        mitre_id="T1098", 
-        graph_structure=g_account, 
-        semantic_keywords=["create role", "alter role", "superuser", "login", "grant", "revoke"], 
+        label="ACCOUNT_MANIPULATION",
+        mitre_id="T1098",
+        graph_structure=g_account,
+        semantic_keywords=["create role", "alter role", "superuser", "login", "grant", "revoke"],
         temporal_constraints={"max_gap": 30.0}
     ))
 
@@ -126,10 +129,10 @@ def initialize_templates():
     g_ingress.add_node("T_Endpoint", type="Endpoint")
     g_ingress.add_edge("T_Process", "T_Endpoint", relation="connects_to")
     templates.append(BehaviorTemplate(
-        label="POTENTIAL_INGRESS_TOOL_TRANSFER", 
-        mitre_id="T1105", 
-        graph_structure=g_ingress, 
-        semantic_keywords=["wget", "curl", "fetch", "git", "clone"], 
+        label="POTENTIAL_INGRESS_TOOL_TRANSFER",
+        mitre_id="T1105",
+        graph_structure=g_ingress,
+        semantic_keywords=["wget", "curl", "fetch", "git", "clone"],
         temporal_constraints={"max_gap": 60.0}
     ))
 
@@ -139,10 +142,10 @@ def initialize_templates():
     g_hist.add_node("T_File", type="File")
     g_hist.add_edge("T_Process", "T_File", relation="opens")
     templates.append(BehaviorTemplate(
-        label="INDICATOR_REMOVAL_HISTORY", 
-        mitre_id="T1070.003", 
-        graph_structure=g_hist, 
-        semantic_keywords=["bash_history", "history", "clear"], 
+        label="INDICATOR_REMOVAL_HISTORY",
+        mitre_id="T1070.003",
+        graph_structure=g_hist,
+        semantic_keywords=["bash_history", "history", "clear"],
         temporal_constraints={"max_gap": 10.0}
     ))
 
@@ -152,10 +155,10 @@ def initialize_templates():
     g_file_del.add_node("T_File", type="File")
     g_file_del.add_edge("T_Process", "T_File", relation="opens")
     templates.append(BehaviorTemplate(
-        label="INDICATOR_REMOVAL_FILE", 
-        mitre_id="T1070.004", 
-        graph_structure=g_file_del, 
-        semantic_keywords=["rm", "unlink", "remove"], 
+        label="INDICATOR_REMOVAL_FILE",
+        mitre_id="T1070.004",
+        graph_structure=g_file_del,
+        semantic_keywords=["rm", "unlink", "remove"],
         temporal_constraints={"max_gap": 10.0}
     ))
 
@@ -165,20 +168,38 @@ def initialize_templates():
     g_def.add_node("T_Table", type="Table")
     g_def.add_edge("T_Query", "T_Table", relation="accesses")
     templates.append(BehaviorTemplate(
-        label="DEFENSE_IMPAIRMENT", 
-        mitre_id="N/A", 
-        graph_structure=g_def, 
-        semantic_keywords=["pg_settings", "log_statement", "log_min_messages", "alter system set", "disable"], 
+        label="DEFENSE_IMPAIRMENT",
+        mitre_id="N/A",
+        graph_structure=g_def,
+        semantic_keywords=["pg_settings", "log_statement", "log_min_messages", "alter system set", "disable"],
         temporal_constraints={"max_gap": 60.0}
     ))
 
     return templates
+
 
 # Efficient pre-fit TF-IDF Vectorizer across all semantic vectors for the 10 templates.
 GLOBAL_CORPUS = []
 for _t in initialize_templates():
     GLOBAL_CORPUS.append(" ".join(_t.semantic_keywords))
 VECTORIZER = TfidfVectorizer().fit(GLOBAL_CORPUS)
+
+
+def _relation_between(G, u, v, target_relation=None):
+    """MultiDiGraph-safe relation lookup between two nodes.
+    Returns the set of relation labels present on edges u->v, or (if
+    target_relation is given) a bool for whether that specific relation
+    is present."""
+    edge_data = G.get_edge_data(u, v)
+    if edge_data is None:
+        return False if target_relation else set()
+    if isinstance(G, nx.MultiDiGraph):
+        rels = {d.get("relation") or d.get("rel") for d in edge_data.values()}
+    else:
+        rels = {edge_data.get("relation") or edge_data.get("rel")}
+    rels.discard(None)
+    return (target_relation in rels) if target_relation else rels
+
 
 def calculate_graded_s_struct(G_s, T, theta_struct=0.6, max_matches=10):
     template = T.structure
@@ -214,13 +235,8 @@ def calculate_graded_s_struct(G_s, T, theta_struct=0.6, max_matches=10):
                     continue
 
                 actual_type = G_s.nodes[actual_child].get("type")
-                
-                # Check for relation logic properly
-                edge_data = G_s.get_edge_data(root, actual_child)
-                actual_relation = edge_data.get("relation") if edge_data else None
 
-                # Simplified node compatibility purely relying on relation + type (semantic hook comes later in pipeline)
-                if actual_type == required_type and actual_relation == required_relation:
+                if actual_type == required_type and _relation_between(G_s, root, actual_child, required_relation):
                     best_candidate = actual_child
                     break
 
@@ -247,11 +263,8 @@ def calculate_graded_s_struct(G_s, T, theta_struct=0.6, max_matches=10):
             if not G_s.has_edge(g_u, g_v):
                 continue
 
-            actual_edge = G_s.get_edge_data(g_u, g_v)
-            actual_relation = actual_edge.get("relation") if actual_edge else None
             required_relation = t_data.get("relation")
-
-            if actual_relation == required_relation:
+            if _relation_between(G_s, g_u, g_v, required_relation):
                 matched_edges += 1
 
         if total_template_edges == 0:
@@ -277,15 +290,23 @@ def calculate_graded_s_struct(G_s, T, theta_struct=0.6, max_matches=10):
 
     return graded_matches
 
+
 def calculate_s_sem(matched_nodes, G_s, T_keywords):
     if not matched_nodes or not T_keywords:
         return 0.0
 
     factual_values = []
     for n in matched_nodes:
-        label = G_s.nodes[n].get("label", "")
-        if label:
-            factual_values.append(str(label).lower())
+        data = G_s.nodes[n]
+        val = (
+            data.get("query", "") or
+            data.get("comm", "") or
+            data.get("arg", "") or
+            data.get("table_name", "") or
+            data.get("label", "")
+        )
+        if val:
+            factual_values.append(str(val).lower())
 
     if not factual_values:
         return 0.0
@@ -314,10 +335,12 @@ def calculate_s_sem(matched_nodes, G_s, T_keywords):
     s_sem = 0.60 * s_coverage + 0.40 * s_tfidf
     return float(s_sem)
 
+
 def calculate_s_temp(matched_nodes, G_s, template):
     timestamps = []
     for n in matched_nodes:
-        ts = G_s.nodes[n].get("timestamp")
+        # Prioritize calibrated timestamp_unix over uncalibrated monotonic timestamp
+        ts = G_s.nodes[n].get("timestamp_unix", G_s.nodes[n].get("timestamp"))
         if ts is None:
             continue
         try:
@@ -337,13 +360,14 @@ def calculate_s_temp(matched_nodes, G_s, template):
     s_temp = math.exp(-delta_t / max_gap)
     return float(s_temp)
 
+
 def abstract_session_graph(G_s, templates, theta_struct=0.60, theta_beh=0.60, chain_gap=60.0):
     G_enriched = G_s.copy()
 
     # Initial weights
-    alpha = 0.40   # Structural
-    beta = 0.35    # Semantic
-    gamma = 0.25   # Temporal
+    alpha = 0.40  # Structural
+    beta = 0.35   # Semantic
+    gamma = 0.25  # Temporal
 
     behavior_counter = 0
     detected_behaviors = []
@@ -381,10 +405,10 @@ def abstract_session_graph(G_s, templates, theta_struct=0.60, theta_beh=0.60, ch
                 continue
             seen_behaviors.add(evidence_key)
 
-            # 8. Determine behavior timestamp
+            # 8. Determine behavior timestamp (prioritize calibrated timestamp_unix)
             timestamps = []
             for n in matched_nodes:
-                ts = G_s.nodes[n].get("timestamp")
+                ts = G_s.nodes[n].get("timestamp_unix", G_s.nodes[n].get("timestamp"))
                 if ts is None:
                     continue
                 try:
@@ -433,13 +457,14 @@ def abstract_session_graph(G_s, templates, theta_struct=0.60, theta_beh=0.60, ch
 
     return G_enriched
 
+
 def main():
     args = parse_args()
     os.makedirs(args.outdir, exist_ok=True)
-    
+
     templates = initialize_templates()
     print(f"Initialized {len(templates)} MITRE ATT&CK Behavioral Templates.")
-    
+
     processed = 0
     for filename in os.listdir(args.input_dir):
         if filename.endswith(".graphml"):
@@ -447,9 +472,10 @@ def main():
             G_enriched = abstract_session_graph(G_s, templates)
             nx.write_graphml(G_enriched, os.path.join(args.outdir, f"enriched_{filename}"))
             processed += 1
-            
+
     print(f"Successfully processed {processed} session graphs with strict Chronological Tracking.")
     print(f"Algorithm 3 Generation Complete.")
+
 
 if __name__ == '__main__':
     main()

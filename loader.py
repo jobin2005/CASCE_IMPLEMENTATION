@@ -18,6 +18,7 @@ def load_attributed_events(event_table_path: Path, correlation_path: Path) -> li
                 "event_id": event["event_id"],
                 "source": event["source"],
                 "timestamp_unix": event["timestamp"],  # top-level: already clock-calibrated
+                "timestamp": event["timestamp"],       # overwrite raw uncalibrated nanosecond timestamp
             }
             attributed.append(merged)
     attributed.sort(key=lambda e: e["timestamp_unix"])

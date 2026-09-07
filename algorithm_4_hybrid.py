@@ -209,7 +209,7 @@ def _behavior_nodes(G):
             "node": n,
             "label": _parse_behavior_label(data.get("label", "")),
             "confidence": _safe_float(data.get("confidence")),
-            "timestamp": _safe_float(data.get("timestamp")),
+            "timestamp": _safe_float(data.get("timestamp_unix", data.get("timestamp"))),
         })
     return out
 
@@ -332,7 +332,7 @@ def trace_evidence(G, behavior_node_ids):
                     data = G.nodes.get(pred, {})
                     facts.append({"node": pred, "type": data.get("type", "Unknown"),
                                    "label": data.get("label", pred),
-                                   "timestamp": data.get("timestamp", data.get("timestamp_unix"))})
+                                   "timestamp": data.get("timestamp_unix", data.get("timestamp"))})
     facts.sort(key=lambda f: _safe_float(f.get("timestamp")))
     return facts
 
@@ -373,8 +373,8 @@ def featurize_node(G, n, max_ts):
     s_struct = _safe_float(data.get("s_struct"))
     s_sem = _safe_float(data.get("s_sem"))
     s_temp = _safe_float(data.get("s_temp"))
-    # Accept both "timestamp" and "timestamp_unix" (jobs branch uses timestamp_unix)
-    ts_raw = data.get("timestamp", data.get("timestamp_unix", None))
+    # Accept both "timestamp_unix" and "timestamp", prioritizing calibrated timestamp_unix
+    ts_raw = data.get("timestamp_unix", data.get("timestamp", None))
     has_ts = 1.0 if ts_raw is not None else 0.0
     recency = (_safe_float(ts_raw) / max_ts) if max_ts > 0 else 0.0
     in_deg = G.in_degree(n) if G.is_directed() else G.degree(n)
@@ -391,10 +391,10 @@ if TORCH_AVAILABLE:
         node_index = {nt: {} for nt in ALL_NODE_TYPES}
         node_feats = {nt: [] for nt in ALL_NODE_TYPES}
 
-        # Accept both "timestamp" and "timestamp_unix" for recency features
+        # Accept both "timestamp_unix" and "timestamp" for recency features
         timestamps = []
         for _, d in G.nodes(data=True):
-            ts = d.get("timestamp", d.get("timestamp_unix"))
+            ts = d.get("timestamp_unix", d.get("timestamp"))
             if ts is not None:
                 timestamps.append(_safe_float(ts))
         max_ts = max(timestamps) if timestamps else 1.0

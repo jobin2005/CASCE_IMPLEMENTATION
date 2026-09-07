@@ -28,7 +28,7 @@ def add_directed_edge(G, u, v, rel, event_id, ts):
         edge["event_ids"].append(event_id)
         edge["last_seen"] = ts
     else:
-        G.add_edge(u, v, key=rel, rel=rel, count=1,
+        G.add_edge(u, v, key=rel, rel=rel, relation=rel, count=1,
                    event_ids=[event_id], first_seen=ts, last_seen=ts)
 
 
@@ -39,7 +39,8 @@ def find_connection_rule(G, node_type, e, facts):
         u = get_node(G, "Session", e["session_key"])
         if u is None:
             u = add_or_update_node(G, "Session", {"session_key": e["session_key"],
-                                                     "timestamp_unix": ts})
+                                                  "timestamp_unix": ts,
+                                                  "timestamp": ts})
         return u, "executes"
 
     if node_type == "Table":
@@ -62,7 +63,7 @@ def find_connection_rule(G, node_type, e, facts):
         # of what the shell command itself later sleeps for).
         pending = G.graph.get("pending_spawn_source")
         pending_ts = G.graph.get("pending_spawn_ts")
-        if pending is not None and pending_ts is not None and (ts - pending_ts) < SPAWN_WINDOW_SEC:
+        if pending is not None and pending_ts is not None and 0 <= (ts - pending_ts) < SPAWN_WINDOW_SEC:
             q = get_node(G, "Query", pending)
             if q is not None:
                 return q, "spawns"

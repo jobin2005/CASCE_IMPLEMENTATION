@@ -38,13 +38,22 @@ def sanitize_for_graphml(G: nx.MultiDiGraph) -> nx.MultiDiGraph:
             elif v is None:
                 G.nodes[n][k] = ""
                 
-    for u, v, k, data in G.edges(data=True, keys=True):
-        temp_data = list(data.items())
-        for attr_k, attr_v in temp_data:
-            if isinstance(attr_v, (list, dict, bool)):
-                G[u][v][k][attr_k] = str(attr_v)
-            elif attr_v is None:
-                G[u][v][k][attr_k] = ""
+    if isinstance(G, nx.MultiDiGraph):
+        for u, v, k, data in G.edges(data=True, keys=True):
+            temp_data = list(data.items())
+            for attr_k, attr_v in temp_data:
+                if isinstance(attr_v, (list, dict, bool)):
+                    G[u][v][k][attr_k] = str(attr_v)
+                elif attr_v is None:
+                    G[u][v][k][attr_k] = ""
+    else:
+        for u, v, data in G.edges(data=True):
+            temp_data = list(data.items())
+            for attr_k, attr_v in temp_data:
+                if isinstance(attr_v, (list, dict, bool)):
+                    G[u][v][attr_k] = str(attr_v)
+                elif attr_v is None:
+                    G[u][v][attr_k] = ""
     return G
 
 def main() -> None:
