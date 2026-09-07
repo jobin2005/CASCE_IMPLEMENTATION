@@ -15,8 +15,17 @@ def extract_query_facts(query_text: str) -> dict:
         stmt = parsed[0].stmt
 
         if isinstance(stmt, ast.CopyStmt):
+            if stmt.relation:
+                table_name = stmt.relation.relname
+            elif stmt.query is not None:
+                inner = stmt.query
+                table_name = None
+                if isinstance(inner, ast.SelectStmt) and inner.fromClause:
+                    table_name = getattr(inner.fromClause[0], "relname", None)
+            else:
+                table_name = None
             return {
-                "table_name": stmt.relation.relname if stmt.relation else None,
+                "table_name": table_name,
                 "is_program": bool(stmt.is_program),
                 "shell_cmd": stmt.filename if stmt.is_program else None,
             }
