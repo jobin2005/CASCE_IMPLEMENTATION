@@ -1,0 +1,277 @@
+{
+  "metadata": {
+    "experiment": "Section 4: Generalization Analysis (Variants, Cross-Run, Unseen Scenario)",
+    "split": "test",
+    "mode": "all",
+    "total_sessions": 2568,
+    "alert_threshold": 0.65
+  },
+  "variants": {
+    "description": "Train on Seen Variants (curl, passwd, etc.), Test on Unseen Variants (socat, shadow, tar, etc.)",
+    "seen_variants_evaluated": [
+      "exfil_curl",
+      "standard",
+      "priv_chmod",
+      "priv_passwd",
+      "sqli_time"
+    ],
+    "unseen_variants_evaluated": [
+      "exfil_bzip2",
+      "priv_shadow",
+      "exfil_netcat",
+      "priv_crontab",
+      "exfil_socat",
+      "sqli_copy",
+      "reverse_shell",
+      "priv_enum",
+      "exfil_tar"
+    ],
+    "seen_performance": {
+      "sample_count": 1389,
+      "attack_count": 642,
+      "normal_count": 747,
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 642,
+      "true_negatives": 747,
+      "recall": 0.0,
+      "precision": 0.0,
+      "f1_score": 0.0,
+      "fpr": 0.0,
+      "mean_risk": 0.0135
+    },
+    "unseen_performance": {
+      "sample_count": 1179,
+      "attack_count": 432,
+      "normal_count": 747,
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 432,
+      "true_negatives": 747,
+      "recall": 0.0,
+      "precision": 0.0,
+      "f1_score": 0.0,
+      "fpr": 0.0,
+      "mean_risk": 0.0218
+    },
+    "generalization_retention_ratio": 0.0,
+    "per_variant_detection": {
+      "exfil_bzip2": {
+        "count": 96,
+        "recall": 0.0,
+        "mean_risk": 0.0569
+      },
+      "priv_shadow": {
+        "count": 24,
+        "recall": 0.0,
+        "mean_risk": 0.0043
+      },
+      "exfil_netcat": {
+        "count": 72,
+        "recall": 0.0,
+        "mean_risk": 0.0353
+      },
+      "exfil_socat": {
+        "count": 72,
+        "recall": 0.0,
+        "mean_risk": 0.1145
+      },
+      "sqli_copy": {
+        "count": 24,
+        "recall": 0.0,
+        "mean_risk": 0.0004
+      },
+      "reverse_shell": {
+        "count": 24,
+        "recall": 0.0,
+        "mean_risk": 0.0002
+      },
+      "priv_enum": {
+        "count": 24,
+        "recall": 0.0,
+        "mean_risk": 0.0155
+      },
+      "exfil_tar": {
+        "count": 96,
+        "recall": 0.0,
+        "mean_risk": 0.0878
+      }
+    }
+  },
+  "cross_run": {
+    "description": "K-Fold Cross-Run Rotation across distinct execution runs",
+    "total_folds": 3,
+    "mean_cross_run_recall": 0.895,
+    "mean_cross_run_f1": 0.9121,
+    "mean_cross_run_fpr": 0.0439,
+    "fold_details": [
+      {
+        "sample_count": 856,
+        "attack_count": 329,
+        "normal_count": 527,
+        "true_positives": 312,
+        "false_positives": 7,
+        "false_negatives": 17,
+        "true_negatives": 520,
+        "recall": 0.9483,
+        "precision": 0.9781,
+        "f1_score": 0.963,
+        "fpr": 0.0133,
+        "mean_risk": 0.3311,
+        "train_runs": [
+          "run_1",
+          "run_2",
+          "run_3",
+          "run_4",
+          "run_5",
+          "run_6",
+          "run_7",
+          "run_8",
+          "run_9",
+          "run_10",
+          "run_11",
+          "run_12",
+          "run_13",
+          "run_14",
+          "run_15",
+          "run_16"
+        ],
+        "test_runs": [
+          "run_17",
+          "run_18",
+          "run_19",
+          "run_20",
+          "run_21",
+          "run_22",
+          "run_23",
+          "run_24"
+        ]
+      },
+      {
+        "sample_count": 856,
+        "attack_count": 349,
+        "normal_count": 507,
+        "true_positives": 340,
+        "false_positives": 60,
+        "false_negatives": 9,
+        "true_negatives": 447,
+        "recall": 0.9742,
+        "precision": 0.85,
+        "f1_score": 0.9079,
+        "fpr": 0.1183,
+        "mean_risk": 0.3655,
+        "train_runs": [
+          "run_9",
+          "run_10",
+          "run_11",
+          "run_12",
+          "run_13",
+          "run_14",
+          "run_15",
+          "run_16",
+          "run_17",
+          "run_18",
+          "run_19",
+          "run_20",
+          "run_21",
+          "run_22",
+          "run_23",
+          "run_24"
+        ],
+        "test_runs": [
+          "run_1",
+          "run_2",
+          "run_3",
+          "run_4",
+          "run_5",
+          "run_6",
+          "run_7",
+          "run_8"
+        ]
+      },
+      {
+        "sample_count": 856,
+        "attack_count": 396,
+        "normal_count": 460,
+        "true_positives": 302,
+        "false_positives": 0,
+        "false_negatives": 94,
+        "true_negatives": 460,
+        "recall": 0.7626,
+        "precision": 1.0,
+        "f1_score": 0.8653,
+        "fpr": 0.0,
+        "mean_risk": 0.2788,
+        "train_runs": [
+          "run_1",
+          "run_2",
+          "run_3",
+          "run_4",
+          "run_5",
+          "run_6",
+          "run_7",
+          "run_8",
+          "run_17",
+          "run_18",
+          "run_19",
+          "run_20",
+          "run_21",
+          "run_22",
+          "run_23",
+          "run_24"
+        ],
+        "test_runs": [
+          "run_9",
+          "run_10",
+          "run_11",
+          "run_12",
+          "run_13",
+          "run_14",
+          "run_15",
+          "run_16"
+        ]
+      }
+    ]
+  },
+  "unseen_scenario": {
+    "description": "Leave-One-Scenario-Out Zero-Shot Transferability",
+    "scenarios_evaluated": [
+      "Data_Exfiltration",
+      "OS_Privilege_Escalation",
+      "Unauthorized_DB_Read",
+      "Sabotage"
+    ],
+    "mean_zero_shot_recall": 0.0,
+    "mean_zero_shot_f1": 0.0,
+    "scenario_breakdown": {
+      "Data_Exfiltration": {
+        "held_out_attack_count": 740,
+        "zero_shot_recall": 0.0,
+        "zero_shot_f1": 0.0,
+        "zero_shot_mean_risk": 0.0005,
+        "verdict": "Requires Scenario Semantics"
+      },
+      "OS_Privilege_Escalation": {
+        "held_out_attack_count": 146,
+        "zero_shot_recall": 0.0,
+        "zero_shot_f1": 0.0,
+        "zero_shot_mean_risk": 0.3037,
+        "verdict": "Requires Scenario Semantics"
+      },
+      "Unauthorized_DB_Read": {
+        "held_out_attack_count": 96,
+        "zero_shot_recall": 0.0,
+        "zero_shot_f1": 0.0,
+        "zero_shot_mean_risk": 0.0,
+        "verdict": "Requires Scenario Semantics"
+      },
+      "Sabotage": {
+        "held_out_attack_count": 30,
+        "zero_shot_recall": 0.0,
+        "zero_shot_f1": 0.0,
+        "zero_shot_mean_risk": 0.302,
+        "verdict": "Requires Scenario Semantics"
+      }
+    }
+  }
+}

