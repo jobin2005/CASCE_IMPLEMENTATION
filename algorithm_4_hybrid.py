@@ -236,7 +236,22 @@ CHAIN_RULES = [
 
 THETA_A = 0.65  # alert threshold selected after validation sweep
 THETA_R = 0.8   # response threshold
-W_RULE = 0.75
+
+# fuse_scores is 1 - (1 - W_RULE*r)(1 - W_GAT*g). With the old W_RULE=W_GAT=0.75,
+# a *perfect* 3-stage exfiltration chain (severity=0.95, mean Algorithm-3
+# confidence ~0.65-0.80) gives rule_score ~= 0.6-0.77, and 0.75 * 0.77 ~= 0.58
+# -- BELOW THETA_A=0.65. That means the rule path could never alert on its
+# own; every real alert was effectively being carried by the GAT, making the
+# "hybrid" detector GAT-with-rule-garnish rather than two independent paths.
+# Raising W_RULE to 1.0 lets a high-confidence rule match (rule_score >= 0.65)
+# clear THETA_A unaided, matching the paper's framing of the rule path as an
+# independent fast-path detector rather than a path that can only ever
+# co-sign the GAT. W_GAT is left at 0.75 rather than also raised to 1.0: the
+# GAT has no equivalent hard evidence trail (see Issue #8 below on shared
+# provenance), so keeping it damped relative to the rule path is a
+# conservative choice that should be revisited empirically once baselines
+# and PR curves (Tier 2 in the review) exist to check it against.
+W_RULE = 1.0
 W_GAT = 0.75
 
 FEATURE_HASH_DIM = 16
@@ -559,7 +574,21 @@ if TORCH_AVAILABLE:
                 self.convs.append(HeteroConv(conv_dict, aggr="sum"))
                 layer_in_dim = hidden_dim * heads  # output dim of every layer after the first
 
-            pooled_dim = hidden_dim * heads * len(node_types)
+            # BUG 3 FIX (readout): plain per-type mean-pooling averages a
+            # 3-node attack subgraph into irrelevance inside a session with
+            # hundreds of benign nodes. Replace with a learned attention gate
+            # per node type: a small linear scorer produces one logit per
+            # node, softmax turns those into weights, and the pooled vector
+            # is the weighted sum. This lets the model learn to weight
+            # Behavior nodes (where the actual signal lives) far more heavily
+            # than routine Process/File/Query noise, instead of every node
+            # counting equally regardless of relevance.
+            out_dim = hidden_dim * heads
+            self.attn_gates = nn.ModuleDict({
+                nt: nn.Linear(out_dim, 1) for nt in node_types
+            })
+
+            pooled_dim = out_dim * len(node_types)
             self.classifier = nn.Sequential(
                 nn.Linear(pooled_dim, hidden_dim), nn.ReLU(), nn.Dropout(dropout),
                 nn.Linear(hidden_dim, 1),
@@ -584,7 +613,9 @@ if TORCH_AVAILABLE:
             for nt in self.node_types:
                 x = x_dict.get(nt)
                 if x is not None and x.size(0) > 0:
-                    pooled_parts.append(x.mean(dim=0))
+                    gate_logits = self.attn_gates[nt](x).squeeze(-1)  # [num_nodes_of_type]
+                    weights = torch.softmax(gate_logits, dim=0)
+                    pooled_parts.append((x * weights.unsqueeze(-1)).sum(dim=0))
                 else:
                     pooled_parts.append(torch.zeros(out_dim))
             graph_repr = torch.cat(pooled_parts, dim=0)
@@ -741,10 +772,27 @@ def load_model(model_path):
     if model_path and os.path.exists(model_path):
         state = torch.load(model_path, map_location="cpu", weights_only=False)
         try:
-            model.load_state_dict(state, strict=False)
-            print(f"[algo4] Loaded trained GAT weights from {model_path}")
-        except Exception as e:
-            print(f"[algo4] WARNING: could not load weights ({e}); using untrained model.")
+            # strict=False was silently tolerating checkpoints that only
+            # partly matched the current architecture (e.g. after adding the
+            # attn_gates module below) -- the load would "succeed" while
+            # leaving those parameters randomly initialized, and nothing
+            # would tell you the resulting model was partly untrained.
+            # Load strictly first; only fall back to a partial load with an
+            # explicit, loud warning naming exactly what didn't match.
+            model.load_state_dict(state, strict=True)
+            print(f"[algo4] Loaded trained GAT weights from {model_path} (strict match).")
+        except RuntimeError as strict_err:
+            result = model.load_state_dict(state, strict=False)
+            missing = list(result.missing_keys)
+            unexpected = list(result.unexpected_keys)
+            warnings.warn(
+                f"[algo4] Checkpoint at {model_path} did NOT strictly match the current "
+                f"model architecture. Missing params (randomly initialized): {missing}. "
+                f"Unexpected params in checkpoint (ignored): {unexpected}. "
+                f"Scores from this model are NOT fully trained-weight scores -- retrain "
+                f"before trusting evaluation numbers. Original error: {strict_err}",
+                RuntimeWarning,
+            )
     else:
         warnings.warn("No trained GAT checkpoint found — gat_score will be near-random "
                        "until train mode is run. The rule path is unaffected.", RuntimeWarning)
