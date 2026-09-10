@@ -76,9 +76,14 @@ except ImportError:
 
 
 def _average_precision_from_scores(y_true, y_scores):
-    """Compute average precision (PR-AUC under the stepwise definition) without extra deps."""
+    """Compute average precision (PR-AUC under the stepwise definition)."""
     if not y_true:
         return 0.0
+    try:
+        from sklearn.metrics import average_precision_score
+        return float(average_precision_score(y_true, y_scores))
+    except Exception:
+        pass
 
     positives = sum(1 for y in y_true if y == 1)
     if positives == 0:
@@ -104,6 +109,31 @@ def _average_precision_from_scores(y_true, y_scores):
             prev_recall = recall
 
     return float(ap)
+
+
+def _roc_auc_from_scores(y_true, y_scores):
+    """Compute AUROC (Area Under Receiver Operating Characteristic Curve)."""
+    if not y_true:
+        return 0.0
+    try:
+        from sklearn.metrics import roc_auc_score
+        return float(roc_auc_score(y_true, y_scores))
+    except Exception:
+        pass
+
+    positives = [s for s, y in zip(y_scores, y_true) if y == 1]
+    negatives = [s for s, y in zip(y_scores, y_true) if y == 0]
+    if not positives or not negatives:
+        return 0.5
+
+    n_pos = len(positives)
+    n_neg = len(negatives)
+    u = sum(
+        1.0 if p > n else 0.5 if p == n else 0.0
+        for p in positives
+        for n in negatives
+    )
+    return float(u / (n_pos * n_neg))
 
 
 def _classification_metrics(tp, fp, fn, tn):
@@ -664,15 +694,23 @@ def fuse_scores(rule_score, gat_score_val, w_rule=W_RULE, w_gat=W_GAT):
     return 1.0 - (1.0 - w_rule * r) * (1.0 - w_gat * g)
 
 
-def detect(G, model, session_id="unknown", theta_a=THETA_A, theta_r=THETA_R):
+def detect(G, model, session_id="unknown", theta_a=THETA_A, theta_r=THETA_R,
+           w_rule=W_RULE, w_gat=W_GAT, detection_mode="hybrid"):
     rule_score, scenario, matched_nodes, _all = evaluate_rules(G)
     gat_prob = gat_score(G, model)
-    risk = fuse_scores(rule_score, gat_prob)
+
+    if detection_mode == "rules_only":
+        risk = rule_score
+    elif detection_mode == "gat_only":
+        risk = gat_prob
+    else:
+        risk = fuse_scores(rule_score, gat_prob, w_rule=w_rule, w_gat=w_gat)
 
     assessment = {
         "session_id": session_id, "risk": round(risk, 4),
         "rule_score": round(rule_score, 4), "gat_score": round(gat_prob, 4),
         "scenario": scenario, "status": "benign",
+        "detection_mode": detection_mode,
     }
 
     if risk >= theta_a:
@@ -921,6 +959,11 @@ def evaluate_model(args):
 
     dirs = [d.strip() for d in args.input_dir.split(',') if d.strip()]
     label_files = [f.strip() for f in args.labels.split(',') if f.strip()]
+    theta_a = getattr(args, 'theta_a', THETA_A)
+    theta_r = getattr(args, 'theta_r', THETA_R)
+    w_rule = getattr(args, 'w_rule', W_RULE)
+    w_gat = getattr(args, 'w_gat', W_GAT)
+    detection_mode = getattr(args, 'detection_mode', 'hybrid')
 
     y_true, y_scores, y_rule, y_gat = [], [], [], []
     for d, lf in zip(dirs, label_files):
@@ -931,7 +974,8 @@ def evaluate_model(args):
             if not os.path.exists(path):
                 continue
             G = nx.read_graphml(path)
-            assessment = detect(G, model, session_id=filename)
+            assessment = detect(G, model, session_id=filename, theta_a=theta_a, theta_r=theta_r,
+                                w_rule=w_rule, w_gat=w_gat, detection_mode=detection_mode)
             y_true.append(int(label))
             y_scores.append(assessment['risk'])
             y_rule.append(assessment['rule_score'])
@@ -941,7 +985,7 @@ def evaluate_model(args):
         raise RuntimeError("No evaluation data found.")
 
     # Binary predictions at current threshold
-    y_pred = [1 if s >= THETA_A else 0 for s in y_scores]
+    y_pred = [1 if s >= theta_a else 0 for s in y_scores]
 
     # Compute metrics
     tp = sum(1 for t, p in zip(y_true, y_pred) if t == 1 and p == 1)
@@ -951,9 +995,13 @@ def evaluate_model(args):
 
     metrics = _classification_metrics(tp, fp, fn, tn)
     pr_auc = _average_precision_from_scores(y_true, y_scores)
+    roc_auc = _roc_auc_from_scores(y_true, y_scores)
 
     results = {
-        'threshold': THETA_A,
+        'threshold': theta_a,
+        'detection_mode': detection_mode,
+        'w_rule': w_rule,
+        'w_gat': w_gat,
         'total_samples': len(y_true),
         'true_positives': tp, 'false_positives': fp,
         'false_negatives': fn, 'true_negatives': tn,
@@ -966,6 +1014,9 @@ def evaluate_model(args):
         'accuracy': round(metrics['accuracy'], 4),
         'balanced_accuracy': round(metrics['balanced_accuracy'], 4),
         'mcc': round(metrics['mcc'], 4),
+        'auroc': round(roc_auc, 4),
+        'roc_auc': round(roc_auc, 4),
+        'auprc': round(pr_auc, 4),
         'pr_auc': round(pr_auc, 4),
         'alert_rate': round(metrics['alert_rate'], 4),
         'miss_rate': round(metrics['miss_rate'], 4),
@@ -973,7 +1024,7 @@ def evaluate_model(args):
     }
 
     print(f"\n{'='*60}")
-    print(f"  EVALUATION RESULTS (θ_A = {THETA_A})")
+    print(f"  EVALUATION RESULTS (θ_A = {theta_a:.2f}, mode = {detection_mode})")
     print(f"{'='*60}")
     print(f"  Samples:   {len(y_true)} ({sum(y_true)} malicious, {len(y_true)-sum(y_true)} normal)")
     print(f"  Accuracy:        {metrics['accuracy']:.4f}")
@@ -985,7 +1036,8 @@ def evaluate_model(args):
     print(f"  FNR:             {metrics['fnr']:.4f}")
     print(f"  F1-Score:        {metrics['f1']:.4f}")
     print(f"  MCC:             {metrics['mcc']:.4f}")
-    print(f"  PR-AUC:          {pr_auc:.4f}")
+    print(f"  AUROC:           {roc_auc:.4f}")
+    print(f"  AUPRC / PR-AUC:  {pr_auc:.4f}")
     print(f"  Alert Rate:      {metrics['alert_rate']:.4f}")
     print(f"  Miss Rate:       {metrics['miss_rate']:.4f}")
     print(f"\n  Confusion Matrix:")
@@ -1081,6 +1133,12 @@ def parse_args():
                    help="Comma-separated label JSON files (evaluate/tune)")
     p.add_argument("--theta-a", type=float, default=THETA_A)
     p.add_argument("--theta-r", type=float, default=THETA_R)
+    p.add_argument("--w-rule", type=float, default=W_RULE,
+                   help="Weight for rule-based detector in fusion")
+    p.add_argument("--w-gat", type=float, default=W_GAT,
+                   help="Weight for GAT detector in fusion")
+    p.add_argument("--detection-mode", choices=["hybrid", "rules_only", "gat_only"], default="hybrid",
+                   help="Detection modality: hybrid, rules_only, or gat_only")
 
     # Train-specific
     p.add_argument("--train-dir", default=None,

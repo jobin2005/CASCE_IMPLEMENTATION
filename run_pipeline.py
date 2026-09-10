@@ -260,10 +260,21 @@ def stage_stats():
     print(f"    Test:       {len(test_runs)} test runs (held out)")
 
 
+def stage_ablation():
+    """Run full model and algorithm ablation experiment suite."""
+    print("\n" + "="*60)
+    print("  STAGE: Model & Algorithm Ablation Suite")
+    print("="*60)
+    return run_cmd(
+        [sys.executable, 'run_ablation_experiments.py'],
+        "Executing Ablation Experiment Suite"
+    )
+
+
 def parse_args():
     p = argparse.ArgumentParser(description="CASCE End-to-End Pipeline Orchestrator")
     p.add_argument('--stage', default='all',
-                   choices=['all', 'graphs', 'labels', 'train', 'evaluate', 'tune', 'stats', 'infer'],
+                   choices=['all', 'graphs', 'labels', 'train', 'evaluate', 'tune', 'stats', 'infer', 'ablation'],
                    help='Pipeline stage to run')
     return p.parse_args()
 
@@ -282,6 +293,7 @@ def main():
         'evaluate': [stage_evaluate],
         'tune': [stage_tune],
         'infer': [stage_graphs, stage_labels, stage_evaluate],
+        'ablation': [stage_ablation],
         'all': [stage_labels, stage_train, stage_evaluate],
     }
 

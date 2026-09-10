@@ -167,7 +167,28 @@ python3 evaluate.py \
 
 ---
 
-### Step 5: Detection / Inference Mode
+### Step 5: Model & Algorithm Ablation Suite (M C Role)
+
+To run the complete ablation and validation experiment suite answering "Why does CASCE work?":
+
+```bash
+# Run via pipeline orchestrator:
+python3 run_pipeline.py --stage ablation
+
+# Or directly:
+python3 run_ablation_experiments.py
+```
+
+This automates all five core experiments:
+1. **Overall CASCE Evaluation**: Precision, Recall, F1, FPR, FNR, Specificity, AUROC, AUPRC, TP/TN/FP/FN, ROC/PR curves, and confusion matrices.
+2. **Rules vs. GAT vs. Hybrid**: Validating the necessity of the dual-path hybrid architecture.
+3. **Algorithm 3 Ablation**: Measuring detection impact across representation progression: Raw Graph $\rightarrow$ Behavior Abstraction $\rightarrow$ Behavior Abstraction + Chaining.
+4. **Fusion Weight Evaluation**: Sweeping $(w_{Rule}, w_{GAT})$ on validation data, resolving the alert crossover issue ($w_{GAT} \ge \theta_A$), and evaluating on test.
+5. **Threshold Sensitivity**: Sweeping and selecting alert threshold $\theta_A$ and response threshold $\theta_R$ on validation data, then freezing them for final test evaluation.
+
+---
+
+### Step 6: Detection / Inference Mode
 
 To run streaming or batch anomaly detection on any directory of enriched graphs:
 
@@ -177,15 +198,17 @@ python3 algorithm_4_hybrid.py --mode detect \
   --model-path casce_gat_noheldout.pt \
   --outdir detections/run_1 \
   --theta-a 0.65 \
-  --theta-r 0.35
+  --theta-r 0.80
 ```
 
 ---
 
-## Repository Structure
+## Deliverables & Repository Structure
 
 ```
-├── main.py                     # Master pipeline orchestrator (Algs 1 -> 2 -> 3)
+├── run_ablation_experiments.py # Master ablation & evaluation experiment suite
+├── run_pipeline.py             # End-to-end pipeline orchestrator (stages: graphs, labels, train, eval, ablation)
+├── main.py                     # Graph generation pipeline (Algs 1 -> 2 -> 3)
 ├── algorithm_1.py              # SAC: Session-Anchored Correlation
 ├── algorithm2.py               # MultiGraph Construction
 ├── algorithm_3_abstract.py     # Graph Abstraction & Feature Enrichment
@@ -194,10 +217,14 @@ python3 algorithm_4_hybrid.py --mode detect \
 ├── eval_indist.sh              # In-distribution evaluation script
 ├── eval_heldout.sh             # Zero-day held-out evaluation script
 ├── evaluate.py                 # Multi-class metrics & evaluation script
-├── reenrich_dataset.py         # Utility to re-enrich graphs with updated features
-├── schema.py                   # Event & graph schema definitions
 ├── casce_gat_noheldout.pt      # Trained GAT model weights (with holdout split)
-├── dataset_dev/                # Raw development run logs (run_1 to run_56)
-├── dataset_test/               # Raw test run logs (run_1 to run_24)
-└── output/                     # Generated graphs and split labels (git-ignored)
+│
+├── casce_results/              # Overall CASCE metrics, summaries, and comparative JSONs
+├── main_detection_tables/      # Publication-ready CSV and Markdown performance tables
+├── algorithm3_ablation/        # Algorithm 3 ablation CSVs, reports, and bar charts
+├── fusion_results/             # Validation weight sweeps, crossover analysis, and heatmaps
+├── threshold_results/          # Threshold sweeps, sensitivity plots, and freezing protocol
+├── confusion_matrices/         # Confusion matrix plots and JSON data (CASCE, Rules, GAT, Hybrid)
+├── ROC_PR_curves/              # High-resolution ROC and PR curve plots and raw curve points
+└── seed_results/               # Random seed model weights and stability records
 ```
