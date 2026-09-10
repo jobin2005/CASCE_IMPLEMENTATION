@@ -4,9 +4,9 @@ Evaluation of representation fidelity on detection efficacy across the graph abs
 
 | Representation Stage | Precision | Recall | F1-Score | FPR | Specificity | AUROC | AUPRC |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **1. Raw/Factual Graph** | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 1.0000 | 0.9896 | 0.8333 |
-| **2. Behavior Abstraction** | 1.0000 | 0.5000 | 0.6667 | 0.0000 | 1.0000 | 0.7344 | 0.5200 |
-| **3. Behavior Abstraction + Chaining** | 1.0000 | 0.5000 | 0.6667 | 0.0000 | 1.0000 | 0.7500 | 0.5200 |
+| **1. Raw/Factual Graph** | 1.0000 | 0.8305 | 0.9074 | 0.0000 | 1.0000 | 0.9583 | 0.9647 |
+| **2. Behavior Abstraction** | 0.8944 | 0.8994 | 0.8969 | 0.0763 | 0.9237 | 0.9518 | 0.9491 |
+| **3. Behavior Abstraction + Chaining** | 0.8944 | 0.8994 | 0.8969 | 0.0763 | 0.9237 | 0.9436 | 0.9367 |
 
 ### Findings:
 1. **Raw / Factual Graphs**: Base provenance captures low-level operating system and database events, but lacks semantic grouping, leading to degraded recall and low detection confidence.
