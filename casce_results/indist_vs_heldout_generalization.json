@@ -1,0 +1,40 @@
+{
+  "in_distribution": {
+    "label_file": "labels_test_indist.json",
+    "description": "Re-recognition of known attack families in test set",
+    "total_samples": 1878,
+    "malicious": 384,
+    "normal": 1494,
+    "precision": 1.0,
+    "recall": 0.9974,
+    "f1_score": 0.9987,
+    "fpr": 0.0,
+    "fnr": 0.0026,
+    "specificity": 1.0,
+    "auroc": 0.9999,
+    "auprc": 0.9997,
+    "tp": 383,
+    "tn": 1494,
+    "fp": 0,
+    "fn": 1
+  },
+  "held_out_zero_day": {
+    "label_file": "labels_heldout_eval.json",
+    "description": "True generalization to unseen attack families (Data_Exfiltration) held out from training and validation",
+    "total_samples": 7267,
+    "malicious": 2480,
+    "normal": 4787,
+    "precision": 1.0,
+    "recall": 0.5016,
+    "f1_score": 0.6681,
+    "fpr": 0.0,
+    "fnr": 0.4984,
+    "specificity": 1.0,
+    "auroc": 0.8725,
+    "auprc": 0.8309,
+    "tp": 1244,
+    "tn": 4787,
+    "fp": 0,
+    "fn": 1236
+  }
+}
