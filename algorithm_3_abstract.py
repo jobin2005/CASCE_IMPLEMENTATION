@@ -244,7 +244,6 @@ for _t in initialize_templates():
     GLOBAL_CORPUS.append(" ".join(_t.semantic_keywords))
 VECTORIZER = TfidfVectorizer().fit(GLOBAL_CORPUS)
 
-
 def _relation_between(G, u, v, target_relation=None):
     """MultiDiGraph-safe relation lookup between two nodes.
     Returns the set of relation labels present on edges u->v, or (if
@@ -254,10 +253,9 @@ def _relation_between(G, u, v, target_relation=None):
     if edge_data is None:
         return False if target_relation else set()
     if isinstance(G, nx.MultiDiGraph):
-        rels = {d.get("relation") or d.get("rel") for d in edge_data.values()}
+        rels = {d.get("relation") for d in edge_data.values()}
     else:
-        rels = {edge_data.get("relation") or edge_data.get("rel")}
-    rels.discard(None)
+        rels = {edge_data.get("relation")}
     return (target_relation in rels) if target_relation else rels
 
 
@@ -321,6 +319,10 @@ def calculate_graded_s_struct(G_s, T, theta_struct=0.6, max_matches=10):
                     continue
 
                 actual_type = G_s.nodes[actual_child].get("type")
+                
+                # Check for relation logic properly
+                edge_data = G_s.get_edge_data(root, actual_child)
+                actual_relation = edge_data.get("relation") if edge_data else None
 
                 if (actual_type == required_type
                         and _relation_between(G_s, root, actual_child, required_relation)
@@ -351,6 +353,8 @@ def calculate_graded_s_struct(G_s, T, theta_struct=0.6, max_matches=10):
             if not G_s.has_edge(g_u, g_v):
                 continue
 
+            actual_edge = G_s.get_edge_data(g_u, g_v)
+            actual_relation = actual_edge.get("relation") if actual_edge else None
             required_relation = t_data.get("relation")
             if _relation_between(G_s, g_u, g_v, required_relation):
                 matched_edges += 1
@@ -394,16 +398,9 @@ def calculate_s_sem(matched_nodes, G_s, T_keywords):
 
     factual_values = []
     for n in matched_nodes:
-        data = G_s.nodes[n]
-        val = (
-            data.get("query", "") or
-            data.get("comm", "") or
-            data.get("arg", "") or
-            data.get("table_name", "") or
-            data.get("label", "")
-        )
-        if val:
-            factual_values.append(str(val).lower())
+        label = G_s.nodes[n].get("label", "")
+        if label:
+            factual_values.append(str(label).lower())
 
     if not factual_values:
         return 0.0
@@ -450,8 +447,7 @@ def calculate_s_sem(matched_nodes, G_s, T_keywords):
 def calculate_s_temp(matched_nodes, G_s, template):
     timestamps = []
     for n in matched_nodes:
-        # Prioritize calibrated timestamp_unix over uncalibrated monotonic timestamp
-        ts = G_s.nodes[n].get("timestamp_unix", G_s.nodes[n].get("timestamp"))
+        ts = G_s.nodes[n].get("timestamp")
         if ts is None:
             continue
         try:
@@ -519,7 +515,7 @@ def abstract_session_graph(G_s, templates, theta_struct=0.60, theta_beh=0.60, ch
             # 8. Determine behavior timestamp (prioritize calibrated timestamp_unix)
             timestamps = []
             for n in matched_nodes:
-                ts = G_s.nodes[n].get("timestamp_unix", G_s.nodes[n].get("timestamp"))
+                ts = G_s.nodes[n].get("timestamp")
                 if ts is None:
                     continue
                 try:

