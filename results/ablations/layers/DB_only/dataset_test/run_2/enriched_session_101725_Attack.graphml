@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key id="d25" for="edge" attr.name="id" attr.type="string" />
+  <key id="d24" for="edge" attr.name="last_seen" attr.type="double" />
+  <key id="d23" for="edge" attr.name="first_seen" attr.type="double" />
+  <key id="d22" for="edge" attr.name="event_ids" attr.type="string" />
+  <key id="d21" for="edge" attr.name="count" attr.type="long" />
+  <key id="d20" for="edge" attr.name="relation" attr.type="string" />
+  <key id="d19" for="edge" attr.name="rel" attr.type="string" />
+  <key id="d18" for="node" attr.name="is_superuser" attr.type="string" />
+  <key id="d17" for="node" attr.name="is_role_change" attr.type="string" />
+  <key id="d16" for="node" attr.name="role_name" attr.type="string" />
+  <key id="d15" for="node" attr.name="timestamp_unix" attr.type="double" />
+  <key id="d14" for="node" attr.name="source" attr.type="string" />
+  <key id="d13" for="node" attr.name="event_id" attr.type="long" />
+  <key id="d12" for="node" attr.name="session_key" attr.type="long" />
+  <key id="d11" for="node" attr.name="client_port" attr.type="string" />
+  <key id="d10" for="node" attr.name="client_addr" attr.type="string" />
+  <key id="d9" for="node" attr.name="username" attr.type="string" />
+  <key id="d8" for="node" attr.name="database" attr.type="string" />
+  <key id="d7" for="node" attr.name="query" attr.type="string" />
+  <key id="d6" for="node" attr.name="event_type" attr.type="string" />
+  <key id="d5" for="node" attr.name="timestamp" attr.type="double" />
+  <key id="d4" for="node" attr.name="backend_pid" attr.type="long" />
+  <key id="d3" for="node" attr.name="session_start_time" attr.type="long" />
+  <key id="d2" for="node" attr.name="session_id" attr.type="long" />
+  <key id="d1" for="node" attr.name="type" attr.type="string" />
+  <key id="d0" for="graph" attr.name="last_event_ts" attr.type="double" />
+  <graph edgedefault="directed">
+    <node id="('Query', 26910)">
+      <data key="d1">Query</data>
+      <data key="d2">101725</data>
+      <data key="d3">1788641468</data>
+      <data key="d4">101725</data>
+      <data key="d5">1788641468.0</data>
+      <data key="d6">ProcessUtility</data>
+      <data key="d7">CREATE ROLE hacker WITH SUPERUSER LOGIN PASSWORD 'hacked';</data>
+      <data key="d8">casce_tpcb</data>
+      <data key="d9">db_admin</data>
+      <data key="d10">192.168.1.126</data>
+      <data key="d11">41725</data>
+      <data key="d12">101725</data>
+      <data key="d13">26910</data>
+      <data key="d14">postgres</data>
+      <data key="d15">1788641468.0</data>
+      <data key="d16">hacker</data>
+      <data key="d17">True</data>
+      <data key="d18">True</data>
+    </node>
+    <node id="('Role', 'hacker')">
+      <data key="d1">Role</data>
+      <data key="d2">101725</data>
+      <data key="d3">1788641468</data>
+      <data key="d4">101725</data>
+      <data key="d5">1788641468.0</data>
+      <data key="d6">ProcessUtility</data>
+      <data key="d7">CREATE ROLE hacker WITH SUPERUSER LOGIN PASSWORD 'hacked';</data>
+      <data key="d8">casce_tpcb</data>
+      <data key="d9">db_admin</data>
+      <data key="d10">192.168.1.126</data>
+      <data key="d11">41725</data>
+      <data key="d12">101725</data>
+      <data key="d13">26910</data>
+      <data key="d14">postgres</data>
+      <data key="d15">1788641468.0</data>
+      <data key="d16">hacker</data>
+      <data key="d17">True</data>
+      <data key="d18">True</data>
+    </node>
+    <node id="('Session', 101725)">
+      <data key="d1">Session</data>
+      <data key="d12">101725</data>
+      <data key="d15">1788641468.0</data>
+      <data key="d5">1788641468.0</data>
+    </node>
+    <edge source="('Query', 26910)" target="('Role', 'hacker')">
+      <data key="d19">accesses</data>
+      <data key="d20">accesses</data>
+      <data key="d21">1</data>
+      <data key="d22">[26910]</data>
+      <data key="d23">1788641468.0</data>
+      <data key="d24">1788641468.0</data>
+      <data key="d25">accesses</data>
+    </edge>
+    <edge source="('Session', 101725)" target="('Query', 26910)">
+      <data key="d19">executes</data>
+      <data key="d20">executes</data>
+      <data key="d21">1</data>
+      <data key="d22">[26910]</data>
+      <data key="d23">1788641468.0</data>
+      <data key="d24">1788641468.0</data>
+      <data key="d25">executes</data>
+    </edge>
+    <data key="d0">1788641468.0</data>
+  </graph>
+</graphml>

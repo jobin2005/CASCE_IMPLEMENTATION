@@ -33,7 +33,9 @@ import argparse
 import subprocess
 import sys
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SRC_DIR = os.path.join(BASE_DIR, 'src')
+MODELS_DIR = os.path.join(BASE_DIR, 'models')
 OUTPUT_DIR = os.path.join(BASE_DIR, 'output')
 
 DEV_OUTPUT = os.path.join(OUTPUT_DIR, 'dataset_dev')
@@ -67,7 +69,10 @@ def run_cmd(cmd, desc):
     print(f"  {desc}")
     print(f"  CMD: {' '.join(cmd)}")
     print(f"{'='*60}")
-    result = subprocess.run(cmd, cwd=BASE_DIR, capture_output=False)
+    env = os.environ.copy()
+    existing_pp = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = os.pathsep.join([SRC_DIR, BASE_DIR, existing_pp]) if existing_pp else os.pathsep.join([SRC_DIR, BASE_DIR])
+    result = subprocess.run(cmd, cwd=BASE_DIR, env=env, capture_output=False)
     if result.returncode != 0:
         print(f"[ERROR] Command failed with return code {result.returncode}")
         return False
@@ -79,7 +84,7 @@ def stage_graphs():
     print("\n" + "="*60)
     print("  STAGE: Building & Enriching Graphs (main.py)")
     print("="*60)
-    return run_cmd([sys.executable, 'main.py'], "Executing main.py (Algorithms 1-3)")
+    return run_cmd([sys.executable, os.path.join(SRC_DIR, 'main.py')], "Executing main.py (Algorithms 1-3)")
 
 
 def stage_labels():
@@ -142,14 +147,16 @@ def stage_train():
     val_dirs = _collect_split_paths(DEV_OUTPUT, val_runs)
     train_labels = _collect_split_paths(DEV_OUTPUT, train_runs, 'labels.json')
     val_labels = _collect_split_paths(DEV_OUTPUT, val_runs, 'labels.json')
-    model_path = os.path.join(BASE_DIR, 'casce_gat.pt')
+    model_path = os.path.join(MODELS_DIR, 'casce_gat.pt')
+    if not os.path.exists(model_path):
+        model_path = os.path.join(BASE_DIR, 'casce_gat.pt')
 
     if not train_dirs:
         print("[ERROR] No training data found — run 'labels' stage first")
         return False
 
     return run_cmd(
-        [sys.executable, 'algorithm_4_hybrid.py', '--mode', 'train',
+        [sys.executable, os.path.join(SRC_DIR, 'algorithm_4_hybrid.py'), '--mode', 'train',
          '--train-dir', train_dirs,
          '--val-dir', val_dirs,
          '--train-labels', train_labels,
@@ -169,14 +176,16 @@ def stage_evaluate():
     test_runs = _discover_runs(TEST_OUTPUT)
     test_dirs = _collect_split_paths(TEST_OUTPUT, test_runs)
     test_labels = _collect_split_paths(TEST_OUTPUT, test_runs, 'labels.json')
-    model_path = os.path.join(BASE_DIR, 'casce_gat.pt')
+    model_path = os.path.join(MODELS_DIR, 'casce_gat.pt')
+    if not os.path.exists(model_path):
+        model_path = os.path.join(BASE_DIR, 'casce_gat.pt')
 
     if not test_dirs:
         print("[ERROR] No test data found — run 'labels' stage first")
         return False
 
     return run_cmd(
-        [sys.executable, 'algorithm_4_hybrid.py', '--mode', 'evaluate',
+        [sys.executable, os.path.join(SRC_DIR, 'algorithm_4_hybrid.py'), '--mode', 'evaluate',
          '--input-dir', test_dirs,
          '--labels', test_labels,
          '--model-path', model_path],
@@ -195,14 +204,16 @@ def stage_tune():
 
     val_dirs = _collect_split_paths(DEV_OUTPUT, val_runs)
     val_labels = _collect_split_paths(DEV_OUTPUT, val_runs, 'labels.json')
-    model_path = os.path.join(BASE_DIR, 'casce_gat.pt')
+    model_path = os.path.join(MODELS_DIR, 'casce_gat.pt')
+    if not os.path.exists(model_path):
+        model_path = os.path.join(BASE_DIR, 'casce_gat.pt')
 
     if not val_dirs:
         print("[ERROR] No validation data found — run 'labels' stage first")
         return False
 
     return run_cmd(
-        [sys.executable, 'algorithm_4_hybrid.py', '--mode', 'tune',
+        [sys.executable, os.path.join(SRC_DIR, 'algorithm_4_hybrid.py'), '--mode', 'tune',
          '--input-dir', val_dirs,
          '--labels', val_labels,
          '--model-path', model_path],
@@ -266,7 +277,7 @@ def stage_ablation():
     print("  STAGE: Model & Algorithm Ablation Suite")
     print("="*60)
     return run_cmd(
-        [sys.executable, 'run_ablation_experiments.py'],
+        [sys.executable, os.path.join(BASE_DIR, 'experiments', 'run_ablation_experiments.py')],
         "Executing Ablation Experiment Suite"
     )
 

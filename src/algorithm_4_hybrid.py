@@ -807,19 +807,25 @@ def load_model(model_path):
     if not TORCH_AVAILABLE:
         return None
     model = CasceHeteroGAT()
-    if model_path and os.path.exists(model_path):
-        state = torch.load(model_path, map_location="cpu", weights_only=False)
-        try:
-            # strict=False was silently tolerating checkpoints that only
-            # partly matched the current architecture (e.g. after adding the
-            # attn_gates module below) -- the load would "succeed" while
-            # leaving those parameters randomly initialized, and nothing
-            # would tell you the resulting model was partly untrained.
-            # Load strictly first; only fall back to a partial load with an
-            # explicit, loud warning naming exactly what didn't match.
-            model.load_state_dict(state, strict=True)
-            print(f"[algo4] Loaded trained GAT weights from {model_path} (strict match).")
-        except RuntimeError as strict_err:
+    if model_path:
+        candidates = [
+            model_path,
+            os.path.join("models", os.path.basename(model_path)),
+            os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "models", os.path.basename(model_path)),
+            os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), os.path.basename(model_path)),
+        ]
+        resolved_path = None
+        for c in candidates:
+            if c and os.path.exists(c):
+                resolved_path = c
+                break
+
+        if resolved_path:
+            state = torch.load(resolved_path, map_location="cpu", weights_only=False)
+            try:
+                model.load_state_dict(state, strict=True)
+                print(f"[algo4] Loaded trained GAT weights from {resolved_path} (strict match).")
+            except RuntimeError as strict_err:
             result = model.load_state_dict(state, strict=False)
             missing = list(result.missing_keys)
             unexpected = list(result.unexpected_keys)
@@ -1127,8 +1133,8 @@ def parse_args():
     # Shared
     p.add_argument("--input-dir", default=None,
                    help="Comma-separated enriched graph dirs (detect/evaluate/tune)")
-    p.add_argument("--outdir", default="./alg4_out")
-    p.add_argument("--model-path", default="./casce_gat.pt")
+    p.add_argument("--outdir", default="results/evaluations/alg4_out")
+    p.add_argument("--model-path", default="models/casce_gat.pt")
     p.add_argument("--labels", default=None,
                    help="Comma-separated label JSON files (evaluate/tune)")
     p.add_argument("--theta-a", type=float, default=THETA_A)

