@@ -76,9 +76,14 @@ except ImportError:
 
 
 def _average_precision_from_scores(y_true, y_scores):
-    """Compute average precision (PR-AUC under the stepwise definition) without extra deps."""
+    """Compute average precision (PR-AUC under the stepwise definition)."""
     if not y_true:
         return 0.0
+    try:
+        from sklearn.metrics import average_precision_score
+        return float(average_precision_score(y_true, y_scores))
+    except Exception:
+        pass
 
     positives = sum(1 for y in y_true if y == 1)
     if positives == 0:
@@ -104,6 +109,31 @@ def _average_precision_from_scores(y_true, y_scores):
             prev_recall = recall
 
     return float(ap)
+
+
+def _roc_auc_from_scores(y_true, y_scores):
+    """Compute AUROC (Area Under Receiver Operating Characteristic Curve)."""
+    if not y_true:
+        return 0.0
+    try:
+        from sklearn.metrics import roc_auc_score
+        return float(roc_auc_score(y_true, y_scores))
+    except Exception:
+        pass
+
+    positives = [s for s, y in zip(y_scores, y_true) if y == 1]
+    negatives = [s for s, y in zip(y_scores, y_true) if y == 0]
+    if not positives or not negatives:
+        return 0.5
+
+    n_pos = len(positives)
+    n_neg = len(negatives)
+    u = sum(
+        1.0 if p > n else 0.5 if p == n else 0.0
+        for p in positives
+        for n in negatives
+    )
+    return float(u / (n_pos * n_neg))
 
 
 def _classification_metrics(tp, fp, fn, tn):
@@ -236,7 +266,22 @@ CHAIN_RULES = [
 
 THETA_A = 0.65  # alert threshold selected after validation sweep
 THETA_R = 0.8   # response threshold
-W_RULE = 0.75
+
+# fuse_scores is 1 - (1 - W_RULE*r)(1 - W_GAT*g). With the old W_RULE=W_GAT=0.75,
+# a *perfect* 3-stage exfiltration chain (severity=0.95, mean Algorithm-3
+# confidence ~0.65-0.80) gives rule_score ~= 0.6-0.77, and 0.75 * 0.77 ~= 0.58
+# -- BELOW THETA_A=0.65. That means the rule path could never alert on its
+# own; every real alert was effectively being carried by the GAT, making the
+# "hybrid" detector GAT-with-rule-garnish rather than two independent paths.
+# Raising W_RULE to 1.0 lets a high-confidence rule match (rule_score >= 0.65)
+# clear THETA_A unaided, matching the paper's framing of the rule path as an
+# independent fast-path detector rather than a path that can only ever
+# co-sign the GAT. W_GAT is left at 0.75 rather than also raised to 1.0: the
+# GAT has no equivalent hard evidence trail (see Issue #8 below on shared
+# provenance), so keeping it damped relative to the rule path is a
+# conservative choice that should be revisited empirically once baselines
+# and PR curves (Tier 2 in the review) exist to check it against.
+W_RULE = 1.0
 W_GAT = 0.75
 
 FEATURE_HASH_DIM = 16
@@ -559,7 +604,21 @@ if TORCH_AVAILABLE:
                 self.convs.append(HeteroConv(conv_dict, aggr="sum"))
                 layer_in_dim = hidden_dim * heads  # output dim of every layer after the first
 
-            pooled_dim = hidden_dim * heads * len(node_types)
+            # BUG 3 FIX (readout): plain per-type mean-pooling averages a
+            # 3-node attack subgraph into irrelevance inside a session with
+            # hundreds of benign nodes. Replace with a learned attention gate
+            # per node type: a small linear scorer produces one logit per
+            # node, softmax turns those into weights, and the pooled vector
+            # is the weighted sum. This lets the model learn to weight
+            # Behavior nodes (where the actual signal lives) far more heavily
+            # than routine Process/File/Query noise, instead of every node
+            # counting equally regardless of relevance.
+            out_dim = hidden_dim * heads
+            self.attn_gates = nn.ModuleDict({
+                nt: nn.Linear(out_dim, 1) for nt in node_types
+            })
+
+            pooled_dim = out_dim * len(node_types)
             self.classifier = nn.Sequential(
                 nn.Linear(pooled_dim, hidden_dim), nn.ReLU(), nn.Dropout(dropout),
                 nn.Linear(hidden_dim, 1),
@@ -584,7 +643,9 @@ if TORCH_AVAILABLE:
             for nt in self.node_types:
                 x = x_dict.get(nt)
                 if x is not None and x.size(0) > 0:
-                    pooled_parts.append(x.mean(dim=0))
+                    gate_logits = self.attn_gates[nt](x).squeeze(-1)  # [num_nodes_of_type]
+                    weights = torch.softmax(gate_logits, dim=0)
+                    pooled_parts.append((x * weights.unsqueeze(-1)).sum(dim=0))
                 else:
                     pooled_parts.append(torch.zeros(out_dim))
             graph_repr = torch.cat(pooled_parts, dim=0)
@@ -633,15 +694,23 @@ def fuse_scores(rule_score, gat_score_val, w_rule=W_RULE, w_gat=W_GAT):
     return 1.0 - (1.0 - w_rule * r) * (1.0 - w_gat * g)
 
 
-def detect(G, model, session_id="unknown", theta_a=THETA_A, theta_r=THETA_R):
+def detect(G, model, session_id="unknown", theta_a=THETA_A, theta_r=THETA_R,
+           w_rule=W_RULE, w_gat=W_GAT, detection_mode="hybrid"):
     rule_score, scenario, matched_nodes, _all = evaluate_rules(G)
     gat_prob = gat_score(G, model)
-    risk = fuse_scores(rule_score, gat_prob)
+
+    if detection_mode == "rules_only":
+        risk = rule_score
+    elif detection_mode == "gat_only":
+        risk = gat_prob
+    else:
+        risk = fuse_scores(rule_score, gat_prob, w_rule=w_rule, w_gat=w_gat)
 
     assessment = {
         "session_id": session_id, "risk": round(risk, 4),
         "rule_score": round(rule_score, 4), "gat_score": round(gat_prob, 4),
         "scenario": scenario, "status": "benign",
+        "detection_mode": detection_mode,
     }
 
     if risk >= theta_a:
@@ -741,10 +810,27 @@ def load_model(model_path):
     if model_path and os.path.exists(model_path):
         state = torch.load(model_path, map_location="cpu", weights_only=False)
         try:
-            model.load_state_dict(state, strict=False)
-            print(f"[algo4] Loaded trained GAT weights from {model_path}")
-        except Exception as e:
-            print(f"[algo4] WARNING: could not load weights ({e}); using untrained model.")
+            # strict=False was silently tolerating checkpoints that only
+            # partly matched the current architecture (e.g. after adding the
+            # attn_gates module below) -- the load would "succeed" while
+            # leaving those parameters randomly initialized, and nothing
+            # would tell you the resulting model was partly untrained.
+            # Load strictly first; only fall back to a partial load with an
+            # explicit, loud warning naming exactly what didn't match.
+            model.load_state_dict(state, strict=True)
+            print(f"[algo4] Loaded trained GAT weights from {model_path} (strict match).")
+        except RuntimeError as strict_err:
+            result = model.load_state_dict(state, strict=False)
+            missing = list(result.missing_keys)
+            unexpected = list(result.unexpected_keys)
+            warnings.warn(
+                f"[algo4] Checkpoint at {model_path} did NOT strictly match the current "
+                f"model architecture. Missing params (randomly initialized): {missing}. "
+                f"Unexpected params in checkpoint (ignored): {unexpected}. "
+                f"Scores from this model are NOT fully trained-weight scores -- retrain "
+                f"before trusting evaluation numbers. Original error: {strict_err}",
+                RuntimeWarning,
+            )
     else:
         warnings.warn("No trained GAT checkpoint found — gat_score will be near-random "
                        "until train mode is run. The rule path is unaffected.", RuntimeWarning)
@@ -873,6 +959,11 @@ def evaluate_model(args):
 
     dirs = [d.strip() for d in args.input_dir.split(',') if d.strip()]
     label_files = [f.strip() for f in args.labels.split(',') if f.strip()]
+    theta_a = getattr(args, 'theta_a', THETA_A)
+    theta_r = getattr(args, 'theta_r', THETA_R)
+    w_rule = getattr(args, 'w_rule', W_RULE)
+    w_gat = getattr(args, 'w_gat', W_GAT)
+    detection_mode = getattr(args, 'detection_mode', 'hybrid')
 
     y_true, y_scores, y_rule, y_gat = [], [], [], []
     for d, lf in zip(dirs, label_files):
@@ -883,7 +974,8 @@ def evaluate_model(args):
             if not os.path.exists(path):
                 continue
             G = nx.read_graphml(path)
-            assessment = detect(G, model, session_id=filename)
+            assessment = detect(G, model, session_id=filename, theta_a=theta_a, theta_r=theta_r,
+                                w_rule=w_rule, w_gat=w_gat, detection_mode=detection_mode)
             y_true.append(int(label))
             y_scores.append(assessment['risk'])
             y_rule.append(assessment['rule_score'])
@@ -893,7 +985,7 @@ def evaluate_model(args):
         raise RuntimeError("No evaluation data found.")
 
     # Binary predictions at current threshold
-    y_pred = [1 if s >= THETA_A else 0 for s in y_scores]
+    y_pred = [1 if s >= theta_a else 0 for s in y_scores]
 
     # Compute metrics
     tp = sum(1 for t, p in zip(y_true, y_pred) if t == 1 and p == 1)
@@ -903,9 +995,13 @@ def evaluate_model(args):
 
     metrics = _classification_metrics(tp, fp, fn, tn)
     pr_auc = _average_precision_from_scores(y_true, y_scores)
+    roc_auc = _roc_auc_from_scores(y_true, y_scores)
 
     results = {
-        'threshold': THETA_A,
+        'threshold': theta_a,
+        'detection_mode': detection_mode,
+        'w_rule': w_rule,
+        'w_gat': w_gat,
         'total_samples': len(y_true),
         'true_positives': tp, 'false_positives': fp,
         'false_negatives': fn, 'true_negatives': tn,
@@ -918,6 +1014,9 @@ def evaluate_model(args):
         'accuracy': round(metrics['accuracy'], 4),
         'balanced_accuracy': round(metrics['balanced_accuracy'], 4),
         'mcc': round(metrics['mcc'], 4),
+        'auroc': round(roc_auc, 4),
+        'roc_auc': round(roc_auc, 4),
+        'auprc': round(pr_auc, 4),
         'pr_auc': round(pr_auc, 4),
         'alert_rate': round(metrics['alert_rate'], 4),
         'miss_rate': round(metrics['miss_rate'], 4),
@@ -925,7 +1024,7 @@ def evaluate_model(args):
     }
 
     print(f"\n{'='*60}")
-    print(f"  EVALUATION RESULTS (θ_A = {THETA_A})")
+    print(f"  EVALUATION RESULTS (θ_A = {theta_a:.2f}, mode = {detection_mode})")
     print(f"{'='*60}")
     print(f"  Samples:   {len(y_true)} ({sum(y_true)} malicious, {len(y_true)-sum(y_true)} normal)")
     print(f"  Accuracy:        {metrics['accuracy']:.4f}")
@@ -937,7 +1036,8 @@ def evaluate_model(args):
     print(f"  FNR:             {metrics['fnr']:.4f}")
     print(f"  F1-Score:        {metrics['f1']:.4f}")
     print(f"  MCC:             {metrics['mcc']:.4f}")
-    print(f"  PR-AUC:          {pr_auc:.4f}")
+    print(f"  AUROC:           {roc_auc:.4f}")
+    print(f"  AUPRC / PR-AUC:  {pr_auc:.4f}")
     print(f"  Alert Rate:      {metrics['alert_rate']:.4f}")
     print(f"  Miss Rate:       {metrics['miss_rate']:.4f}")
     print(f"\n  Confusion Matrix:")
@@ -1033,6 +1133,12 @@ def parse_args():
                    help="Comma-separated label JSON files (evaluate/tune)")
     p.add_argument("--theta-a", type=float, default=THETA_A)
     p.add_argument("--theta-r", type=float, default=THETA_R)
+    p.add_argument("--w-rule", type=float, default=W_RULE,
+                   help="Weight for rule-based detector in fusion")
+    p.add_argument("--w-gat", type=float, default=W_GAT,
+                   help="Weight for GAT detector in fusion")
+    p.add_argument("--detection-mode", choices=["hybrid", "rules_only", "gat_only"], default="hybrid",
+                   help="Detection modality: hybrid, rules_only, or gat_only")
 
     # Train-specific
     p.add_argument("--train-dir", default=None,

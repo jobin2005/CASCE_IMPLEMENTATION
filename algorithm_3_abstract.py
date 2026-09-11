@@ -1,4 +1,5 @@
 import os
+import re
 import argparse
 import networkx as nx
 import numpy as np
@@ -15,12 +16,25 @@ def parse_args():
 
 
 class BehaviorTemplate:
-    def __init__(self, label, mitre_id, graph_structure, semantic_keywords, temporal_constraints):
+    def __init__(self, label, mitre_id, graph_structure, semantic_keywords, temporal_constraints,
+                 node_attr_requirements=None):
         self.label = label
         self.mitre_id = mitre_id
         self.structure = graph_structure
         self.semantic_keywords = semantic_keywords
         self.temporal_constraints = temporal_constraints
+        # Optional: {template_node_name: {attr_name: expected_value}} where expected_value
+        # is either True (attr must be truthy), or a set/tuple of acceptable values.
+        # Several templates in this project share an identical (type, relation, type)
+        # shape -- e.g. every {DATA_ACCESS, DESTRUCTIVE_DB_OPERATION, DEFENSE_IMPAIRMENT}
+        # instance is literally "Query -accesses-> Table". Without this, s_struct
+        # cannot tell them apart at all and all discrimination silently falls on
+        # s_sem. This field lets a template additionally require a raw fact
+        # (already present on the node from Algorithm 2/sqlfacts.py) to count as a
+        # structural match. Only added where the upstream event schema actually
+        # carries a distinguishing fact -- see the per-template comments below for
+        # which groups remain semantic-only and why.
+        self.node_attr_requirements = node_attr_requirements or {}
 
 
 def initialize_templates():
@@ -37,6 +51,11 @@ def initialize_templates():
         graph_structure=g_access,
         semantic_keywords=["pg_authid", "pg_shadow", "pg_roles", "password", "credential", "secret"],
         temporal_constraints={"max_gap": 5.0}
+        # No node_attr_requirements: sqlfacts.py doesn't (and structurally can't)
+        # distinguish "read a sensitive table" from any other SELECT via a raw
+        # fact -- it's a semantic question. Discrimination from
+        # DESTRUCTIVE_DB_OPERATION / DEFENSE_IMPAIRMENT is intentionally left to
+        # s_sem (now fixed to word-boundary matching, see calculate_s_sem).
     ))
 
     # 2. DATA_PACKAGING (T1560.001)
@@ -69,6 +88,12 @@ def initialize_templates():
         graph_structure=g_transfer,
         semantic_keywords=["curl", "wget", "nc", "ncat", "ssh", "scp", "ftp"],
         temporal_constraints={"max_gap": 30.0}
+        # Both this and POTENTIAL_INGRESS_TOOL_TRANSFER are "Process
+        # -connects_to-> Endpoint" and the current kernel schema has no
+        # direction-of-flow fact (e.g. inbound vs outbound bytes) to gate on,
+        # so this pair is genuinely semantic-only given today's event schema.
+        # If direction ever gets captured, add a node_attr_requirements entry
+        # here instead of leaving it to keyword overlap.
     ))
 
     # 4. DESTRUCTIVE_DB_OPERATION (T1485)
@@ -81,7 +106,14 @@ def initialize_templates():
         mitre_id="T1485",
         graph_structure=g_destruct,
         semantic_keywords=["drop", "delete", "truncate"],
-        temporal_constraints={"max_gap": 15.0}
+        temporal_constraints={"max_gap": 15.0},
+        # sqlfacts.py sets is_drop=True only for DropStmt, so this only gives a
+        # real structural signal for DROP, not DELETE/TRUNCATE (UpdateStmt/
+        # DeleteStmt facts don't currently carry an equivalent flag). DELETE/
+        # TRUNCATE still rely on s_sem alone until extract_query_facts is
+        # extended to tag them too -- flagging that as a follow-up, not fixing
+        # it silently here.
+        node_attr_requirements={"T_Table": {"is_drop": True}}
     ))
 
     # 5. OS_CREDENTIAL_DUMPING (T1003.008)
@@ -94,7 +126,15 @@ def initialize_templates():
         mitre_id="T1003.008",
         graph_structure=g_cred_dump,
         semantic_keywords=["/etc/shadow", "/etc/passwd"],
-        temporal_constraints={"max_gap": 15.0}
+        temporal_constraints={"max_gap": 15.0},
+        # Reading a credential file is an openat, not an unlink/rename -- this
+        # alone separates it from INDICATOR_REMOVAL_FILE structurally. It does
+        # NOT separate it from INDICATOR_REMOVAL_HISTORY (clearing
+        # .bash_history is also usually an openat); that distinction is
+        # semantic (/etc/shadow vs bash_history/history keywords) and stays
+        # that way -- there's no raw fact in the kernel event schema for
+        # "read vs truncate intent" to gate on structurally.
+        node_attr_requirements={"T_File": {"syscall": "openat"}}
     ))
 
     # 6. UNIX_SHELL_EXECUTION (T1059.004)
@@ -120,7 +160,8 @@ def initialize_templates():
         mitre_id="T1098",
         graph_structure=g_account,
         semantic_keywords=["create role", "alter role", "superuser", "login", "grant", "revoke"],
-        temporal_constraints={"max_gap": 30.0}
+        temporal_constraints={"max_gap": 30.0},
+        node_attr_requirements={"T_Role": {"is_role_change": True}}
     ))
 
     # 8. POTENTIAL_INGRESS_TOOL_TRANSFER (T1105)
@@ -134,6 +175,8 @@ def initialize_templates():
         graph_structure=g_ingress,
         semantic_keywords=["wget", "curl", "fetch", "git", "clone"],
         temporal_constraints={"max_gap": 60.0}
+        # See EXTERNAL_TRANSFER's comment -- same structural shape, no
+        # direction-of-flow fact available yet, so left semantic-only.
     ))
 
     # 9. INDICATOR_REMOVAL_HISTORY (T1070.003)
@@ -147,6 +190,11 @@ def initialize_templates():
         graph_structure=g_hist,
         semantic_keywords=["bash_history", "history", "clear"],
         temporal_constraints={"max_gap": 10.0}
+        # Deliberately no syscall requirement: history clearing shows up as
+        # openat (truncate), unlink, or rename depending on the tool used, so
+        # gating on one syscall would under-match. Discrimination from
+        # OS_CREDENTIAL_DUMPING is semantic (bash_history/history vs
+        # /etc/shadow/passwd keywords).
     ))
 
     # 10. INDICATOR_REMOVAL_FILE (T1070.004)
@@ -159,7 +207,11 @@ def initialize_templates():
         mitre_id="T1070.004",
         graph_structure=g_file_del,
         semantic_keywords=["rm", "unlink", "remove"],
-        temporal_constraints={"max_gap": 10.0}
+        temporal_constraints={"max_gap": 10.0},
+        # Actual deletion is unlink/rename, never openat -- this is the
+        # discriminator that separates this template structurally from both
+        # OS_CREDENTIAL_DUMPING (openat) and INDICATOR_REMOVAL_HISTORY (any).
+        node_attr_requirements={"T_File": {"syscall": ("unlink", "rename")}}
     ))
 
     # 11. DEFENSE_IMPAIRMENT (Project-defined)
@@ -173,6 +225,14 @@ def initialize_templates():
         graph_structure=g_def,
         semantic_keywords=["pg_settings", "log_statement", "log_min_messages", "alter system set", "disable"],
         temporal_constraints={"max_gap": 60.0}
+        # No fact-based discriminator: sqlfacts.py doesn't parse
+        # VariableSetStmt/ALTER SYSTEM SET for a generic setting name (only
+        # the role-related VariableSetStmt case is handled), and there's no
+        # "Configuration" node ever actually produced by Algorithm 2 today
+        # (identify_node_types() in algorithm2.py never emits it despite it
+        # being in the Algorithm 4 schema) -- worth raising separately.
+        # Discrimination from DATA_ACCESS/DESTRUCTIVE_DB_OPERATION is
+        # semantic-only until that's addressed.
     ))
 
     return templates
@@ -198,6 +258,30 @@ def _relation_between(G, u, v, target_relation=None):
         rels = {edge_data.get("relation")}
     return (target_relation in rels) if target_relation else rels
 
+
+def _node_satisfies_requirements(G_s, node, requirements):
+    """True if `node`'s attrs satisfy a template's node_attr_requirements
+    entry for it (or if there is no requirement -- the common case)."""
+    if not requirements:
+        return True
+    data = G_s.nodes[node]
+    for attr, expected in requirements.items():
+        val = data.get(attr)
+        if isinstance(expected, (set, list, tuple)):
+            if val not in expected:
+                return False
+        elif expected is True:
+            # Truthy check -- handles both real bools and the "True"/"" string
+            # forms GraphML round-tripping produces (sanitize_for_graphml in
+            # main.py stringifies bools before writing).
+            if not (val is True or val == "True"):
+                return False
+        else:
+            if val != expected:
+                return False
+    return True
+
+
 def calculate_graded_s_struct(G_s, T, theta_struct=0.6, max_matches=10):
     template = T.structure
 
@@ -208,10 +292,12 @@ def calculate_graded_s_struct(G_s, T, theta_struct=0.6, max_matches=10):
     )
 
     t_root_type = template.nodes[t_root].get("type")
+    root_requirements = T.node_attr_requirements.get(t_root)
 
     candidates = [
         n for n, data in G_s.nodes(data=True)
         if data.get("type") == t_root_type
+        and _node_satisfies_requirements(G_s, n, root_requirements)
     ]
 
     graded_matches = []
@@ -225,6 +311,7 @@ def calculate_graded_s_struct(G_s, T, theta_struct=0.6, max_matches=10):
         for t_child in template.successors(t_root):
             required_type = template.nodes[t_child].get("type")
             required_relation = template.edges[t_root, t_child].get("relation")
+            child_requirements = T.node_attr_requirements.get(t_child)
 
             best_candidate = None
             for actual_child in G_s.successors(root):
@@ -237,8 +324,9 @@ def calculate_graded_s_struct(G_s, T, theta_struct=0.6, max_matches=10):
                 edge_data = G_s.get_edge_data(root, actual_child)
                 actual_relation = edge_data.get("relation") if edge_data else None
 
-                # Simplified node compatibility purely relying on relation + type (semantic hook comes later in pipeline)
-                if actual_type == required_type and actual_relation == required_relation:
+                if (actual_type == required_type
+                        and _relation_between(G_s, root, actual_child, required_relation)
+                        and _node_satisfies_requirements(G_s, actual_child, child_requirements)):
                     best_candidate = actual_child
                     break
 
@@ -295,6 +383,15 @@ def calculate_graded_s_struct(G_s, T, theta_struct=0.6, max_matches=10):
     return graded_matches
 
 
+_TOKEN_RE = re.compile(r"[a-zA-Z0-9_./:-]+")
+
+
+def _tokenize(text):
+    """Split into word-boundary tokens, e.g. '/etc/shadow' and 'branches'
+    stay distinct tokens instead of one being a substring of the other."""
+    return set(_TOKEN_RE.findall(text.lower()))
+
+
 def calculate_s_sem(matched_nodes, G_s, T_keywords):
     if not matched_nodes or not T_keywords:
         return 0.0
@@ -310,11 +407,25 @@ def calculate_s_sem(matched_nodes, G_s, T_keywords):
 
     factual_text = " ".join(factual_values)
     factual_text_lower = factual_text.lower()
+    factual_tokens = _tokenize(factual_text)
 
+    # BUG FIX: the old check was `if keyword in factual_text_lower`, i.e.
+    # raw substring containment. That made "nc" match inside "branches",
+    # "sh" match inside "shadow"/"push", "program" match inside any
+    # "...program..." identifier, etc. -- 529 spurious matches on
+    # EXTERNAL_TRANSFER/"nc" alone against dev run_1's 684 queries.
+    # Single-word keywords now require a real token match (word boundaries);
+    # multi-word keywords (e.g. "create role") still need a phrase match,
+    # done with \b-anchored regex rather than naive `in`.
     matched_keywords = 0
     for keyword in T_keywords:
         keyword = str(keyword).lower().strip()
-        if keyword and keyword in factual_text_lower:
+        if not keyword:
+            continue
+        if " " in keyword:
+            if re.search(r"\b" + re.escape(keyword) + r"\b", factual_text_lower):
+                matched_keywords += 1
+        elif keyword in factual_tokens:
             matched_keywords += 1
 
     s_coverage = matched_keywords / max(1, len(T_keywords))
