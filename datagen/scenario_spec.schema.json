@@ -1,0 +1,132 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "casce-datagen/scenario_spec.schema.json",
+  "title": "CASCE synthetic scenario spec (v1)",
+  "type": "object",
+  "required": ["scenario_id", "family_id", "domain", "sessions"],
+  "properties": {
+    "scenario_id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+    "family_id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+    "domain": { "type": "string" },
+    "matched_pair_id": { "type": "string" },
+    "matched_dimensions": {
+      "type": "object",
+      "required": ["fixed", "varied"],
+      "properties": {
+        "fixed": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/matchDimension" }
+        },
+        "varied": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/matchDimension" }
+        }
+      }
+    },
+    "time_of_day": { "type": "string", "pattern": "^[0-2][0-9]:[0-5][0-9]$" },
+    "default_class": { "enum": ["benign", "malicious"] },
+    "rule_engine_relationship": {
+      "enum": ["agrees", "benign_false_positive", "malicious_false_negative"],
+      "default": "agrees"
+    },
+    "sessions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/session" }
+    }
+  },
+  "dependencies": {
+    "matched_pair_id": ["matched_dimensions"]
+  },
+  "definitions": {
+    "matchDimension": {
+      "enum": [
+        "process_tree_shape",
+        "syscall_sequence",
+        "timing_pattern",
+        "sql_content",
+        "connects_to_destination",
+        "role"
+      ]
+    },
+    "session": {
+      "type": "object",
+      "required": ["session_label", "events"],
+      "properties": {
+        "session_label": { "type": "string" },
+        "class": { "enum": ["benign", "malicious"] },
+        "role": { "type": "string" },
+        "anchor": { "enum": ["db", "synthetic", "none"], "default": "db" },
+        "anchor_query": { "type": "string", "default": "SELECT 1" },
+        "concurrent_with": { "type": ["string", "null"] },
+        "delay_after_previous_seconds": { "type": ["number", "null"] },
+        "timing": {
+          "type": "object",
+          "properties": {
+            "tempo": { "enum": ["bursty", "steady", "scheduled", "off_hours"] },
+            "step_gaps_seconds": {
+              "type": "array",
+              "items": { "type": "number", "minimum": 0 }
+            }
+          }
+        },
+        "events": { "$ref": "#/definitions/events" }
+      }
+    },
+    "events": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/event" }
+    },
+    "event": {
+      "type": "object",
+      "properties": {
+        "step_id": { "type": "string" },
+        "sql": { "type": "string" },
+        "process": {
+          "type": "object",
+          "required": ["comm", "args"],
+          "properties": {
+            "comm": { "type": "string" },
+            "args": { "type": "array", "items": { "type": "string" } },
+            "parent": { "type": ["string", "null"] }
+          }
+        },
+        "file": {
+          "type": "object",
+          "required": ["path", "syscall", "parent"],
+          "properties": {
+            "path": { "type": "string" },
+            "syscall": { "enum": ["openat", "unlink", "rename"] },
+            "parent": { "type": "string" }
+          }
+        },
+        "connect": {
+          "type": "object",
+          "required": ["ip", "port", "parent"],
+          "properties": {
+            "ip": { "type": "string" },
+            "port": { "type": "integer" },
+            "parent": { "type": "string" }
+          }
+        },
+        "connects_to": {
+          "type": "object",
+          "required": ["ip", "port"],
+          "properties": {
+            "ip": { "type": "string" },
+            "port": { "type": "integer" }
+          }
+        }
+      },
+      "oneOf": [
+        { "required": ["sql"] },
+        { "required": ["process"] },
+        { "required": ["file"] },
+        { "required": ["connect"] }
+      ]
+    }
+  }
+}
