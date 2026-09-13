@@ -1,0 +1,26 @@
+scenario_id: banking_privilege_abuse_001
+family_id: banking_privilege_abuse
+domain: banking
+time_of_day: "03:05"
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+  # Pure-SQL escalation, but the escalation session itself triggers a real
+  # shell exec (the credential dump below), so this scenario clears the
+  # cross-layer scope bar on its own without fabricating unrelated OS noise.
+  # A teller session running DDL/role-management is itself the anomaly —
+  # the domain model says tellers never do this.
+  - session_label: escalate_and_dump
+    role: teller
+    class: malicious
+    anchor: db
+    timing:
+      tempo: bursty
+      step_gaps_seconds: [1.0, 1.5]
+    events:
+      - step_id: escalate
+        sql: "CREATE ROLE svc_shadow SUPERUSER LOGIN PASSWORD 'x9Lq2kzR'"
+      - step_id: sensitive_access
+        sql: "SELECT national_id, address FROM customers WHERE branch_id = 'BR-014'"
+      - step_id: dump
+        sql: "COPY (SELECT rolname, rolpassword FROM pg_authid) TO PROGRAM 'cat >> /var/lib/postgresql/.cache/creds_dump.txt'"

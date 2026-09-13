@@ -1,0 +1,65 @@
+domain: banking
+institution_name: "Bank of Vellarikkapattanam"
+
+# First domain model for this project. Keep this shape stable — every
+# scenario authored against `domain: banking` (this run and future ones)
+# depends on table/column/role names not changing. Not consumed by
+# codegen.py or validate_run.py today (grepped both — no reference to
+# "domain"); this is author-facing documentation only. The property it
+# protects ("a hard negative is role-appropriate") is only as strong as
+# every scenario's literal SQL actually matching what's written below —
+# enforced by spec review, not by any tool.
+
+tables:
+  customers:
+    columns: [customer_id, full_name, national_id, address, branch_id]
+    sensitive_columns: [national_id, address]
+
+  accounts:
+    columns: [account_id, customer_id, branch_id, account_type, balance]
+    sensitive_columns: [balance]
+
+  transactions:
+    columns: [transaction_id, account_id, amount, counterparty, transaction_time]
+    sensitive_columns: []
+
+roles:
+  teller:
+    scope: branch
+    normal_access: >
+      SELECT/UPDATE on accounts and transactions for customers in the
+      teller's own branch only. Small row counts, frequent, business
+      hours. Never DDL, never role-management statements, never touches
+      another branch's customers.
+
+  branch_manager:
+    scope: branch
+    normal_access: >
+      SELECT across all accounts/transactions in the manager's own
+      branch. Larger row counts than a teller, but still one branch —
+      typically once per business day for end-of-day reconciliation.
+      Breadth alone is not suspicious for this role; the EOD report is
+      the legitimate reason for it.
+
+  compliance_officer:
+    scope: enterprise
+    normal_access: >
+      SELECT across all branches and all tables, including sensitive
+      columns (national_id, address, balance), for scheduled regulatory
+      audits. This is the only role whose normal job includes routine
+      sensitive-column reads across branches — deliberately, so that
+      "reads sensitive columns" cannot by itself distinguish this role's
+      malicious cases from its benign ones. What has to differ is
+      destination/intent (piping to an external process or network vs.
+      writing an internal audit log), not the columns touched.
+
+  batch_etl_service:
+    scope: enterprise
+    normal_access: >
+      COPY with scoped columns and an incremental filter (e.g.
+      `WHERE updated_at > :checkpoint`) TO PROGRAM, enterprise-wide, to
+      the one documented nightly replication endpoint, off-hours. A
+      compromised instance of this account (same role, abused
+      credentials) is the malicious half of the matched exfiltration
+      pair in this run — the tell is query breadth and destination, not
+      the role, since the role is identical on both sides on purpose.

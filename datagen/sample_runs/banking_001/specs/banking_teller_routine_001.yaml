@@ -1,0 +1,31 @@
+scenario_id: banking_teller_routine_001
+family_id: banking_teller_routine
+domain: banking
+time_of_day: "11:20"
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+  # Ordinary counter traffic: small reads/writes, one customer at a time,
+  # own branch only. Each transaction prints a receipt (the scenario's
+  # required OS-layer activity) — a mundane action, not incidental noise
+  # added to satisfy the cross-layer check.
+  - session_label: counter_traffic
+    role: teller
+    class: benign
+    anchor: db
+    timing:
+      tempo: steady
+      step_gaps_seconds: [6.0]
+    events:
+      - step_id: lookup_1
+        sql: "SELECT account_id, balance FROM accounts WHERE account_id = 55231 AND branch_id = 'BR-014'"
+      - step_id: withdrawal
+        sql: "UPDATE accounts SET balance = balance - 4000 WHERE account_id = 55231"
+      - step_id: print_receipt_1
+        file: {path: "/var/print/receipts/receipt_20260912_0001.txt", syscall: openat, parent: withdrawal}
+      - step_id: lookup_2
+        sql: "SELECT account_id, balance FROM accounts WHERE account_id = 55232 AND branch_id = 'BR-014'"
+      - step_id: deposit
+        sql: "UPDATE accounts SET balance = balance + 1500 WHERE account_id = 55232"
+      - step_id: print_receipt_2
+        file: {path: "/var/print/receipts/receipt_20260912_0002.txt", syscall: openat, parent: deposit}
