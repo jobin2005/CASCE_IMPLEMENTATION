@@ -116,17 +116,45 @@ def _facts(query) -> Dict[str, Any]:
         return {}
 
 
+DEFAULT_PADDING_PROFILE = {
+    "teller": {
+        "pre": [{"sql": "SELECT 1"}, {"sql": "SELECT column_name FROM information_schema.columns WHERE table_name = 'accounts'"}],
+        "post": [{"sql": "SELECT branch_id FROM branches WHERE is_active = true"}]
+    },
+    "branch_manager": {
+        "pre": [{"sql": "SELECT 1"}, {"sql": "SELECT setting, unit FROM pg_settings WHERE name = 'work_mem'"}],
+        "post": [{"sql": "SELECT count(*) FROM branches"}]
+    },
+    "compliance_officer": {
+        "pre": [{"sql": "SELECT 1"}, {"sql": "SELECT session_user, current_user"}],
+        "post": [{"sql": "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'"}]
+    },
+    "batch_etl_service": {
+        "pre": [{"sql": "SELECT 1"}, {"sql": "SELECT setting FROM pg_settings WHERE name = 'server_version'"}],
+        "post": [{"sql": "SELECT pg_is_in_recovery()"}]
+    }
+}
+
+
 def _event_list(sess: Any) -> List[Dict[str, Any]]:
-    """Session events including the synthetic anchor (mirrors codegen)."""
+    """Session events including synthetic anchor and padding (mirrors codegen)."""
     out: List[Dict[str, Any]] = []
     if not isinstance(sess, dict):
         return out
+    role = sess.get("role", "postgres")
+    padding = DEFAULT_PADDING_PROFILE.get(role, {
+        "pre": [{"sql": "SELECT 1"}],
+        "post": [{"sql": "SELECT 1"}]
+    })
+    out.extend(padding.get("pre", []))
     if sess.get("anchor", "db") == "synthetic":
         out.append({ANCHOR_KEY: sess.get("anchor_query") or "SELECT 1"})
     events = sess.get("events")
     if isinstance(events, list):
         out.extend(ev for ev in events if isinstance(ev, dict))
+    out.extend(padding.get("post", []))
     return out
+
 
 
 def _explicit_events(sess: Any) -> List[Dict[str, Any]]:

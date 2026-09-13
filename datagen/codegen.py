@@ -443,14 +443,45 @@ def parse_shell_command(shell_cmd: str) -> List[ShellSegment]:
 
 ANCHOR_KEY = "__anchor_query__"
 
+DEFAULT_PADDING_PROFILE = {
+    "teller": {
+        "pre": [{"sql": "SELECT 1"}, {"sql": "SELECT column_name FROM information_schema.columns WHERE table_name = 'accounts'"}],
+        "post": [{"sql": "SELECT branch_id FROM branches WHERE is_active = true"}]
+    },
+    "branch_manager": {
+        "pre": [{"sql": "SELECT 1"}, {"sql": "SELECT setting, unit FROM pg_settings WHERE name = 'work_mem'"}],
+        "post": [{"sql": "SELECT count(*) FROM branches"}]
+    },
+    "compliance_officer": {
+        "pre": [{"sql": "SELECT 1"}, {"sql": "SELECT session_user, current_user"}],
+        "post": [{"sql": "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'"}]
+    },
+    "batch_etl_service": {
+        "pre": [{"sql": "SELECT 1"}, {"sql": "SELECT setting FROM pg_settings WHERE name = 'server_version'"}],
+        "post": [{"sql": "SELECT pg_is_in_recovery()"}]
+    }
+}
+
 
 def event_list_for_session(sess: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """Session's event list including the synthetic anchor, if any."""
+    """Session's event list including synthetic anchor and domain/role padding."""
     out: List[Dict[str, Any]] = []
+    role = sess.get("role", "postgres")
+    padding = DEFAULT_PADDING_PROFILE.get(role, {
+        "pre": [{"sql": "SELECT 1"}],
+        "post": [{"sql": "SELECT 1"}]
+    })
+
+    # Generator-level session padding (cover traffic)
+    out.extend(padding.get("pre", []))
+
     if sess.get("anchor", "db") == "synthetic":
         out.append({ANCHOR_KEY: sess.get("anchor_query") or "SELECT 1"})
     out.extend(sess.get("events") or [])
+
+    out.extend(padding.get("post", []))
     return out
+
 
 
 def get_gaps(sess: Dict[str, Any]) -> List[float]:
@@ -653,13 +684,13 @@ def _kernel_record(pid, ppid, comm, syscall, arg,
     return rec
 
 
-def _postgres_record(session: SessionRuntime, ts: float, query: str) -> Dict[str, Any]:
+def _postgres_record(session: SessionRuntime, ts: float, query: str, event_type: str = "ProcessUtility") -> Dict[str, Any]:
     return {
         "session_id": session.backend_pid,
         "session_start_time": int(session.times[0]),
         "backend_pid": session.backend_pid,
         "timestamp": ts,
-        "event_type": "ProcessUtility",
+        "event_type": event_type,
         "query": query,
         "database": "casce_synthetic",
         "username": session.role,
@@ -705,9 +736,14 @@ def build_session(scenario: ScenarioRuntime, index: int, alloc: PidAllocator) ->
                     sf.filename, sid, label, None,
                     f"anchor_query sqlfacts parse error: {facts['parse_error']}"))
             if emit_postgres:
-                raw = _postgres_record(runtime, ts, query)
+                raw = _postgres_record(runtime, ts, query, event_type="ExecutorStart")
                 runtime.records.append(EmittedRecord(
                     session=runtime, source="postgres", timestamp=ts, raw=raw,
+                    facts=facts, step_id=None, source_event_type="sql",
+                    event_index=ev_index))
+                raw_end = _postgres_record(runtime, ts + 0.0005, query, event_type="ExecutorEnd")
+                runtime.records.append(EmittedRecord(
+                    session=runtime, source="postgres", timestamp=ts + 0.0005, raw=raw_end,
                     facts=facts, step_id=None, source_event_type="sql",
                     event_index=ev_index))
             continue
@@ -759,11 +795,27 @@ def _build_sql_event(runtime, ev, step_id, ts, ev_index, steps, alloc, sf):
         raise BuildError(Failure(sf.filename, sid, label, step_id,
                                  f"sqlfacts parse error: {facts['parse_error']}"))
 
+    q_upper = query.strip().upper()
+    is_dml = any(q_upper.startswith(kw) for kw in ["SELECT", "INSERT", "UPDATE", "DELETE"])
+
     if runtime.anchor != "none":
-        runtime.records.append(EmittedRecord(
-            session=runtime, source="postgres", timestamp=ts,
-            raw=_postgres_record(runtime, ts, query), facts=facts,
-            step_id=step_id, source_event_type="sql", event_index=ev_index))
+        if is_dml:
+            # Emit ExecutorStart
+            runtime.records.append(EmittedRecord(
+                session=runtime, source="postgres", timestamp=ts,
+                raw=_postgres_record(runtime, ts, query, event_type="ExecutorStart"), facts=facts,
+                step_id=step_id, source_event_type="sql", event_index=ev_index))
+            # Emit ExecutorEnd
+            runtime.records.append(EmittedRecord(
+                session=runtime, source="postgres", timestamp=ts + 0.0005,
+                raw=_postgres_record(runtime, ts + 0.0005, query, event_type="ExecutorEnd"), facts=facts,
+                step_id=step_id, source_event_type="sql", event_index=ev_index))
+        else:
+            runtime.records.append(EmittedRecord(
+                session=runtime, source="postgres", timestamp=ts,
+                raw=_postgres_record(runtime, ts, query, event_type="ProcessUtility"), facts=facts,
+                step_id=step_id, source_event_type="sql", event_index=ev_index))
+
 
     spawned: List[StepInfo] = []
     if facts.get("is_program") and facts.get("shell_cmd"):
@@ -917,6 +969,8 @@ def assign_event_ids(all_records: List[EmittedRecord]) -> None:
 
 def _identify_node_types(rec: EmittedRecord) -> List[str]:
     if rec.source == "postgres":
+        if rec.raw.get("event_type") == "ExecutorEnd":
+            return []
         types = ["Query"]
         facts = rec.facts or {}
         if facts.get("table_name"):
@@ -924,6 +978,7 @@ def _identify_node_types(rec: EmittedRecord) -> List[str]:
         if facts.get("role_name"):
             types.append("Role")
         return types
+
     syscall = rec.raw.get("syscall")
     if syscall == "execve":
         return ["Process"]

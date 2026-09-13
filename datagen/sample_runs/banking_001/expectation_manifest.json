@@ -32,24 +32,55 @@
             },
             {
               "node_type": "Query",
-              "key_hint": "12",
+              "key_hint": "31",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "33",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "35",
               "source_step_id": "audit_sample",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "38",
+              "source_step_id": null,
               "source_event_type": "sql"
             },
             {
               "node_type": "Session",
               "key_hint": "20000",
-              "source_step_id": "audit_sample",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "tables",
+              "source_step_id": null,
               "source_event_type": "sql"
             }
           ],
           "expected_edges": [
             {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
               "edge_type": "executes",
               "source_node_type": "Session",
               "target_node_type": "Query",
               "source_step_id": null,
-              "target_step_id": "audit_sample"
+              "target_step_id": null
             },
             {
               "edge_type": "opens",
@@ -91,20 +122,50 @@
             },
             {
               "node_type": "Query",
-              "key_hint": "20",
+              "key_hint": "56",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "58",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "60",
               "source_step_id": "reconcile_query",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "63",
+              "source_step_id": null,
               "source_event_type": "sql"
             },
             {
               "node_type": "Session",
               "key_hint": "20001",
-              "source_step_id": "reconcile_query",
+              "source_step_id": null,
               "source_event_type": "sql"
             },
             {
               "node_type": "Table",
               "key_hint": "accounts",
               "source_step_id": "reconcile_query",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "branches",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "pg_settings",
+              "source_step_id": null,
               "source_event_type": "sql"
             }
           ],
@@ -114,14 +175,14 @@
               "source_node_type": "Query",
               "target_node_type": "Table",
               "source_step_id": null,
-              "target_step_id": "reconcile_query"
+              "target_step_id": null
             },
             {
               "edge_type": "executes",
               "source_node_type": "Session",
               "target_node_type": "Query",
               "source_step_id": null,
-              "target_step_id": "reconcile_query"
+              "target_step_id": null
             },
             {
               "edge_type": "opens",
@@ -163,18 +224,49 @@
             },
             {
               "node_type": "Query",
-              "key_hint": "22",
+              "key_hint": "65",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "67",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "69",
               "source_step_id": "exfil",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "72",
+              "source_step_id": null,
               "source_event_type": "sql"
             },
             {
               "node_type": "Session",
               "key_hint": "20002",
-              "source_step_id": "exfil",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "tables",
+              "source_step_id": null,
               "source_event_type": "sql"
             }
           ],
           "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
             {
               "edge_type": "connects_to",
               "source_node_type": "Process",
@@ -187,7 +279,7 @@
               "source_node_type": "Session",
               "target_node_type": "Query",
               "source_step_id": null,
-              "target_step_id": "exfil"
+              "target_step_id": null
             },
             {
               "edge_type": "spawns",
@@ -239,17 +331,48 @@
             {
               "node_type": "Query",
               "key_hint": "1",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "15",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "5",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "9",
               "source_step_id": "exfil",
               "source_event_type": "sql"
             },
             {
               "node_type": "Session",
               "key_hint": "20004",
-              "source_step_id": "exfil",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "pg_settings",
+              "source_step_id": null,
               "source_event_type": "sql"
             }
           ],
           "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
             {
               "edge_type": "connects_to",
               "source_node_type": "Process",
@@ -262,7 +385,7 @@
               "source_node_type": "Session",
               "target_node_type": "Query",
               "source_step_id": null,
-              "target_step_id": "exfil"
+              "target_step_id": null
             },
             {
               "edge_type": "spawns",
@@ -313,18 +436,49 @@
             },
             {
               "node_type": "Query",
-              "key_hint": "2",
+              "key_hint": "10",
               "source_step_id": "exfil",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "16",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "2",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "6",
+              "source_step_id": null,
               "source_event_type": "sql"
             },
             {
               "node_type": "Session",
               "key_hint": "20006",
-              "source_step_id": "exfil",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "pg_settings",
+              "source_step_id": null,
               "source_event_type": "sql"
             }
           ],
           "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
             {
               "edge_type": "connects_to",
               "source_node_type": "Process",
@@ -337,7 +491,7 @@
               "source_node_type": "Session",
               "target_node_type": "Query",
               "source_step_id": null,
-              "target_step_id": "exfil"
+              "target_step_id": null
             },
             {
               "edge_type": "spawns",
@@ -379,20 +533,38 @@
             },
             {
               "node_type": "Query",
-              "key_hint": "7",
+              "key_hint": "19",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "21",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "23",
               "source_step_id": "escalate",
               "source_event_type": "sql"
             },
             {
               "node_type": "Query",
-              "key_hint": "8",
+              "key_hint": "24",
               "source_step_id": "sensitive_access",
               "source_event_type": "sql"
             },
             {
               "node_type": "Query",
-              "key_hint": "9",
+              "key_hint": "26",
               "source_step_id": "dump",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "29",
+              "source_step_id": null,
               "source_event_type": "sql"
             },
             {
@@ -404,7 +576,19 @@
             {
               "node_type": "Session",
               "key_hint": "20008",
-              "source_step_id": "escalate",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "branches",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "columns",
+              "source_step_id": null,
               "source_event_type": "sql"
             },
             {
@@ -427,14 +611,14 @@
               "source_node_type": "Query",
               "target_node_type": "Table",
               "source_step_id": null,
-              "target_step_id": "sensitive_access"
+              "target_step_id": null
             },
             {
               "edge_type": "executes",
               "source_node_type": "Session",
               "target_node_type": "Query",
               "source_step_id": null,
-              "target_step_id": "escalate"
+              "target_step_id": null
             },
             {
               "edge_type": "opens",
@@ -489,38 +673,68 @@
             },
             {
               "node_type": "Query",
-              "key_hint": "14",
+              "key_hint": "40",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "42",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "44",
               "source_step_id": "lookup_1",
               "source_event_type": "sql"
             },
             {
               "node_type": "Query",
-              "key_hint": "15",
+              "key_hint": "46",
               "source_step_id": "withdrawal",
               "source_event_type": "sql"
             },
             {
               "node_type": "Query",
-              "key_hint": "17",
+              "key_hint": "49",
               "source_step_id": "lookup_2",
               "source_event_type": "sql"
             },
             {
               "node_type": "Query",
-              "key_hint": "18",
+              "key_hint": "51",
               "source_step_id": "deposit",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "54",
+              "source_step_id": null,
               "source_event_type": "sql"
             },
             {
               "node_type": "Session",
               "key_hint": "20010",
-              "source_step_id": "lookup_1",
+              "source_step_id": null,
               "source_event_type": "sql"
             },
             {
               "node_type": "Table",
               "key_hint": "accounts",
               "source_step_id": "lookup_1",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "branches",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "columns",
+              "source_step_id": null,
               "source_event_type": "sql"
             }
           ],
@@ -530,14 +744,14 @@
               "source_node_type": "Query",
               "target_node_type": "Table",
               "source_step_id": null,
-              "target_step_id": "lookup_1"
+              "target_step_id": null
             },
             {
               "edge_type": "executes",
               "source_node_type": "Session",
               "target_node_type": "Query",
               "source_step_id": null,
-              "target_step_id": "lookup_1"
+              "target_step_id": null
             },
             {
               "edge_type": "opens",

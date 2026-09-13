@@ -38,6 +38,18 @@ def process_event(session_key: int, e: dict, active_graphs: dict[int, nx.MultiDi
     G = active_graphs.setdefault(session_key, nx.MultiDiGraph())
     ts = e["timestamp_unix"]
 
+    # Deduplicate / merge paired ExecutorEnd postgres events into their ExecutorStart Query node
+    if e.get("source") == "postgres":
+        event_type = e.get("event_type", "ProcessUtility")
+        q_key = (session_key, e.get("query"))
+        if event_type == "ExecutorEnd":
+            start_event_id = G.graph.get(f"active_dml_{q_key}")
+            if start_event_id is not None:
+                e["event_id"] = start_event_id
+                e["executor_end_timestamp"] = ts
+        elif event_type == "ExecutorStart":
+            G.graph[f"active_dml_{q_key}"] = e["event_id"]
+
     facts = extract_query_facts(e.get("query")) if e.get("source") == "postgres" else {}
     if facts.get("parse_error"):
         PARSE_ERROR_LOG.append({"session_key": session_key, "event_id": e["event_id"],
@@ -63,6 +75,7 @@ def process_event(session_key: int, e: dict, active_graphs: dict[int, nx.MultiDi
         G.graph["pending_spawn_ts"] = ts
 
     G.graph["last_event_ts"] = ts
+
 
 
 def run(event_table_path: Path, correlation_path: Path, out_dir: Path,
