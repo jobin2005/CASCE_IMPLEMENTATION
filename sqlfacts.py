@@ -88,6 +88,11 @@ def extract_query_facts(query_text: str) -> dict:
                 return {"role_name": stmt.args[0].val.sval, "is_role_change": True}
             except Exception:
                 return {"is_role_change": True}
+        if isinstance(stmt, ast.VariableSetStmt) and stmt.name != "role":
+            return {
+                "setting_name": stmt.name,
+                "is_system_config": True,
+            }
         if isinstance(stmt, (ast.UpdateStmt, ast.InsertStmt, ast.DeleteStmt)):
             rel = getattr(stmt, "relation", None)
             name = getattr(rel, "relname", None) if rel else None

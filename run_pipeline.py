@@ -260,10 +260,26 @@ def stage_stats():
     print(f"    Test:       {len(test_runs)} test runs (held out)")
 
 
+def stage_datagen():
+    """Generate synthetic scenarios using generate_batch_v2.py."""
+    print("\n" + "="*60)
+    print("  STAGE: Generating Synthetic Scenarios (generate_batch_v2.py)")
+    print("="*60)
+    out_dir = os.path.join(BASE_DIR, 'datagen', 'generated', 'dataset_v2')
+    return run_cmd(
+        [sys.executable, os.path.join(BASE_DIR, 'datagen', 'generate_batch_v2.py'),
+         '--out', out_dir,
+         '--runs', '10',
+         '--scenarios-per-run', '20',
+         '--seed', '42'],
+        "Generating spec-driven scenarios"
+    )
+
+
 def parse_args():
     p = argparse.ArgumentParser(description="CASCE End-to-End Pipeline Orchestrator")
     p.add_argument('--stage', default='all',
-                   choices=['all', 'graphs', 'labels', 'train', 'evaluate', 'tune', 'stats', 'infer'],
+                   choices=['all', 'datagen', 'graphs', 'labels', 'train', 'evaluate', 'tune', 'stats', 'infer'],
                    help='Pipeline stage to run')
     return p.parse_args()
 
@@ -276,6 +292,7 @@ def main():
         return
 
     stages = {
+        'datagen': [stage_datagen],
         'graphs': [stage_graphs],
         'labels': [stage_labels],
         'train': [stage_train],
@@ -295,3 +312,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

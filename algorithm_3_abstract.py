@@ -128,7 +128,7 @@ def initialize_templates():
     g_account = nx.DiGraph()
     g_account.add_node("T_Query", type="Query")
     g_account.add_node("T_Role", type="Role")
-    g_account.add_edge("T_Query", "T_Role", relation="accesses")
+    g_account.add_edge("T_Query", "T_Role", relation="modifies")
     templates.append(BehaviorTemplate(
         label="ACCOUNT_MANIPULATION", 
         mitre_id="T1098", 
@@ -164,15 +164,31 @@ def initialize_templates():
     ))
 
     # 10. DEFENSE_IMPAIRMENT (Project-defined)
+    # Uses Query→Configuration(modifies) since ALTER SYSTEM SET now produces
+    # Configuration nodes via sqlfacts (is_system_config: true).
+    # Also matches Query→Table(accesses) for TRUNCATE TABLE audit_logs.
     g_def = nx.DiGraph()
     g_def.add_node("T_Query", type="Query")
-    g_def.add_node("T_Table", type="Table")
-    g_def.add_edge("T_Query", "T_Table", relation="accesses")
+    g_def.add_node("T_Config", type="Configuration")
+    g_def.add_edge("T_Query", "T_Config", relation="modifies")
     templates.append(BehaviorTemplate(
         label="DEFENSE_IMPAIRMENT", 
         mitre_id="T1562", 
         graph_structure=g_def, 
         semantic_keywords=["pg_settings", "log_statement", "log_min_messages", "alter system set", "disable", "truncate table audit_logs"], 
+        temporal_constraints={"max_gap": 60.0}
+    ))
+
+    # 11. DEFENSE_IMPAIRMENT via destructive table ops (TRUNCATE audit_logs)
+    g_def_db = nx.DiGraph()
+    g_def_db.add_node("T_Query", type="Query")
+    g_def_db.add_node("T_Table", type="Table")
+    g_def_db.add_edge("T_Query", "T_Table", relation="accesses")
+    templates.append(BehaviorTemplate(
+        label="DEFENSE_IMPAIRMENT", 
+        mitre_id="T1562", 
+        graph_structure=g_def_db, 
+        semantic_keywords=["audit_logs", "truncate", "delete", "log"], 
         temporal_constraints={"max_gap": 60.0}
     ))
 
@@ -373,6 +389,13 @@ def abstract_session_graph(G_s, templates, theta_struct=0.50, theta_beh=0.45, ch
                 continue
 
             s_sem = calculate_s_sem(matched_nodes, G_s, template.semantic_keywords)
+
+            # Option C: semantic gate — a template must have nonzero semantic
+            # overlap to fire, preventing purely structural matches from
+            # tagging every Query→Table edge with every behavior label.
+            if s_sem == 0.0:
+                continue
+
             s_temp = calculate_s_temp(matched_nodes, G_s, template)
 
             confidence = (alpha * s_struct) + (beta * s_sem) + (gamma * s_temp)

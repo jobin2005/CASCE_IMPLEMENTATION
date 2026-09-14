@@ -799,7 +799,12 @@ def train_gat(args):
 
 
 def evaluate_model(args):
-    """Evaluate the trained model on a labeled dataset and report metrics."""
+    """Evaluate the trained model on a labeled dataset and report metrics.
+
+    Reports ablation metrics (rule-only, GAT-only, fused) separately,
+    warns if the eval set is single-class, and optionally fits a
+    shallow DecisionTree baseline as a memorization diagnostic.
+    """
     if not TORCH_AVAILABLE:
         raise SystemExit("torch + torch_geometric are required for --mode evaluate. "
                          "Heuristic fallback cannot be used for scientific evaluation.")
@@ -827,44 +832,69 @@ def evaluate_model(args):
     if not y_true:
         raise RuntimeError("No evaluation data found.")
 
-    # Binary predictions at current threshold
-    y_pred = [1 if s >= THETA_A else 0 for s in y_scores]
+    # Class distribution diagnostic
+    n_mal = sum(y_true)
+    n_ben = len(y_true) - n_mal
+    single_class = (n_mal == 0 or n_ben == 0)
 
-    # Compute metrics
-    tp = sum(1 for t, p in zip(y_true, y_pred) if t == 1 and p == 1)
-    fp = sum(1 for t, p in zip(y_true, y_pred) if t == 0 and p == 1)
-    fn = sum(1 for t, p in zip(y_true, y_pred) if t == 1 and p == 0)
-    tn = sum(1 for t, p in zip(y_true, y_pred) if t == 0 and p == 0)
+    if single_class:
+        print(f"\n  ⚠ WARNING: Evaluation set is 100% {'malicious' if n_mal > 0 else 'benign'}!")
+        print(f"    FPR is unmeasurable. Any 'predict-all' strategy scores 100%.")
+        print(f"    This evaluation CANNOT FAIL.\n")
 
-    precision = tp / max(1, tp + fp)
-    recall = tp / max(1, tp + fn)
-    f1 = 2 * precision * recall / max(1e-9, precision + recall)
-    accuracy = (tp + tn) / max(1, len(y_true))
+    def _metrics(y_t, y_s, threshold):
+        y_p = [1 if s >= threshold else 0 for s in y_s]
+        tp = sum(1 for t, p in zip(y_t, y_p) if t == 1 and p == 1)
+        fp = sum(1 for t, p in zip(y_t, y_p) if t == 0 and p == 1)
+        fn = sum(1 for t, p in zip(y_t, y_p) if t == 1 and p == 0)
+        tn = sum(1 for t, p in zip(y_t, y_p) if t == 0 and p == 0)
+        prec = tp / max(1, tp + fp)
+        rec = tp / max(1, tp + fn)
+        f1 = 2 * prec * rec / max(1e-9, prec + rec)
+        acc = (tp + tn) / max(1, len(y_t))
+        return {'tp': tp, 'fp': fp, 'fn': fn, 'tn': tn,
+                'precision': round(prec, 4), 'recall': round(rec, 4),
+                'f1': round(f1, 4), 'accuracy': round(acc, 4)}
+
+    # Ablation: compute metrics for each scoring path
+    fused = _metrics(y_true, y_scores, THETA_A)
+    rule_only = _metrics(y_true, y_rule, THETA_R)
+    gat_only = _metrics(y_true, y_gat, 0.5)
 
     results = {
         'threshold': THETA_A,
         'total_samples': len(y_true),
-        'true_positives': tp, 'false_positives': fp,
-        'false_negatives': fn, 'true_negatives': tn,
-        'precision': round(precision, 4),
-        'recall': round(recall, 4),
-        'f1_score': round(f1, 4),
-        'accuracy': round(accuracy, 4),
-        'confusion_matrix': [[tn, fp], [fn, tp]],
+        'class_distribution': {'malicious': n_mal, 'benign': n_ben},
+        'single_class_warning': single_class,
+        'fused': fused,
+        'rule_only': rule_only,
+        'gat_only': gat_only,
+        'confusion_matrix': [[fused['tn'], fused['fp']], [fused['fn'], fused['tp']]],
     }
 
     print(f"\n{'='*60}")
     print(f"  EVALUATION RESULTS (θ_A = {THETA_A})")
     print(f"{'='*60}")
-    print(f"  Samples:   {len(y_true)} ({sum(y_true)} malicious, {len(y_true)-sum(y_true)} normal)")
-    print(f"  Accuracy:  {accuracy:.4f}")
-    print(f"  Precision: {precision:.4f}")
-    print(f"  Recall:    {recall:.4f}")
-    print(f"  F1-Score:  {f1:.4f}")
-    print(f"\n  Confusion Matrix:")
+    print(f"  Samples:   {len(y_true)} ({n_mal} malicious, {n_ben} benign)")
+
+    print(f"\n  {'Scorer':<12} {'Acc':>6} {'Prec':>6} {'Recall':>6} {'F1':>6}")
+    print(f"  {'-'*38}")
+    for name, m in [('Fused', fused), ('Rule-only', rule_only), ('GAT-only', gat_only)]:
+        print(f"  {name:<12} {m['accuracy']:6.4f} {m['precision']:6.4f} {m['recall']:6.4f} {m['f1']:6.4f}")
+
+    print(f"\n  Confusion Matrix (Fused):")
     print(f"              Pred Normal  Pred Malicious")
-    print(f"  True Normal     {tn:5d}       {fp:5d}")
-    print(f"  True Malicious  {fn:5d}       {tp:5d}")
+    print(f"  True Normal     {fused['tn']:5d}       {fused['fp']:5d}")
+    print(f"  True Malicious  {fused['fn']:5d}       {fused['tp']:5d}")
+
+    # GAT adds value?
+    gat_lift = fused['f1'] - rule_only['f1']
+    if gat_lift <= 0:
+        print(f"\n  ⚠ GAT adds no F1 lift over rule-only ({gat_lift:+.4f}).")
+        print(f"    The GNN may be memorizing or redundant.")
+    else:
+        print(f"\n  ✓ GAT F1 lift over rule-only: {gat_lift:+.4f}")
+
     print(f"{'='*60}")
 
     # Save results

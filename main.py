@@ -99,11 +99,12 @@ def main() -> None:
             print(f"[3/3] Running Algorithm 3 (Behavior Abstraction & Serialization)")
             
             # Explicit isolated output per the user's dataset constraint
-            alg3_out_dir = OUTPUT_DIR / run_dir.parent.name / run_dir.name
+            # Output directly to the generated dataset directory to feed prepare_algo4_dataset.py
+            alg3_out_dir = run_dir.parent / "enriched_graphs" / "graphml"
             alg3_out_dir.mkdir(parents=True, exist_ok=True)
 
             for session_key, G_s in active_graphs.items():
-                G_enriched = algorithm_3_abstract.abstract_session_graph(G_s, templates)
+                G_enriched, _ = algorithm_3_abstract.abstract_session_graph(G_s, templates)
                 G_enriched = sanitize_for_graphml(G_enriched)
 
                 # Fish the label out of the manifest rows
@@ -113,7 +114,7 @@ def main() -> None:
                         label = row["label"]
                         break
 
-                out_file = alg3_out_dir / f"enriched_session_{session_key}_{label.replace(' ', '_')}.graphml"
+                out_file = alg3_out_dir / f"enriched_{run_name}_{session_key}_{label.replace(' ', '_')}.graphml"
                 nx.write_graphml(G_enriched, out_file)
                 print(f"     [+] Wrote {out_file.name} (Nodes: {G_enriched.number_of_nodes()}, Edges: {G_enriched.number_of_edges()})")
 
