@@ -135,6 +135,9 @@ CHAIN_RULES = [
     {"name": "Data exfiltration",
      "sequence": ["DATA_ACCESS", "DATA_PACKAGING", "EXTERNAL_TRANSFER"],
      "match_type": "ordered_subsequence", "severity": 0.95},
+    {"name": "Direct data exfiltration",
+     "sequence": ["DATA_ACCESS", "EXTERNAL_TRANSFER"],
+     "match_type": "ordered_subsequence", "severity": 0.95},
     {"name": "Privilege abuse",
      "sequence": ["ACCOUNT_MANIPULATION", "UNIX_SHELL_EXECUTION", "DATA_ACCESS"],
      "match_type": "ordered_subsequence", "severity": 0.90},
@@ -171,7 +174,7 @@ CHAIN_RULES = [
 
 THETA_A = 0.5   # alert threshold
 THETA_R = 0.8   # response threshold
-W_RULE = 0.75
+W_RULE = 0.85
 W_GAT = 0.75
 
 FEATURE_HASH_DIM = 16

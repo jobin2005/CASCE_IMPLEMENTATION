@@ -30,7 +30,7 @@ def parse_args():
     parser.add_argument('--input-dir', required=True, help='Path to directory containing input graph files (.json or .graphml)')
     parser.add_argument('--outdir', required=True, help='Directory to save enriched graphs')
     parser.add_argument('--theta-struct', type=float, default=0.50, help='Structural similarity threshold')
-    parser.add_argument('--theta-beh', type=float, default=0.60, help='Behavior confidence threshold')
+    parser.add_argument('--theta-beh', type=float, default=0.50, help='Behavior confidence threshold')
     return parser.parse_args()
 
 
@@ -367,7 +367,7 @@ def calculate_s_temp(matched_nodes, G_s, template):
     return float(math.exp(-delta_t / max_gap))
 
 
-def abstract_session_graph(G_s, templates, theta_struct=0.50, theta_beh=0.60, chain_gap=120.0):
+def abstract_session_graph(G_s, templates, theta_struct=0.50, theta_beh=0.50, chain_gap=120.0):
     G_enriched = G_s.copy()
 
     behavior_counter = 0
@@ -460,7 +460,7 @@ def abstract_session_graph(G_s, templates, theta_struct=0.50, theta_beh=0.60, ch
     return G_enriched, detected_behaviors
 
 
-def run_batch(input_dir: Path, out_dir: Path, theta_struct=0.50, theta_beh=0.60):
+def run_batch(input_dir: Path, out_dir: Path, theta_struct=0.50, theta_beh=0.50):
     input_dir = Path(input_dir).resolve()
     out_dir = Path(out_dir).resolve()
 
