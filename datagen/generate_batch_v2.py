@@ -58,18 +58,18 @@ ALL_TABLES = ["customers", "accounts", "transactions"]
 
 ROLES = ["teller", "branch_manager", "compliance_officer", "batch_etl_service"]
 
-INTERNAL_IPS = [
+SHARED_IPS = [
     ("198.51.100.20", 443),   # approved warehouse
     ("10.0.1.50", 5432),      # internal DB replica
     ("10.0.1.100", 8080),     # internal API
-]
-EXTERNAL_IPS = [
     ("198.51.100.77", 443),   # near-miss of approved warehouse
-    ("93.184.216.34", 443),   # suspicious external
+    ("93.184.216.34", 443),   # suspicious external / offsite backup
     ("45.33.12.9", 4444),     # reverse shell endpoint
     ("185.220.101.5", 8443),  # Tor exit node
     ("203.0.113.42", 443),    # external drop site
 ]
+INTERNAL_IPS = SHARED_IPS
+EXTERNAL_IPS = SHARED_IPS
 
 BRANCH_IDS = ["BR-001", "BR-002", "BR-003", "BR-014", "BR-027"]
 

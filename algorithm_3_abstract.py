@@ -30,7 +30,7 @@ def parse_args():
     parser.add_argument('--input-dir', required=True, help='Path to directory containing input graph files (.json or .graphml)')
     parser.add_argument('--outdir', required=True, help='Directory to save enriched graphs')
     parser.add_argument('--theta-struct', type=float, default=0.50, help='Structural similarity threshold')
-    parser.add_argument('--theta-beh', type=float, default=0.45, help='Behavior confidence threshold')
+    parser.add_argument('--theta-beh', type=float, default=0.60, help='Behavior confidence threshold')
     return parser.parse_args()
 
 
@@ -367,12 +367,8 @@ def calculate_s_temp(matched_nodes, G_s, template):
     return float(math.exp(-delta_t / max_gap))
 
 
-def abstract_session_graph(G_s, templates, theta_struct=0.50, theta_beh=0.45, chain_gap=120.0):
+def abstract_session_graph(G_s, templates, theta_struct=0.50, theta_beh=0.60, chain_gap=120.0):
     G_enriched = G_s.copy()
-
-    alpha = 0.40   # Structural
-    beta = 0.35    # Semantic
-    gamma = 0.25   # Temporal
 
     behavior_counter = 0
     detected_behaviors = []
@@ -396,7 +392,20 @@ def abstract_session_graph(G_s, templates, theta_struct=0.50, theta_beh=0.45, ch
             if s_sem == 0.0:
                 continue
 
-            s_temp = calculate_s_temp(matched_nodes, G_s, template)
+            # Determine weights dynamically:
+            # Single-hop templates (<= 1 edge) share identical node timestamps (delta_t = 0),
+            # making s_temp non-discriminative (1.0). For single-hop templates, we drop s_temp
+            # (gamma=0.0) and rebalance structural and semantic weights to require real s_sem contribution.
+            if template.structure.number_of_edges() <= 1:
+                alpha = 0.50
+                beta = 0.50
+                gamma = 0.0
+                s_temp = 0.0
+            else:
+                alpha = 0.40
+                beta = 0.35
+                gamma = 0.25
+                s_temp = calculate_s_temp(matched_nodes, G_s, template)
 
             confidence = (alpha * s_struct) + (beta * s_sem) + (gamma * s_temp)
 
@@ -451,7 +460,7 @@ def abstract_session_graph(G_s, templates, theta_struct=0.50, theta_beh=0.45, ch
     return G_enriched, detected_behaviors
 
 
-def run_batch(input_dir: Path, out_dir: Path, theta_struct=0.50, theta_beh=0.45):
+def run_batch(input_dir: Path, out_dir: Path, theta_struct=0.50, theta_beh=0.60):
     input_dir = Path(input_dir).resolve()
     out_dir = Path(out_dir).resolve()
 
