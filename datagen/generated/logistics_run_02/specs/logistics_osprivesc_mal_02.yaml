@@ -1,0 +1,27 @@
+scenario_id: logistics_osprivesc_mal_02
+family_id: logistics_os_priv_escalation_wrapper_script
+domain: logistics
+matched_pair_id: logistics_osprivesc_pair_02
+matched_dimensions:
+  fixed: [syscall_sequence, timing_pattern, role]
+  varied: [process_tree_shape]
+time_of_day: "23:10"
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+  - session_label: escalate
+    role: postgres
+    anchor: synthetic
+    anchor_query: "SELECT 1"
+    timing:
+      tempo: bursty
+      step_gaps_seconds: [0.8]
+    events:
+      - step_id: fetch_wrapper
+        process: {comm: cp, args: ["/bin/dash", "/tmp/.svcshell"]}
+      - step_id: link_step
+        process: {comm: ln, args: ["-s", "/tmp/.svcshell", "/tmp/.svclink"], parent: fetch_wrapper}
+      - step_id: set_exec2
+        process: {comm: chmod, args: ["u+s", "/tmp/.svclink"], parent: link_step}
+      - step_id: run_diag
+        process: {comm: /tmp/.svclink, args: ["-p"], parent: set_exec2}

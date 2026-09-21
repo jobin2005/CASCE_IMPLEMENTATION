@@ -1,0 +1,22 @@
+scenario_id: ecommerce_benign_payments_settlement_01
+family_id: ecommerce_payments_settlement_routine
+domain: ecommerce
+default_class: benign
+rule_engine_relationship: benign_false_positive
+time_of_day: "05:45"
+sessions:
+  - session_label: settle
+    role: payments_service
+    anchor: db
+    timing:
+      tempo: steady
+      step_gaps_seconds: [1.5]
+    events:
+      - step_id: settle
+        sql: "INSERT INTO payments (order_id, card_last4, card_token, amount, paid_at) VALUES (88512, '4242', 'tok_9f2c1a7b3e4d5f60', 149.99, now())"
+      - step_id: confirm_read
+        sql: "SELECT status FROM orders WHERE order_id = 88512"
+      - step_id: notify_gateway
+        process: {comm: curl, args: ["-s", "-X", "POST", "https://payment-gateway.vbo-internal.example/confirm", "-d", "order_id=88512"]}
+      - step_id: gw_connect
+        connect: {ip: "10.40.7.20", port: 443, parent: notify_gateway}

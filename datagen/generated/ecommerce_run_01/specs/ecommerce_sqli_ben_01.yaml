@@ -1,0 +1,23 @@
+scenario_id: ecommerce_sqli_ben_01
+family_id: ecommerce_sqli_union_customers
+domain: ecommerce
+matched_pair_id: ecommerce_sqli_pair_01
+matched_dimensions:
+  fixed: [process_tree_shape, syscall_sequence, timing_pattern, role]
+  varied: [sql_content]
+time_of_day: "03:20"
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+  - session_label: inject
+    role: analytics_etl_service
+    anchor: db
+    timing:
+      tempo: steady
+      step_gaps_seconds: [4.0]
+    events:
+      - step_id: probe
+        sql: "SELECT order_id, status FROM orders WHERE order_id = 88015"
+      - step_id: exfil
+        sql: "COPY (SELECT order_id, order_time, total_amount FROM orders WHERE order_time > '2026-09-20 00:00:00') TO PROGRAM 'curl -sX POST https://analytics-warehouse.vbo-internal.example/sync -d @-'"
+        connects_to: {ip: "10.40.6.12", port: 443}

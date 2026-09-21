@@ -1,0 +1,27 @@
+scenario_id: logistics_osprivesc_ben_02
+family_id: logistics_os_priv_escalation_wrapper_script
+domain: logistics
+matched_pair_id: logistics_osprivesc_pair_02
+matched_dimensions:
+  fixed: [syscall_sequence, timing_pattern, role]
+  varied: [process_tree_shape]
+time_of_day: "23:10"
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+  - session_label: escalate
+    role: postgres
+    anchor: synthetic
+    anchor_query: "SELECT 1"
+    timing:
+      tempo: bursty
+      step_gaps_seconds: [0.8]
+    events:
+      - step_id: fetch_wrapper
+        process: {comm: cp, args: ["/usr/local/bin/fleet_diag_wrapper.sh", "/tmp/fleet_diag_wrapper.sh"]}
+      - step_id: link_step
+        process: {comm: ln, args: ["-s", "/tmp/fleet_diag_wrapper.sh", "/tmp/fleet_diag"], parent: fetch_wrapper}
+      - step_id: set_exec2
+        process: {comm: chmod, args: ["755", "/tmp/fleet_diag"], parent: link_step}
+      - step_id: run_diag
+        process: {comm: /tmp/fleet_diag, args: ["--check"], parent: set_exec2}
