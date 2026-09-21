@@ -1,0 +1,22 @@
+scenario_id: logistics_routine_dispatch_01
+family_id: logistics_routine_dispatch_report
+domain: logistics
+time_of_day: "03:05"
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+  - session_label: dispatch
+    role: dispatcher
+    anchor: db
+    timing:
+      tempo: bursty
+      step_gaps_seconds: [1.0]
+    events:
+      - step_id: check_shipment
+        sql: "SELECT shipment_id, status FROM shipments WHERE shipment_id = 55010"
+      - step_id: update_status
+        sql: "UPDATE shipments SET status = 'dispatched' WHERE shipment_id = 55010"
+      - step_id: gen_manifest
+        process: {comm: lp, args: ["-d", "depot_dp02_printer", "/tmp/dispatch_manifest_55010.pdf"], parent: update_status}
+      - step_id: cleanup_tmp
+        file: {path: "/tmp/dispatch_manifest_55010.pdf", syscall: unlink, parent: gen_manifest}

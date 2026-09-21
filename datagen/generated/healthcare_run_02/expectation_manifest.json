@@ -1,0 +1,1718 @@
+{
+  "run_dir": "datagen/generated/healthcare_run_02",
+  "generation_date": "2026-09-21",
+  "logging_start_timestamp": 1790028300.0,
+  "scenarios": {
+    "hc2_copyprog_pair1_ben": {
+      "source_file": "hc2_copyprog_pair1_ben.yaml",
+      "family_id": "healthcare_copyprog_nightly_sync",
+      "matched_pair_id": "healthcare_copyprog_pair1",
+      "matched_dimensions": {
+        "fixed": [
+          "process_tree_shape",
+          "syscall_sequence",
+          "timing_pattern",
+          "role"
+        ],
+        "varied": [
+          "sql_content"
+        ]
+      },
+      "default_class": "benign",
+      "rule_engine_relationship": "benign_false_positive",
+      "sessions": {
+        "nightly_sync": {
+          "backend_pid": 20000,
+          "class": "benign",
+          "role": "research_etl_service",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(10.60.4.12, 8443)",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20001",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "19",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "23",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "29",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20000",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "medical_records",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            }
+          ]
+        }
+      }
+    },
+    "hc2_copyprog_pair1_mal": {
+      "source_file": "hc2_copyprog_pair1_mal.yaml",
+      "family_id": "healthcare_copyprog_nightly_sync",
+      "matched_pair_id": "healthcare_copyprog_pair1",
+      "matched_dimensions": {
+        "fixed": [
+          "process_tree_shape",
+          "syscall_sequence",
+          "timing_pattern",
+          "role"
+        ],
+        "varied": [
+          "sql_content"
+        ]
+      },
+      "default_class": "malicious",
+      "rule_engine_relationship": "malicious_false_negative",
+      "sessions": {
+        "nightly_sync": {
+          "backend_pid": 20002,
+          "class": "malicious",
+          "role": "research_etl_service",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(193.42.33.17, 8080)",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20003",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "20",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "24",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "30",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20002",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "medical_records",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            }
+          ]
+        }
+      }
+    },
+    "hc2_copyprog_pair2_ben": {
+      "source_file": "hc2_copyprog_pair2_ben.yaml",
+      "family_id": "healthcare_copyprog_prescription_export",
+      "matched_pair_id": "healthcare_copyprog_pair2",
+      "matched_dimensions": {
+        "fixed": [
+          "process_tree_shape",
+          "syscall_sequence",
+          "timing_pattern",
+          "role"
+        ],
+        "varied": [
+          "sql_content"
+        ]
+      },
+      "default_class": "benign",
+      "rule_engine_relationship": "benign_false_positive",
+      "sessions": {
+        "rx_sync": {
+          "backend_pid": 20004,
+          "class": "benign",
+          "role": "research_etl_service",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(10.60.4.12, 8443)",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20005",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "88",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "92",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "98",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20004",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "prescriptions",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            }
+          ]
+        }
+      }
+    },
+    "hc2_copyprog_pair2_mal": {
+      "source_file": "hc2_copyprog_pair2_mal.yaml",
+      "family_id": "healthcare_copyprog_prescription_export",
+      "matched_pair_id": "healthcare_copyprog_pair2",
+      "matched_dimensions": {
+        "fixed": [
+          "process_tree_shape",
+          "syscall_sequence",
+          "timing_pattern",
+          "role"
+        ],
+        "varied": [
+          "sql_content"
+        ]
+      },
+      "default_class": "malicious",
+      "rule_engine_relationship": "malicious_false_negative",
+      "sessions": {
+        "rx_sync": {
+          "backend_pid": 20006,
+          "class": "malicious",
+          "role": "research_etl_service",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(193.42.33.44, 9001)",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20007",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "89",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "93",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "99",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20006",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "prescriptions",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            }
+          ]
+        }
+      }
+    },
+    "hc2_osprivesc_pair1_ben": {
+      "source_file": "hc2_osprivesc_pair1_ben.yaml",
+      "family_id": "healthcare_osprivesc_maint_chain",
+      "matched_pair_id": "healthcare_osprivesc_pair1",
+      "matched_dimensions": {
+        "fixed": [
+          "syscall_sequence",
+          "timing_pattern",
+          "role"
+        ],
+        "varied": [
+          "process_tree_shape"
+        ]
+      },
+      "default_class": "benign",
+      "rule_engine_relationship": "benign_false_positive",
+      "sessions": {
+        "escalate": {
+          "backend_pid": 20008,
+          "class": "benign",
+          "role": "postgres",
+          "anchor": "synthetic",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Process",
+              "key_hint": "20009",
+              "source_step_id": "copy_script",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20010",
+              "source_step_id": "set_exec",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20011",
+              "source_step_id": "run_maint",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "1",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "15",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "5",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20008",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Process",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "set_exec"
+            }
+          ]
+        }
+      }
+    },
+    "hc2_osprivesc_pair1_mal": {
+      "source_file": "hc2_osprivesc_pair1_mal.yaml",
+      "family_id": "healthcare_osprivesc_maint_chain",
+      "matched_pair_id": "healthcare_osprivesc_pair1",
+      "matched_dimensions": {
+        "fixed": [
+          "syscall_sequence",
+          "timing_pattern",
+          "role"
+        ],
+        "varied": [
+          "process_tree_shape"
+        ]
+      },
+      "default_class": "malicious",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "escalate": {
+          "backend_pid": 20012,
+          "class": "malicious",
+          "role": "postgres",
+          "anchor": "synthetic",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Process",
+              "key_hint": "20013",
+              "source_step_id": "copy_bash",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20014",
+              "source_step_id": "set_suid",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20015",
+              "source_step_id": "run_root",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "16",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "2",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "6",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20012",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Process",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "set_suid"
+            }
+          ]
+        }
+      }
+    },
+    "hc2_osprivesc_pair2_ben": {
+      "source_file": "hc2_osprivesc_pair2_ben.yaml",
+      "family_id": "healthcare_osprivesc_dbadmin_chain",
+      "matched_pair_id": "healthcare_osprivesc_pair2",
+      "matched_dimensions": {
+        "fixed": [
+          "syscall_sequence",
+          "timing_pattern",
+          "role"
+        ],
+        "varied": [
+          "process_tree_shape"
+        ]
+      },
+      "default_class": "benign",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "escalate": {
+          "backend_pid": 20016,
+          "class": "benign",
+          "role": "postgres",
+          "anchor": "synthetic",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Process",
+              "key_hint": "20017",
+              "source_step_id": "copy_script2",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20018",
+              "source_step_id": "set_exec2",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20019",
+              "source_step_id": "run_maint2",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "136",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "140",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "150",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20016",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Process",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "set_exec2"
+            }
+          ]
+        }
+      }
+    },
+    "hc2_osprivesc_pair2_mal": {
+      "source_file": "hc2_osprivesc_pair2_mal.yaml",
+      "family_id": "healthcare_osprivesc_dbadmin_chain",
+      "matched_pair_id": "healthcare_osprivesc_pair2",
+      "matched_dimensions": {
+        "fixed": [
+          "syscall_sequence",
+          "timing_pattern",
+          "role"
+        ],
+        "varied": [
+          "process_tree_shape"
+        ]
+      },
+      "default_class": "malicious",
+      "rule_engine_relationship": "malicious_false_negative",
+      "sessions": {
+        "escalate": {
+          "backend_pid": 20020,
+          "class": "malicious",
+          "role": "postgres",
+          "anchor": "synthetic",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Process",
+              "key_hint": "20021",
+              "source_step_id": "copy_bash2",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20022",
+              "source_step_id": "set_suid2",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20023",
+              "source_step_id": "run_root2",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "137",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "141",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "151",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20020",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Process",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "set_suid2"
+            }
+          ]
+        }
+      }
+    },
+    "hc2_revshell_pair1_ben": {
+      "source_file": "hc2_revshell_pair1_ben.yaml",
+      "family_id": "healthcare_revshell_healthcheck",
+      "matched_pair_id": "healthcare_revshell_pair1",
+      "matched_dimensions": {
+        "fixed": [
+          "process_tree_shape",
+          "syscall_sequence",
+          "timing_pattern",
+          "role"
+        ],
+        "varied": [
+          "connects_to_destination"
+        ]
+      },
+      "default_class": "benign",
+      "rule_engine_relationship": "benign_false_positive",
+      "sessions": {
+        "revshell": {
+          "backend_pid": 20024,
+          "class": "benign",
+          "role": "postgres",
+          "anchor": "synthetic",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(10.60.9.5, 9100)",
+              "source_step_id": "beacon",
+              "source_event_type": "connect"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20025",
+              "source_step_id": "spawn_shell",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "33",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "37",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "45",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20024",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "beacon"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            }
+          ]
+        }
+      }
+    },
+    "hc2_revshell_pair1_mal": {
+      "source_file": "hc2_revshell_pair1_mal.yaml",
+      "family_id": "healthcare_revshell_healthcheck",
+      "matched_pair_id": "healthcare_revshell_pair1",
+      "matched_dimensions": {
+        "fixed": [
+          "process_tree_shape",
+          "syscall_sequence",
+          "timing_pattern",
+          "role"
+        ],
+        "varied": [
+          "connects_to_destination"
+        ]
+      },
+      "default_class": "malicious",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "revshell": {
+          "backend_pid": 20026,
+          "class": "malicious",
+          "role": "postgres",
+          "anchor": "synthetic",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(193.42.33.101, 8080)",
+              "source_step_id": "beacon",
+              "source_event_type": "connect"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20027",
+              "source_step_id": "spawn_shell",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "34",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "38",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "46",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20026",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "beacon"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            }
+          ]
+        }
+      }
+    },
+    "hc2_revshell_pair2_ben": {
+      "source_file": "hc2_revshell_pair2_ben.yaml",
+      "family_id": "healthcare_revshell_backup_agent",
+      "matched_pair_id": "healthcare_revshell_pair2",
+      "matched_dimensions": {
+        "fixed": [
+          "process_tree_shape",
+          "syscall_sequence",
+          "timing_pattern",
+          "role"
+        ],
+        "varied": [
+          "connects_to_destination"
+        ]
+      },
+      "default_class": "benign",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "revshell": {
+          "backend_pid": 20028,
+          "class": "benign",
+          "role": "postgres",
+          "anchor": "synthetic",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(10.60.9.7, 9100)",
+              "source_step_id": "beacon",
+              "source_event_type": "connect"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20029",
+              "source_step_id": "spawn_shell",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "120",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "124",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "132",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20028",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "beacon"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            }
+          ]
+        }
+      }
+    },
+    "hc2_revshell_pair2_mal": {
+      "source_file": "hc2_revshell_pair2_mal.yaml",
+      "family_id": "healthcare_revshell_backup_agent",
+      "matched_pair_id": "healthcare_revshell_pair2",
+      "matched_dimensions": {
+        "fixed": [
+          "process_tree_shape",
+          "syscall_sequence",
+          "timing_pattern",
+          "role"
+        ],
+        "varied": [
+          "connects_to_destination"
+        ]
+      },
+      "default_class": "malicious",
+      "rule_engine_relationship": "malicious_false_negative",
+      "sessions": {
+        "revshell": {
+          "backend_pid": 20030,
+          "class": "malicious",
+          "role": "postgres",
+          "anchor": "synthetic",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(193.42.33.156, 9001)",
+              "source_step_id": "beacon",
+              "source_event_type": "connect"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20031",
+              "source_step_id": "spawn_shell",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "121",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "125",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "133",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20030",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "beacon"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            }
+          ]
+        }
+      }
+    },
+    "hc2_routine_him_audit": {
+      "source_file": "hc2_routine_him_audit.yaml",
+      "family_id": "healthcare_routine_him_audit",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "benign_false_positive",
+      "sessions": {
+        "quarterly_audit": {
+          "backend_pid": 20032,
+          "class": "benign",
+          "role": "him_officer",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/audit/phi_release_d07_2026q3.csv.gz",
+              "source_step_id": "audit_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20033",
+              "source_step_id": "audit_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "67",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "69",
+              "source_step_id": "scope_check",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "71",
+              "source_step_id": "audit_export",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "74",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20032",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "doctors",
+              "source_step_id": "scope_check",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "patients",
+              "source_step_id": "audit_export",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "scope_check"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "audit_export"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "audit_export"
+            }
+          ]
+        }
+      }
+    },
+    "hc2_routine_physician_oncall": {
+      "source_file": "hc2_routine_physician_oncall.yaml",
+      "family_id": "healthcare_routine_physician_oncall",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "oncall_consult": {
+          "backend_pid": 20034,
+          "class": "benign",
+          "role": "physician",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/tmp/rx_74213.pdf",
+              "source_step_id": "cleanup_tmp",
+              "source_event_type": "file"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20035",
+              "source_step_id": "print_rx",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "76",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "78",
+              "source_step_id": "lookup",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "80",
+              "source_step_id": "chart_review",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "82",
+              "source_step_id": "new_rx",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "86",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20034",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "medical_records",
+              "source_step_id": "chart_review",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "patients",
+              "source_step_id": "lookup",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "prescriptions",
+              "source_step_id": "new_rx",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "lookup"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "cleanup_tmp"
+            }
+          ]
+        }
+      }
+    },
+    "hc2_sqli_pair1_ben": {
+      "source_file": "hc2_sqli_pair1_ben.yaml",
+      "family_id": "healthcare_sqli_billing_probe",
+      "matched_pair_id": "healthcare_sqli_pair1",
+      "matched_dimensions": {
+        "fixed": [
+          "process_tree_shape",
+          "syscall_sequence",
+          "timing_pattern",
+          "role"
+        ],
+        "varied": [
+          "sql_content"
+        ]
+      },
+      "default_class": "benign",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "inject": {
+          "backend_pid": 20036,
+          "class": "benign",
+          "role": "research_etl_service",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(10.60.4.12, 8443)",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20037",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "49",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "53",
+              "source_step_id": "probe",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "57",
+              "source_step_id": "exfil",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "63",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20036",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "billing",
+              "source_step_id": "probe",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "probe"
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            }
+          ]
+        }
+      }
+    },
+    "hc2_sqli_pair1_mal": {
+      "source_file": "hc2_sqli_pair1_mal.yaml",
+      "family_id": "healthcare_sqli_billing_probe",
+      "matched_pair_id": "healthcare_sqli_pair1",
+      "matched_dimensions": {
+        "fixed": [
+          "process_tree_shape",
+          "syscall_sequence",
+          "timing_pattern",
+          "role"
+        ],
+        "varied": [
+          "sql_content"
+        ]
+      },
+      "default_class": "malicious",
+      "rule_engine_relationship": "malicious_false_negative",
+      "sessions": {
+        "inject": {
+          "backend_pid": 20038,
+          "class": "malicious",
+          "role": "research_etl_service",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(193.42.33.71, 8080)",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20039",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "50",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "54",
+              "source_step_id": "probe",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "58",
+              "source_step_id": "exfil",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "64",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20038",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "patients",
+              "source_step_id": "exfil",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            }
+          ]
+        }
+      }
+    },
+    "hc2_sqli_pair2_ben": {
+      "source_file": "hc2_sqli_pair2_ben.yaml",
+      "family_id": "healthcare_sqli_records_probe",
+      "matched_pair_id": "healthcare_sqli_pair2",
+      "matched_dimensions": {
+        "fixed": [
+          "process_tree_shape",
+          "syscall_sequence",
+          "timing_pattern",
+          "role"
+        ],
+        "varied": [
+          "sql_content"
+        ]
+      },
+      "default_class": "benign",
+      "rule_engine_relationship": "benign_false_positive",
+      "sessions": {
+        "inject": {
+          "backend_pid": 20040,
+          "class": "benign",
+          "role": "research_etl_service",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(10.60.4.12, 8443)",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20041",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "102",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "106",
+              "source_step_id": "probe",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "110",
+              "source_step_id": "exfil",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "116",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20040",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "medical_records",
+              "source_step_id": "probe",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "probe"
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            }
+          ]
+        }
+      }
+    },
+    "hc2_sqli_pair2_mal": {
+      "source_file": "hc2_sqli_pair2_mal.yaml",
+      "family_id": "healthcare_sqli_records_probe",
+      "matched_pair_id": "healthcare_sqli_pair2",
+      "matched_dimensions": {
+        "fixed": [
+          "process_tree_shape",
+          "syscall_sequence",
+          "timing_pattern",
+          "role"
+        ],
+        "varied": [
+          "sql_content"
+        ]
+      },
+      "default_class": "malicious",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "inject": {
+          "backend_pid": 20042,
+          "class": "malicious",
+          "role": "research_etl_service",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(193.42.33.90, 9001)",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20043",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "103",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "107",
+              "source_step_id": "probe",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "111",
+              "source_step_id": "exfil",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "117",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20042",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "prescriptions",
+              "source_step_id": "exfil",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

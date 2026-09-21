@@ -1,0 +1,20 @@
+scenario_id: ecommerce_routine_catalog_sync_01
+family_id: ecommerce_routine_catalog_price_sync
+domain: ecommerce
+time_of_day: "22:50"
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+  - session_label: catalog_update
+    role: catalog_manager
+    anchor: db
+    timing:
+      tempo: steady
+      step_gaps_seconds: [2.0]
+    events:
+      - step_id: update_price
+        sql: "UPDATE products SET price = 449.00 WHERE product_id = 3021"
+      - step_id: check_stock
+        sql: "SELECT product_id, stock_qty FROM products WHERE category = 'electronics'"
+      - step_id: invalidate_cache
+        process: {comm: cache_invalidate, args: ["--scope", "catalog"]}

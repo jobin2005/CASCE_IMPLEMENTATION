@@ -1,0 +1,24 @@
+scenario_id: hc2_routine_physician_oncall
+family_id: healthcare_routine_physician_oncall
+domain: healthcare
+time_of_day: "23:05"
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+  - session_label: oncall_consult
+    role: physician
+    anchor: db
+    timing:
+      tempo: steady
+      step_gaps_seconds: [4.0]
+    events:
+      - step_id: lookup
+        sql: "SELECT patient_id, full_name, date_of_birth FROM patients WHERE patient_id = 74213"
+      - step_id: chart_review
+        sql: "SELECT diagnosis_code, diagnosis_notes FROM medical_records WHERE patient_id = 74213 ORDER BY recorded_at DESC LIMIT 5"
+      - step_id: new_rx
+        sql: "INSERT INTO prescriptions (patient_id, doctor_id, drug_name, dosage, issued_at) VALUES (74213, 118, 'amoxicillin', '500mg', now())"
+      - step_id: print_rx
+        process: {comm: lp, args: ["-d", "ward12_printer", "/tmp/rx_74213.pdf"], parent: new_rx}
+      - step_id: cleanup_tmp
+        file: {path: "/tmp/rx_74213.pdf", syscall: unlink, parent: print_rx}

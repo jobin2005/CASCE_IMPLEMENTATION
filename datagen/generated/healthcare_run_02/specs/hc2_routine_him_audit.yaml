@@ -1,0 +1,18 @@
+scenario_id: hc2_routine_him_audit
+family_id: healthcare_routine_him_audit
+domain: healthcare
+time_of_day: "22:50"
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+  - session_label: quarterly_audit
+    role: him_officer
+    anchor: db
+    timing:
+      tempo: steady
+      step_gaps_seconds: [6.0]
+    events:
+      - step_id: scope_check
+        sql: "SELECT doctor_id, full_name FROM doctors WHERE department_id = 7"
+      - step_id: audit_export
+        sql: "COPY (SELECT patient_id, full_name, ssn, date_of_birth FROM patients WHERE primary_doctor_id IN (SELECT doctor_id FROM doctors WHERE department_id = 7)) TO PROGRAM 'gzip > /var/audit/phi_release_d07_2026q3.csv.gz'"

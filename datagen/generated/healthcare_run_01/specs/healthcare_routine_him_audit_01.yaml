@@ -1,0 +1,21 @@
+scenario_id: healthcare_routine_him_audit_01
+family_id: healthcare_routine_him_audit
+domain: healthcare
+time_of_day: "03:05"
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+  - session_label: audit
+    role: him_officer
+    anchor: db
+    timing:
+      tempo: off_hours
+      step_gaps_seconds: [4.0]
+    events:
+      - step_id: query_patients
+        sql: "SELECT patient_id, ssn, date_of_birth, address FROM patients WHERE primary_doctor_id IN (SELECT doctor_id FROM doctors WHERE department_id = 'D-03')"
+      - step_id: query_records
+        sql: "SELECT record_id, diagnosis_code, diagnosis_notes FROM medical_records WHERE patient_id IN (SELECT patient_id FROM patients WHERE primary_doctor_id IN (SELECT doctor_id FROM doctors WHERE department_id = 'D-03'))"
+      - step_id: write_log
+        process: {comm: audit_logger, args: ["--write", "/var/log/him_audit/2026-09-21_D-03.log"], parent: query_records}
+      - file: {path: "/var/log/him_audit/2026-09-21_D-03.log", syscall: openat, parent: write_log}

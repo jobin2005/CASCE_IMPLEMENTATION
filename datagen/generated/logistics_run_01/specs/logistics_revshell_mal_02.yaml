@@ -1,0 +1,23 @@
+scenario_id: logistics_revshell_mal_02
+family_id: logistics_reverse_shell_metrics
+domain: logistics
+matched_pair_id: logistics_revshell_pair_02
+matched_dimensions:
+  fixed: [process_tree_shape, syscall_sequence, timing_pattern, role]
+  varied: [connects_to_destination]
+time_of_day: "04:40"
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+  - session_label: revshell
+    role: postgres
+    anchor: synthetic
+    anchor_query: "SELECT 1"
+    timing:
+      tempo: bursty
+      step_gaps_seconds: [0.6]
+    events:
+      - step_id: spawn_shell
+        process: {comm: python3, args: ["-c", "reverse shell stub"]}
+      - step_id: beacon
+        connect: {ip: "194.147.78.34", port: 443, parent: spawn_shell}

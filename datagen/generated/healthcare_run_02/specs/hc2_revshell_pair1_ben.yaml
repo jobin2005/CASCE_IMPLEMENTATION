@@ -1,0 +1,23 @@
+scenario_id: hc2_revshell_pair1_ben
+family_id: healthcare_revshell_healthcheck
+domain: healthcare
+matched_pair_id: healthcare_revshell_pair1
+matched_dimensions:
+  fixed: [process_tree_shape, syscall_sequence, timing_pattern, role]
+  varied: [connects_to_destination]
+time_of_day: "22:20"
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+  - session_label: revshell
+    role: postgres
+    anchor: synthetic
+    anchor_query: "SELECT 1"
+    timing:
+      tempo: bursty
+      step_gaps_seconds: [0.5]
+    events:
+      - step_id: spawn_shell
+        process: {comm: bash, args: ["/usr/local/bin/pg_replica_healthcheck.sh"]}
+      - step_id: beacon
+        connect: {ip: "10.60.9.5", port: 9100, parent: spawn_shell}

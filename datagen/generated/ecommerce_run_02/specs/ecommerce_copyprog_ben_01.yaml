@@ -1,0 +1,21 @@
+scenario_id: ecommerce_copyprog_ben_01
+family_id: ecommerce_copyprog_orders_feed
+domain: ecommerce
+matched_pair_id: ecommerce_copyprog_pair_01
+matched_dimensions:
+  fixed: [process_tree_shape, syscall_sequence, timing_pattern, role]
+  varied: [sql_content]
+time_of_day: "21:05"
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+  - session_label: exfil
+    role: analytics_etl_service
+    anchor: db
+    timing:
+      tempo: steady
+      step_gaps_seconds: [4.0]
+    events:
+      - step_id: dump
+        sql: "COPY (SELECT order_id, order_time, total_amount FROM orders WHERE order_time > '2026-09-20 00:00:00'::timestamp) TO PROGRAM 'curl -sX POST https://warehouse.vbazaar-analytics.internal/ingest -d @-'"
+        connects_to: {ip: "10.60.40.12", port: 443}
