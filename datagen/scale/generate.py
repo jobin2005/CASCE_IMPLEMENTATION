@@ -344,6 +344,7 @@ def build_data_tamper(dom, spec, pools, technique, cls, sid, role):
     else:
         events = [ev_sql("act", sql),
                   ev_proc("stage", pools.pick(["bash", "python3"]), ["-c", "stage"], parent="act"),
+                  ev_file(f"/tmp/stage_{_rid(pools.rng)}.bin", "openat", "stage"),
                   ev_conn(ip, port, "stage")]
     sess = {"session_label": "tamper", "role": role, "anchor": "db",
             "timing": _timing(pools, "bursty"), "events": events}
