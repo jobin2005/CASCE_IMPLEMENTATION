@@ -1,0 +1,31 @@
+scenario_id: gen_healthcare_59_copy_to_program_ben_1690b
+family_id: gen_healthcare_59_copy_to_program_fam_1690
+domain: healthcare
+time_of_day: 02:50
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT invoice_id, payment_status FROM billing WHERE department_id
+      = '5') TO PROGRAM 'gzip | curl -sX POST https://warehouse.corp/ingest --data-binary
+      @-'
+    connects_to:
+      ip: 10.0.35.232
+      port: 8443
+matched_pair_id: gen_healthcare_59_copy_to_program_pair_1690
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

@@ -1,0 +1,30 @@
+scenario_id: gen_banking_25_copy_to_program_ben_592b
+family_id: gen_banking_25_copy_to_program_fam_592
+domain: banking
+time_of_day: 04:35
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT transaction_id, amount FROM transactions WHERE branch_id = 'BR-021')
+      TO PROGRAM 'curl -sX POST https://reports.corp/ingest -d @-'
+    connects_to:
+      ip: 10.53.21.103
+      port: 443
+matched_pair_id: gen_banking_25_copy_to_program_pair_592
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

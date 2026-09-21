@@ -1,0 +1,27 @@
+scenario_id: gen_banking_73_legit_routine_ben_2036
+family_id: gen_banking_73_legit_routine_ben_fam2036
+domain: banking
+time_of_day: '15:10'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: routine
+  role: teller
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: op
+    sql: SELECT transaction_id, amount FROM transactions WHERE branch_id = 'BR-011'
+  - step_id: notify
+    process:
+      comm: bash
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.41.5.108
+      port: 9200
+      parent: notify

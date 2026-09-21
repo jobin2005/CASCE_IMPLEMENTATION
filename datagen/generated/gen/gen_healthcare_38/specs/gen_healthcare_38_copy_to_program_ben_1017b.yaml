@@ -1,0 +1,30 @@
+scenario_id: gen_healthcare_38_copy_to_program_ben_1017b
+family_id: gen_healthcare_38_copy_to_program_fam_1017
+domain: healthcare
+time_of_day: '15:40'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: exfil
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT doctor_id, specialty FROM doctors WHERE department_id = '3')
+      TO PROGRAM 'curl -sX POST https://etl-internal.corp/ingest -d @-'
+    connects_to:
+      ip: 192.168.2.67
+      port: 9443
+matched_pair_id: gen_healthcare_38_copy_to_program_pair_1017
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

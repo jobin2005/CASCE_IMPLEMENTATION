@@ -1,0 +1,30 @@
+scenario_id: gen_healthcare_77_copy_to_program_ben_2253b
+family_id: gen_healthcare_77_copy_to_program_fam_2253
+domain: healthcare
+time_of_day: 03:50
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT appointment_id, status FROM appointments WHERE department_id
+      = '11') TO PROGRAM 'nc warehouse.corp 443'
+    connects_to:
+      ip: 10.72.30.131
+      port: 9001
+matched_pair_id: gen_healthcare_77_copy_to_program_pair_2253
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

@@ -1,0 +1,34 @@
+scenario_id: gen_banking_07_reverse_shell_mal_159m
+family_id: gen_banking_07_reverse_shell_fam_159
+domain: banking
+time_of_day: '22:20'
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: revshell
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: spawn
+    process:
+      comm: sh
+      args:
+      - -i
+  - connect:
+      ip: 141.98.11.158.153
+      port: 4444
+      parent: spawn
+matched_pair_id: gen_banking_07_reverse_shell_pair_159
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - connects_to_destination

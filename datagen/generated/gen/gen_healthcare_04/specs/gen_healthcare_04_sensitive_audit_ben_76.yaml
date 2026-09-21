@@ -1,0 +1,18 @@
+scenario_id: gen_healthcare_04_sensitive_audit_ben_76
+family_id: gen_healthcare_04_sensitive_audit_ben_fam76
+domain: healthcare
+time_of_day: '23:05'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: audit
+  role: him_officer
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: read
+    sql: COPY (SELECT diagnosis_notes, diagnosis_code FROM medical_records) TO PROGRAM
+      'cat > /var/log/audit/healthcare_940055.log'

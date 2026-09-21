@@ -1,0 +1,27 @@
+scenario_id: gen_ecommerce_19_legit_routine_ben_483
+family_id: gen_ecommerce_19_legit_routine_ben_fam483
+domain: ecommerce
+time_of_day: 04:20
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: routine
+  role: catalog_manager
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: op
+    sql: SELECT product_id, name FROM products WHERE status = 'delivered'
+  - step_id: notify
+    process:
+      comm: bash
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 192.168.8.89
+      port: 443
+      parent: notify

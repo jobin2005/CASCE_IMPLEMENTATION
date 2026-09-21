@@ -1,0 +1,28 @@
+scenario_id: gen_ecommerce_25_union_report_ben_655
+family_id: gen_ecommerce_25_union_report_ben_fam655
+domain: ecommerce
+time_of_day: 04:05
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: reporting
+  role: fraud_analyst
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: report
+    sql: SELECT order_item_id, quantity FROM order_items WHERE status = 'pending'
+      UNION SELECT order_item_id, quantity FROM order_items WHERE status = 'flagged'
+  - step_id: gen
+    process:
+      comm: python3
+      args:
+      - report_gen
+      parent: report
+  - file:
+      path: /var/reports/ecommerce_867566.csv
+      syscall: openat
+      parent: gen

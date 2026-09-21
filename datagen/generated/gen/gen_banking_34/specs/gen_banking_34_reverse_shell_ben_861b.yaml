@@ -1,0 +1,34 @@
+scenario_id: gen_banking_34_reverse_shell_ben_861b
+family_id: gen_banking_34_reverse_shell_fam_861
+domain: banking
+time_of_day: 04:35
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: revshell
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: spawn
+    process:
+      comm: bash
+      args:
+      - /usr/local/bin/metrics_agent.sh
+  - connect:
+      ip: 10.69.2.127
+      port: 443
+      parent: spawn
+matched_pair_id: gen_banking_34_reverse_shell_pair_861
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - connects_to_destination

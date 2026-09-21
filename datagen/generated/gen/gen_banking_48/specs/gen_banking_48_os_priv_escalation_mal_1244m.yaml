@@ -1,0 +1,42 @@
+scenario_id: gen_banking_48_os_priv_escalation_mal_1244m
+family_id: gen_banking_48_os_priv_escalation_fam_1244
+domain: banking
+time_of_day: 00:05
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: escalate
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: enum
+    process:
+      comm: sudo
+      args:
+      - -l
+  - step_id: cp
+    process:
+      comm: cp
+      args:
+      - /bin/sh
+      - /tmp/.rootdash
+      parent: enum
+  - step_id: run
+    process:
+      comm: /tmp/.rootdash
+      args:
+      - -p
+      parent: cp
+matched_pair_id: gen_banking_48_os_priv_escalation_pair_1244
+matched_dimensions:
+  fixed:
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - process_tree_shape

@@ -1,0 +1,27 @@
+scenario_id: gen_ecommerce_79_legit_dml_ben_2359
+family_id: gen_ecommerce_79_legit_dml_ben_fam2359
+domain: ecommerce
+time_of_day: 04:35
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dml
+  role: support_agent
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: op
+    sql: UPDATE products SET category = '372' WHERE status = 'flagged'
+  - step_id: notify
+    process:
+      comm: curl
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 192.168.50.34
+      port: 9200
+      parent: notify

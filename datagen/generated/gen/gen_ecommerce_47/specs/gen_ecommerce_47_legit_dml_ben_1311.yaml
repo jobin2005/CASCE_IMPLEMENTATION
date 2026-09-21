@@ -1,0 +1,27 @@
+scenario_id: gen_ecommerce_47_legit_dml_ben_1311
+family_id: gen_ecommerce_47_legit_dml_ben_fam1311
+domain: ecommerce
+time_of_day: '11:40'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dml
+  role: support_agent
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: op
+    sql: INSERT INTO payments DEFAULT VALUES
+  - step_id: notify
+    process:
+      comm: curl
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.37.13.196
+      port: 443
+      parent: notify

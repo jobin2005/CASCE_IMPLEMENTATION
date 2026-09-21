@@ -1,0 +1,27 @@
+scenario_id: gen_ecommerce_00_legit_dml_ben_21
+family_id: gen_ecommerce_00_legit_dml_ben_fam21
+domain: ecommerce
+time_of_day: 04:05
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: dml
+  role: catalog_manager
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: op
+    sql: UPDATE products SET category = '150' WHERE status = 'delivered'
+  - step_id: notify
+    process:
+      comm: bash
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.53.23.76
+      port: 9200
+      parent: notify

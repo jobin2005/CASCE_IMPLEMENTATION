@@ -1,0 +1,30 @@
+scenario_id: gen_banking_71_copy_to_program_ben_1975b
+family_id: gen_banking_71_copy_to_program_fam_1975
+domain: banking
+time_of_day: '11:40'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT account_id, account_type FROM accounts WHERE branch_id = 'BR-021')
+      TO PROGRAM 'nc audit-intake.corp 443'
+    connects_to:
+      ip: 10.51.29.57
+      port: 9443
+matched_pair_id: gen_banking_71_copy_to_program_pair_1975
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

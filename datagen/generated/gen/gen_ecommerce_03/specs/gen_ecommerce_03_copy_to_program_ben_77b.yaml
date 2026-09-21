@@ -1,0 +1,30 @@
+scenario_id: gen_ecommerce_03_copy_to_program_ben_77b
+family_id: gen_ecommerce_03_copy_to_program_fam_77
+domain: ecommerce
+time_of_day: '23:20'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: exfil
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT product_id, name FROM products WHERE status = 'pending') TO
+      PROGRAM 'nc warehouse.corp 443'
+    connects_to:
+      ip: 10.61.17.226
+      port: 9443
+matched_pair_id: gen_ecommerce_03_copy_to_program_pair_77
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

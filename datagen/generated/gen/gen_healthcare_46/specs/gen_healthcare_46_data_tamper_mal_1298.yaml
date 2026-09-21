@@ -1,0 +1,32 @@
+scenario_id: gen_healthcare_46_data_tamper_mal_1298
+family_id: gen_healthcare_46_data_tamper_mal_fam1298
+domain: healthcare
+time_of_day: 03:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: nurse
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: TRUNCATE TABLE billing
+  - step_id: stage
+    process:
+      comm: python3
+      args:
+      - -c
+      - stage
+      parent: act
+  - file:
+      path: /tmp/stage_14049.bin
+      syscall: openat
+      parent: stage
+  - connect:
+      ip: 185.220.101.190.213
+      port: 8443
+      parent: stage

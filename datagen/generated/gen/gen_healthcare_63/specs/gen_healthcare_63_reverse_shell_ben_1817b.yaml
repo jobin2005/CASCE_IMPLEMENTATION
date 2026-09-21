@@ -1,0 +1,34 @@
+scenario_id: gen_healthcare_63_reverse_shell_ben_1817b
+family_id: gen_healthcare_63_reverse_shell_fam_1817
+domain: healthcare
+time_of_day: '15:10'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: revshell
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: spawn
+    process:
+      comm: sh
+      args:
+      - /usr/local/bin/vacuum_nightly.sh
+  - connect:
+      ip: 10.37.23.244
+      port: 9101
+      parent: spawn
+matched_pair_id: gen_healthcare_63_reverse_shell_pair_1817
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - connects_to_destination

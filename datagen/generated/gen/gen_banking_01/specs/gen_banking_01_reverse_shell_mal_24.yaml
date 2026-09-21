@@ -1,0 +1,25 @@
+scenario_id: gen_banking_01_reverse_shell_mal_24
+family_id: gen_banking_01_reverse_shell_mal_fam24
+domain: banking
+time_of_day: 00:50
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: revshell
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: spawn
+    process:
+      comm: bash
+      args:
+      - -i
+  - connect:
+      ip: 193.42.33.73.58
+      port: 6666
+      parent: spawn

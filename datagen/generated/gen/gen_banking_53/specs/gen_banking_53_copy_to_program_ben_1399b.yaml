@@ -1,0 +1,31 @@
+scenario_id: gen_banking_53_copy_to_program_ben_1399b
+family_id: gen_banking_53_copy_to_program_fam_1399
+domain: banking
+time_of_day: '23:50'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT account_id, account_type FROM accounts WHERE branch_id = 'BR-052')
+      TO PROGRAM 'gzip | curl -sX POST https://etl-internal.corp/ingest --data-binary
+      @-'
+    connects_to:
+      ip: 10.74.15.93
+      port: 8443
+matched_pair_id: gen_banking_53_copy_to_program_pair_1399
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

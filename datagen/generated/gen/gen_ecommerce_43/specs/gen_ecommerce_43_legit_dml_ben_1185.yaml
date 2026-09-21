@@ -1,0 +1,27 @@
+scenario_id: gen_ecommerce_43_legit_dml_ben_1185
+family_id: gen_ecommerce_43_legit_dml_ben_fam1185
+domain: ecommerce
+time_of_day: '13:10'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dml
+  role: catalog_manager
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: op
+    sql: UPDATE order_items SET quantity = '593' WHERE status = 'pending'
+  - step_id: notify
+    process:
+      comm: python3
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.16.31.13
+      port: 9100
+      parent: notify

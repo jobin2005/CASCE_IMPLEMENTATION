@@ -1,0 +1,32 @@
+scenario_id: gen_banking_97_data_tamper_mal_2747
+family_id: gen_banking_97_data_tamper_mal_fam2747
+domain: banking
+time_of_day: 03:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: postgres
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: act
+    sql: UPDATE transactions SET amount = 747728 WHERE customer_id = 38559
+  - step_id: stage
+    process:
+      comm: python3
+      args:
+      - -c
+      - stage
+      parent: act
+  - file:
+      path: /tmp/stage_170696.bin
+      syscall: openat
+      parent: stage
+  - connect:
+      ip: 23.129.64.38.209
+      port: 8080
+      parent: stage

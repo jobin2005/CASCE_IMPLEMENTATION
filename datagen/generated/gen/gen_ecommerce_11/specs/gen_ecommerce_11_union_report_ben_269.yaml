@@ -1,0 +1,28 @@
+scenario_id: gen_ecommerce_11_union_report_ben_269
+family_id: gen_ecommerce_11_union_report_ben_fam269
+domain: ecommerce
+time_of_day: 02:35
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: reporting
+  role: fraud_analyst
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: report
+    sql: SELECT order_item_id, quantity FROM order_items WHERE status = 'delivered'
+      UNION SELECT order_item_id, quantity FROM order_items WHERE status = 'shipped'
+  - step_id: gen
+    process:
+      comm: python3
+      args:
+      - report_gen
+      parent: report
+  - file:
+      path: /var/reports/ecommerce_711704.csv
+      syscall: openat
+      parent: gen

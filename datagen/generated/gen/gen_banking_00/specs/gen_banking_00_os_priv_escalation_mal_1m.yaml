@@ -1,0 +1,44 @@
+scenario_id: gen_banking_00_os_priv_escalation_mal_1m
+family_id: gen_banking_00_os_priv_escalation_fam_1
+domain: banking
+time_of_day: '23:50'
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: escalate
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: cp
+    process:
+      comm: cp
+      args:
+      - /usr/bin/python3
+      - /tmp/.dpbash
+  - step_id: suid
+    process:
+      comm: setcap
+      args:
+      - cap_setuid+ep
+      - /tmp/.dpbash
+      parent: cp
+  - step_id: run
+    process:
+      comm: /tmp/.dpbash
+      args:
+      - -c
+      - import os; os.setuid(0)
+      parent: suid
+matched_pair_id: gen_banking_00_os_priv_escalation_pair_1
+matched_dimensions:
+  fixed:
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - process_tree_shape

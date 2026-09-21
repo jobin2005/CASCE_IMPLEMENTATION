@@ -1,0 +1,34 @@
+scenario_id: gen_ecommerce_06_reverse_shell_ben_148b
+family_id: gen_ecommerce_06_reverse_shell_fam_148
+domain: ecommerce
+time_of_day: '22:35'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: revshell
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: spawn
+    process:
+      comm: sh
+      args:
+      - /usr/local/bin/wal_archive.sh
+  - connect:
+      ip: 192.168.13.122
+      port: 9100
+      parent: spawn
+matched_pair_id: gen_ecommerce_06_reverse_shell_pair_148
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - connects_to_destination

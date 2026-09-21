@@ -1,0 +1,27 @@
+scenario_id: gen_logistics_63_legit_dml_ben_1711
+family_id: gen_logistics_63_legit_dml_ben_fam1711
+domain: logistics
+time_of_day: 01:20
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: dml
+  role: dispatcher
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: op
+    sql: UPDATE warehouses SET name = '400' WHERE depot_id = 'DP-02'
+  - step_id: notify
+    process:
+      comm: curl
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 192.168.12.70
+      port: 9100
+      parent: notify

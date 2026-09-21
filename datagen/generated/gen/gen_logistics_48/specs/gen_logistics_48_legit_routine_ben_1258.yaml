@@ -1,0 +1,27 @@
+scenario_id: gen_logistics_48_legit_routine_ben_1258
+family_id: gen_logistics_48_legit_routine_ben_fam1258
+domain: logistics
+time_of_day: 04:50
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: routine
+  role: dispatcher
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: op
+    sql: SELECT warehouse_id, name FROM warehouses WHERE depot_id = 'DP-02'
+  - step_id: notify
+    process:
+      comm: curl
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.62.10.39
+      port: 9101
+      parent: notify

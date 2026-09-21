@@ -1,0 +1,27 @@
+scenario_id: gen_banking_26_legit_dml_ben_622
+family_id: gen_banking_26_legit_dml_ben_fam622
+domain: banking
+time_of_day: 00:35
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: dml
+  role: teller
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: op
+    sql: INSERT INTO transactions DEFAULT VALUES
+  - step_id: notify
+    process:
+      comm: curl
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.23.13.163
+      port: 9200
+      parent: notify

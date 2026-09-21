@@ -1,0 +1,27 @@
+scenario_id: gen_healthcare_40_legit_dml_ben_1094
+family_id: gen_healthcare_40_legit_dml_ben_fam1094
+domain: healthcare
+time_of_day: '23:05'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: dml
+  role: nurse
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: op
+    sql: UPDATE doctors SET specialty = '136' WHERE department_id = 7
+  - step_id: notify
+    process:
+      comm: bash
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.9.13.180
+      port: 9200
+      parent: notify

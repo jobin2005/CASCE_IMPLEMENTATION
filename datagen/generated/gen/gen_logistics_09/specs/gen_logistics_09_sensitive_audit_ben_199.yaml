@@ -1,0 +1,17 @@
+scenario_id: gen_logistics_09_sensitive_audit_ben_199
+family_id: gen_logistics_09_sensitive_audit_ben_fam199
+domain: logistics
+time_of_day: '13:40'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: audit
+  role: compliance_auditor
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: read
+    sql: COPY (SELECT declared_value FROM manifests) TO PROGRAM 'gzip > /var/log/audit/logistics_849996.log'

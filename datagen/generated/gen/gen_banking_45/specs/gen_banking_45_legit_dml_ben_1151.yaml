@@ -1,0 +1,27 @@
+scenario_id: gen_banking_45_legit_dml_ben_1151
+family_id: gen_banking_45_legit_dml_ben_fam1151
+domain: banking
+time_of_day: '10:40'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: dml
+  role: teller
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: op
+    sql: UPDATE accounts SET account_type = '612' WHERE branch_id = 'BR-033'
+  - step_id: notify
+    process:
+      comm: python3
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.70.18.21
+      port: 9101
+      parent: notify

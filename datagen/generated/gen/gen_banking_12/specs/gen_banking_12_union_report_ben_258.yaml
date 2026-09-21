@@ -1,0 +1,28 @@
+scenario_id: gen_banking_12_union_report_ben_258
+family_id: gen_banking_12_union_report_ben_fam258
+domain: banking
+time_of_day: 02:05
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: reporting
+  role: teller
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: report
+    sql: SELECT account_id, account_type FROM accounts WHERE branch_id = 'BR-052'
+      UNION SELECT account_id, account_type FROM accounts WHERE branch_id = 'BR-052'
+  - step_id: gen
+    process:
+      comm: python3
+      args:
+      - report_gen
+      parent: report
+  - file:
+      path: /var/reports/banking_729587.csv
+      syscall: openat
+      parent: gen

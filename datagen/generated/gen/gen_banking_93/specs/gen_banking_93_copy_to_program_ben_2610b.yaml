@@ -1,0 +1,31 @@
+scenario_id: gen_banking_93_copy_to_program_ben_2610b
+family_id: gen_banking_93_copy_to_program_fam_2610
+domain: banking
+time_of_day: '13:10'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT transaction_id, amount FROM transactions WHERE branch_id = 'BR-052')
+      TO PROGRAM 'python3 -c "import urllib.request,sys; urllib.request.urlopen(urllib.request.Request(\"https://audit-intake.corp/ingest\",
+      data=sys.stdin.buffer.read(), method=\"POST\"))"'
+    connects_to:
+      ip: 192.168.1.151
+      port: 9443
+matched_pair_id: gen_banking_93_copy_to_program_pair_2610
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

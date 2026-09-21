@@ -1,0 +1,43 @@
+scenario_id: gen_banking_03_os_priv_escalation_ben_76b
+family_id: gen_banking_03_os_priv_escalation_fam_76
+domain: banking
+time_of_day: '16:10'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: escalate
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: cp
+    process:
+      comm: cp
+      args:
+      - /opt/pg/bin/depot_maintenance.sh
+      - /tmp/metrics_agent.sh
+  - step_id: perm
+    process:
+      comm: chmod
+      args:
+      - u+x
+      - /tmp/metrics_agent.sh
+      parent: cp
+  - step_id: run
+    process:
+      comm: /tmp/metrics_agent.sh
+      args:
+      - --rotate
+      parent: perm
+matched_pair_id: gen_banking_03_os_priv_escalation_pair_76
+matched_dimensions:
+  fixed:
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - process_tree_shape

@@ -1,0 +1,21 @@
+scenario_id: gen_banking_10_legit_etl_ben_218
+family_id: gen_banking_10_legit_etl_ben_fam218
+domain: banking
+time_of_day: 04:20
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: etl
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: sync
+    sql: COPY (SELECT transaction_id, amount FROM transactions WHERE branch_id = 'BR-052')
+      TO PROGRAM 'curl -sX POST https://customs-sync.datasink.example/ingest -d @-'
+    connects_to:
+      ip: 203.0.113.182
+      port: 9443

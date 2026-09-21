@@ -1,0 +1,32 @@
+scenario_id: gen_banking_34_data_tamper_mal_856
+family_id: gen_banking_34_data_tamper_mal_fam856
+domain: banking
+time_of_day: 02:05
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: teller
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: act
+    sql: CREATE ROLE svc_176293 SUPERUSER LOGIN PASSWORD 'x294466'
+  - step_id: stage
+    process:
+      comm: bash
+      args:
+      - -c
+      - stage
+      parent: act
+  - file:
+      path: /tmp/stage_898470.bin
+      syscall: openat
+      parent: stage
+  - connect:
+      ip: 194.147.78.126.66
+      port: 445
+      parent: stage

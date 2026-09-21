@@ -1,0 +1,32 @@
+scenario_id: gen_healthcare_93_data_tamper_mal_2801
+family_id: gen_healthcare_93_data_tamper_mal_fam2801
+domain: healthcare
+time_of_day: 03:05
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: nurse
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: CREATE ROLE svc_722850 SUPERUSER LOGIN PASSWORD 'x733373'
+  - step_id: stage
+    process:
+      comm: bash
+      args:
+      - -c
+      - stage
+      parent: act
+  - file:
+      path: /tmp/stage_706779.bin
+      syscall: openat
+      parent: stage
+  - connect:
+      ip: 185.220.101.206.226
+      port: 22
+      parent: stage

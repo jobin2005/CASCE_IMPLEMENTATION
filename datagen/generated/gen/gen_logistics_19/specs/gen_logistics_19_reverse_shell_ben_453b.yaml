@@ -1,0 +1,34 @@
+scenario_id: gen_logistics_19_reverse_shell_ben_453b
+family_id: gen_logistics_19_reverse_shell_fam_453
+domain: logistics
+time_of_day: '22:05'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: revshell
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: spawn
+    process:
+      comm: bash
+      args:
+      - /usr/local/bin/depot_maintenance.sh
+  - connect:
+      ip: 10.17.17.211
+      port: 9101
+      parent: spawn
+matched_pair_id: gen_logistics_19_reverse_shell_pair_453
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - connects_to_destination

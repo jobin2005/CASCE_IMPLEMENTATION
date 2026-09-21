@@ -1,0 +1,27 @@
+scenario_id: gen_healthcare_36_legit_dml_ben_975
+family_id: gen_healthcare_36_legit_dml_ben_fam975
+domain: healthcare
+time_of_day: '13:40'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: dml
+  role: billing_clerk
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: op
+    sql: UPDATE doctors SET specialty = '742' WHERE department_id = 5
+  - step_id: notify
+    process:
+      comm: curl
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.40.13.174
+      port: 9200
+      parent: notify

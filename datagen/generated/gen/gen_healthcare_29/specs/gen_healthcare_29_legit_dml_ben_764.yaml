@@ -1,0 +1,27 @@
+scenario_id: gen_healthcare_29_legit_dml_ben_764
+family_id: gen_healthcare_29_legit_dml_ben_fam764
+domain: healthcare
+time_of_day: 00:35
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dml
+  role: billing_clerk
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: op
+    sql: UPDATE appointments SET status = '612' WHERE department_id = 11
+  - step_id: notify
+    process:
+      comm: curl
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 192.168.43.145
+      port: 9100
+      parent: notify

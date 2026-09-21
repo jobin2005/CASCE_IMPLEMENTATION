@@ -1,0 +1,30 @@
+scenario_id: gen_ecommerce_79_copy_to_program_ben_2362b
+family_id: gen_ecommerce_79_copy_to_program_fam_2362
+domain: ecommerce
+time_of_day: '14:10'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT order_item_id, quantity FROM order_items WHERE status = 'delivered')
+      TO PROGRAM 'gzip | curl -sX POST https://reports.corp/ingest --data-binary @-'
+    connects_to:
+      ip: 10.5.7.121
+      port: 9443
+matched_pair_id: gen_ecommerce_79_copy_to_program_pair_2362
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

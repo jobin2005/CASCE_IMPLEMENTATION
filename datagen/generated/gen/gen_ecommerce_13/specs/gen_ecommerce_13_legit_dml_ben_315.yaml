@@ -1,0 +1,27 @@
+scenario_id: gen_ecommerce_13_legit_dml_ben_315
+family_id: gen_ecommerce_13_legit_dml_ben_fam315
+domain: ecommerce
+time_of_day: '13:40'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: dml
+  role: catalog_manager
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: op
+    sql: UPDATE orders SET total_amount = '686' WHERE status = 'shipped'
+  - step_id: notify
+    process:
+      comm: python3
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.3.23.36
+      port: 9200
+      parent: notify

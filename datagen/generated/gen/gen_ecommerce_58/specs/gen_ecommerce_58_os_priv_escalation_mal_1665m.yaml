@@ -1,0 +1,45 @@
+scenario_id: gen_ecommerce_58_os_priv_escalation_mal_1665m
+family_id: gen_ecommerce_58_os_priv_escalation_fam_1665
+domain: ecommerce
+time_of_day: 01:35
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: escalate
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: cp
+    process:
+      comm: cp
+      args:
+      - /bin/bash
+      - /tmp/.svclink
+  - step_id: suid
+    process:
+      comm: chmod
+      args:
+      - u+s
+      - /tmp/.svclink
+      parent: cp
+  - step_id: run
+    process:
+      comm: /tmp/.svclink
+      args:
+      - -p
+      - -c
+      - id
+      parent: suid
+matched_pair_id: gen_ecommerce_58_os_priv_escalation_pair_1665
+matched_dimensions:
+  fixed:
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - process_tree_shape

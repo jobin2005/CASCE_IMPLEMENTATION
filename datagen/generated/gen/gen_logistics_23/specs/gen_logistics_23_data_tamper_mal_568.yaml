@@ -1,0 +1,32 @@
+scenario_id: gen_logistics_23_data_tamper_mal_568
+family_id: gen_logistics_23_data_tamper_mal_fam568
+domain: logistics
+time_of_day: 02:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: dispatcher
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: TRUNCATE TABLE manifests
+  - step_id: stage
+    process:
+      comm: python3
+      args:
+      - -c
+      - stage
+      parent: act
+  - file:
+      path: /tmp/stage_581475.bin
+      syscall: openat
+      parent: stage
+  - connect:
+      ip: 176.65.48.189.181
+      port: 3389
+      parent: stage

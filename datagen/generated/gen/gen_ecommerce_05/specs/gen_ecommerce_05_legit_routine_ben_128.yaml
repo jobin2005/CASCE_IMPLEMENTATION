@@ -1,0 +1,27 @@
+scenario_id: gen_ecommerce_05_legit_routine_ben_128
+family_id: gen_ecommerce_05_legit_routine_ben_fam128
+domain: ecommerce
+time_of_day: 02:05
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: routine
+  role: catalog_manager
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: op
+    sql: SELECT product_id, name FROM products WHERE status = 'flagged'
+  - step_id: notify
+    process:
+      comm: python3
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.41.13.132
+      port: 443
+      parent: notify

@@ -1,0 +1,27 @@
+scenario_id: gen_banking_39_legit_dml_ben_985
+family_id: gen_banking_39_legit_dml_ben_fam985
+domain: banking
+time_of_day: '23:50'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: dml
+  role: teller
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: op
+    sql: UPDATE customers SET full_name = '107' WHERE branch_id = 'BR-033'
+  - step_id: notify
+    process:
+      comm: bash
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.72.7.203
+      port: 9101
+      parent: notify

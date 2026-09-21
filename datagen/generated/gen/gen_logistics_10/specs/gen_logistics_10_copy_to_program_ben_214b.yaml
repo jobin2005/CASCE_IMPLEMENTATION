@@ -1,0 +1,31 @@
+scenario_id: gen_logistics_10_copy_to_program_ben_214b
+family_id: gen_logistics_10_copy_to_program_fam_214
+domain: logistics
+time_of_day: 02:35
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT warehouse_id, name FROM warehouses WHERE depot_id = 'DP-02')
+      TO PROGRAM 'gzip | curl -sX POST https://warehouse.corp/ingest --data-binary
+      @-'
+    connects_to:
+      ip: 10.62.28.124
+      port: 9443
+matched_pair_id: gen_logistics_10_copy_to_program_pair_214
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

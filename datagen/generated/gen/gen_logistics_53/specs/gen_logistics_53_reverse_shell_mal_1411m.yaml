@@ -1,0 +1,35 @@
+scenario_id: gen_logistics_53_reverse_shell_mal_1411m
+family_id: gen_logistics_53_reverse_shell_fam_1411
+domain: logistics
+time_of_day: 01:35
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: revshell
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: spawn
+    process:
+      comm: perl
+      args:
+      - -e
+      - use Socket; socket(S,PF_INET,SOCK_STREAM,0);
+  - connect:
+      ip: 141.98.11.41.170
+      port: 1337
+      parent: spawn
+matched_pair_id: gen_logistics_53_reverse_shell_pair_1411
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - connects_to_destination

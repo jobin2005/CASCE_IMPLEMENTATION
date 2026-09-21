@@ -1,0 +1,27 @@
+scenario_id: gen_logistics_29_legit_dml_ben_752
+family_id: gen_logistics_29_legit_dml_ben_fam752
+domain: logistics
+time_of_day: '11:40'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dml
+  role: warehouse_clerk
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: op
+    sql: UPDATE vehicles SET plate_number = '659' WHERE depot_id = 'DP-05'
+  - step_id: notify
+    process:
+      comm: curl
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 192.168.35.44
+      port: 9200
+      parent: notify

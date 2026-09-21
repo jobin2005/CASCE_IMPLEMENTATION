@@ -1,0 +1,17 @@
+scenario_id: gen_banking_01_sensitive_audit_ben_22
+family_id: gen_banking_01_sensitive_audit_ben_fam22
+domain: banking
+time_of_day: '16:10'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: audit
+  role: compliance_officer
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: read
+    sql: COPY (SELECT balance FROM accounts) TO PROGRAM 'cat > /var/log/audit/banking_650133.log'

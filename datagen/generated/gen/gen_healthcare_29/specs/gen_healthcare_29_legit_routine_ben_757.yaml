@@ -1,0 +1,27 @@
+scenario_id: gen_healthcare_29_legit_routine_ben_757
+family_id: gen_healthcare_29_legit_routine_ben_fam757
+domain: healthcare
+time_of_day: '23:50'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: routine
+  role: physician
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: op
+    sql: SELECT invoice_id, payment_status FROM billing WHERE department_id = 7
+  - step_id: notify
+    process:
+      comm: bash
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.4.14.59
+      port: 9100
+      parent: notify

@@ -1,0 +1,32 @@
+scenario_id: gen_ecommerce_67_sql_injection_ben_1969b
+family_id: gen_ecommerce_67_sql_injection_fam_1969
+domain: ecommerce
+time_of_day: 02:35
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: inject
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: probe
+    sql: SELECT order_id, status FROM orders WHERE order_id = 81953
+  - step_id: exfil
+    sql: COPY (SELECT order_id, status FROM orders WHERE status = 'delivered') TO
+      PROGRAM 'curl -sX POST https://deid-partner.example/ingest -d @-'
+    connects_to:
+      ip: 203.0.113.114
+      port: 9443
+matched_pair_id: gen_ecommerce_67_sql_injection_pair_1969
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

@@ -1,0 +1,27 @@
+scenario_id: gen_banking_20_legit_dml_ben_454
+family_id: gen_banking_20_legit_dml_ben_fam454
+domain: banking
+time_of_day: '12:10'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: dml
+  role: branch_manager
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: op
+    sql: INSERT INTO transactions DEFAULT VALUES
+  - step_id: notify
+    process:
+      comm: curl
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.10.31.227
+      port: 443
+      parent: notify

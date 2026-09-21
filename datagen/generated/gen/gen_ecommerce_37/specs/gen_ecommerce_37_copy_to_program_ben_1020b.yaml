@@ -1,0 +1,30 @@
+scenario_id: gen_ecommerce_37_copy_to_program_ben_1020b
+family_id: gen_ecommerce_37_copy_to_program_fam_1020
+domain: ecommerce
+time_of_day: '23:35'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT product_id, name FROM products WHERE status = 'flagged') TO
+      PROGRAM 'nc audit-intake.corp 443'
+    connects_to:
+      ip: 192.168.17.108
+      port: 8443
+matched_pair_id: gen_ecommerce_37_copy_to_program_pair_1020
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

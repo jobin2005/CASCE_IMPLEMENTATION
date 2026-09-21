@@ -1,0 +1,32 @@
+scenario_id: gen_banking_13_data_tamper_mal_286
+family_id: gen_banking_13_data_tamper_mal_fam286
+domain: banking
+time_of_day: 01:05
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: teller
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: act
+    sql: UPDATE accounts SET balance = 709113 WHERE customer_id = 29116
+  - step_id: stage
+    process:
+      comm: python3
+      args:
+      - -c
+      - stage
+      parent: act
+  - file:
+      path: /tmp/stage_74909.bin
+      syscall: openat
+      parent: stage
+  - connect:
+      ip: 45.77.195.199
+      port: 9443
+      parent: stage

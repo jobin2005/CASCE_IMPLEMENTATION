@@ -1,0 +1,17 @@
+scenario_id: gen_logistics_04_sensitive_audit_ben_82
+family_id: gen_logistics_04_sensitive_audit_ben_fam82
+domain: logistics
+time_of_day: '23:35'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: audit
+  role: compliance_auditor
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: read
+    sql: COPY (SELECT dest_address FROM shipments) TO PROGRAM 'gzip > /var/log/audit/logistics_705093.log'

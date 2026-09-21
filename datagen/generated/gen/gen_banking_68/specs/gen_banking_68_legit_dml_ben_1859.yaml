@@ -1,0 +1,27 @@
+scenario_id: gen_banking_68_legit_dml_ben_1859
+family_id: gen_banking_68_legit_dml_ben_fam1859
+domain: banking
+time_of_day: '12:10'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dml
+  role: teller
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: op
+    sql: UPDATE accounts SET account_type = '310' WHERE branch_id = 'BR-052'
+  - step_id: notify
+    process:
+      comm: curl
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.39.16.238
+      port: 443
+      parent: notify

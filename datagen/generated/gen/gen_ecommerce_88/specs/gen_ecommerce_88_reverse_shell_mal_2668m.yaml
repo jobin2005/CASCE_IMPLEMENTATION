@@ -1,0 +1,34 @@
+scenario_id: gen_ecommerce_88_reverse_shell_mal_2668m
+family_id: gen_ecommerce_88_reverse_shell_fam_2668
+domain: ecommerce
+time_of_day: 04:35
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: revshell
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: spawn
+    process:
+      comm: sh
+      args:
+      - -i
+  - connect:
+      ip: 194.147.78.197.14
+      port: 4445
+      parent: spawn
+matched_pair_id: gen_ecommerce_88_reverse_shell_pair_2668
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - connects_to_destination

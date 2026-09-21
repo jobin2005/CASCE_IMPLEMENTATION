@@ -1,0 +1,28 @@
+scenario_id: gen_banking_08_union_report_ben_170
+family_id: gen_banking_08_union_report_ben_fam170
+domain: banking
+time_of_day: 00:50
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: reporting
+  role: compliance_officer
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: report
+    sql: SELECT transaction_id, amount FROM transactions WHERE branch_id = 'BR-021'
+      UNION SELECT transaction_id, amount FROM transactions WHERE branch_id = 'BR-021'
+  - step_id: gen
+    process:
+      comm: bash
+      args:
+      - report_gen
+      parent: report
+  - file:
+      path: /var/reports/banking_596365.csv
+      syscall: openat
+      parent: gen

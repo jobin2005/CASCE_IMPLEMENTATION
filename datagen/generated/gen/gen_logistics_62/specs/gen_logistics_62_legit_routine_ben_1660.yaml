@@ -1,0 +1,27 @@
+scenario_id: gen_logistics_62_legit_routine_ben_1660
+family_id: gen_logistics_62_legit_routine_ben_fam1660
+domain: logistics
+time_of_day: '16:10'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: routine
+  role: fleet_manager
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: op
+    sql: SELECT vehicle_id, plate_number FROM vehicles WHERE depot_id = 'DP-05'
+  - step_id: notify
+    process:
+      comm: curl
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.47.12.49
+      port: 9101
+      parent: notify

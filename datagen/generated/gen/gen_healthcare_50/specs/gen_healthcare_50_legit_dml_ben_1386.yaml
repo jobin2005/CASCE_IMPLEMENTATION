@@ -1,0 +1,27 @@
+scenario_id: gen_healthcare_50_legit_dml_ben_1386
+family_id: gen_healthcare_50_legit_dml_ben_fam1386
+domain: healthcare
+time_of_day: '23:05'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dml
+  role: billing_clerk
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: op
+    sql: UPDATE appointments SET status = '37' WHERE department_id = 3
+  - step_id: notify
+    process:
+      comm: bash
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.52.26.120
+      port: 443
+      parent: notify

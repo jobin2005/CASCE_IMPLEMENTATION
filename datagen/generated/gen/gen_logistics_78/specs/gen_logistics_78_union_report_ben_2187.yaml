@@ -1,0 +1,28 @@
+scenario_id: gen_logistics_78_union_report_ben_2187
+family_id: gen_logistics_78_union_report_ben_fam2187
+domain: logistics
+time_of_day: '10:10'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: reporting
+  role: dispatcher
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: report
+    sql: SELECT vehicle_id, plate_number FROM vehicles WHERE depot_id = 'DP-14' UNION
+      SELECT vehicle_id, plate_number FROM vehicles WHERE depot_id = 'DP-11'
+  - step_id: gen
+    process:
+      comm: bash
+      args:
+      - report_gen
+      parent: report
+  - file:
+      path: /var/reports/logistics_758048.csv
+      syscall: openat
+      parent: gen

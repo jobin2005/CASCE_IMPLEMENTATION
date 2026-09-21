@@ -1,0 +1,27 @@
+scenario_id: gen_healthcare_07_legit_dml_ben_164
+family_id: gen_healthcare_07_legit_dml_ben_fam164
+domain: healthcare
+time_of_day: 04:20
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dml
+  role: nurse
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: op
+    sql: UPDATE appointments SET status = '663' WHERE department_id = 3
+  - step_id: notify
+    process:
+      comm: python3
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 192.168.49.230
+      port: 9200
+      parent: notify

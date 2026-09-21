@@ -1,0 +1,31 @@
+scenario_id: gen_ecommerce_98_copy_to_program_ben_3033b
+family_id: gen_ecommerce_98_copy_to_program_fam_3033
+domain: ecommerce
+time_of_day: '16:40'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT product_id, name FROM products WHERE status = 'delivered') TO
+      PROGRAM 'gzip | curl -sX POST https://audit-intake.corp/ingest --data-binary
+      @-'
+    connects_to:
+      ip: 192.168.47.33
+      port: 443
+matched_pair_id: gen_ecommerce_98_copy_to_program_pair_3033
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content
