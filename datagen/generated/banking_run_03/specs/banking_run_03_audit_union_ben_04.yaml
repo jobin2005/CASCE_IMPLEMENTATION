@@ -1,0 +1,20 @@
+scenario_id: banking_run_03_audit_union_ben_04
+family_id: banking_run_03_compliance_recon_union
+domain: banking
+time_of_day: "11:00"
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+  - session_label: recon_union
+    role: compliance_officer
+    anchor: db
+    timing:
+      tempo: steady
+      step_gaps_seconds: [3.0]
+    events:
+      - step_id: recon_query
+        sql: "SELECT account_id, balance FROM accounts WHERE branch_id = 'BR-014' UNION SELECT account_id, balance FROM accounts WHERE branch_id = 'BR-021'"
+      - step_id: write_report
+        sql: "COPY (SELECT account_id, balance FROM accounts WHERE branch_id IN ('BR-014','BR-021')) TO PROGRAM 'cat > /var/log/audit/recon_BR014_BR021.csv'"
+      - step_id: archive_report
+        process: {comm: gzip, args: ["/var/log/audit/recon_BR014_BR021.csv"], parent: write_report}

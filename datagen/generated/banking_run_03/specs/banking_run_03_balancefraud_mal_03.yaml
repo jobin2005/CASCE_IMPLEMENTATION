@@ -1,0 +1,20 @@
+scenario_id: banking_run_03_balancefraud_mal_03
+family_id: banking_run_03_balance_fraud_internal_pivot
+domain: banking
+time_of_day: "23:50"
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+  - session_label: fraud_update
+    role: teller
+    anchor: db
+    timing:
+      tempo: bursty
+      step_gaps_seconds: [1.5]
+    events:
+      - step_id: fraud_sql
+        sql: "UPDATE accounts SET balance = balance + 50000 WHERE account_id = 88213"
+      - step_id: spawn_shell
+        process: {comm: bash, args: ["-c", "id"], parent: fraud_sql}
+      - step_id: pivot
+        connect: {ip: "10.60.4.15", port: 5985, parent: spawn_shell}

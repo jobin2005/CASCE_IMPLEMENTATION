@@ -1,0 +1,19 @@
+scenario_id: banking_run_03_revshell_ordinary_mal_07
+family_id: banking_run_03_reverse_shell_ordinary_names
+domain: banking
+time_of_day: "01:20"
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+  - session_label: revshell
+    role: teller
+    anchor: synthetic
+    anchor_query: "SELECT 1"
+    timing:
+      tempo: bursty
+      step_gaps_seconds: [0.5]
+    events:
+      - step_id: spawn_shell
+        process: {comm: bash, args: ["-i"]}
+      - step_id: beacon
+        connect: {ip: "10.80.5.5", port: 4444, parent: spawn_shell}

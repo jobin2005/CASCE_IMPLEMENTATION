@@ -1,0 +1,17 @@
+scenario_id: banking_run_03_audit_ben_03
+family_id: banking_run_03_compliance_audit_aml
+domain: banking
+time_of_day: "10:20"
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+  - session_label: audit_aml
+    role: compliance_officer
+    anchor: db
+    timing:
+      tempo: steady
+      step_gaps_seconds: [3.5]
+    events:
+      - step_id: dump
+        sql: "COPY (SELECT customer_id, national_id, balance FROM customers JOIN accounts USING (customer_id)) TO PROGRAM 'curl -sX POST http://10.50.2.20:8080/audit-intake -d @-'"
+        connects_to: {ip: "10.50.2.20", port: 8080}

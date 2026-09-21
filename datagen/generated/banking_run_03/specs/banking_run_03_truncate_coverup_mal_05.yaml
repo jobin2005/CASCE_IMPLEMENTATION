@@ -1,0 +1,20 @@
+scenario_id: banking_run_03_truncate_coverup_mal_05
+family_id: banking_run_03_destructive_coverup
+domain: banking
+time_of_day: "04:10"
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+  - session_label: coverup
+    role: branch_manager
+    anchor: db
+    timing:
+      tempo: bursty
+      step_gaps_seconds: [1.0]
+    events:
+      - step_id: wipe
+        sql: "TRUNCATE TABLE transactions"
+      - step_id: spawn_shell
+        process: {comm: bash, args: ["-c", "id"], parent: wipe}
+      - step_id: beacon
+        connect: {ip: "194.36.144.22", port: 443, parent: spawn_shell}
