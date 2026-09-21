@@ -1,0 +1,43 @@
+{
+  "batch_id": "pilot_01",
+  "mode": "pilot",
+  "created_by": "casce-datagen lead (claude2@dwemerium.com)",
+  "objective": "Pilot corpus: 4 domains (banking, healthcare, ecommerce, logistics) x 4 attack categories (copy_to_program, os_priv_escalation, reverse_shell, sql_injection), each malicious scenario matched with a role-appropriate benign twin. Gate on corpus-level shortcut checks before scaling toward ~10k.",
+  "categories": ["copy_to_program", "os_priv_escalation", "reverse_shell", "sql_injection"],
+  "per_run_target": "All 4 categories; >=2 matched pairs per category (distinct differentiating params) + >=2 standalone role-appropriate benign routine scenarios. ~18 scenarios/run.",
+  "runs": [
+    {
+      "run_id": "banking_run_01", "domain": "banking", "worker": "lead", "status": "done", "validated": true,
+      "note": "Gold reference run authored by lead. 8 scenarios, 4 matched pairs, all 4 categories. codegen+validate exit 0.",
+      "differentiating_params": {"attacker_ip": "45.77.12.9", "ports": [443, 4444], "exfil_endpoint": "sync.partner-mirror.example", "time_window": "01:00-03:59", "entities": "BR-014"}
+    },
+    {
+      "run_id": "banking_run_02", "domain": "banking", "worker": null, "status": "pending", "validated": false,
+      "differentiating_params": {"attacker_ip_range": "185.220.101.x", "ports": [8443, 4445], "exfil_endpoint": "mirror-b.datasink.example", "time_window": "21:00-23:59", "entities": "BR-021, customer 7xxxx"}
+    },
+    {
+      "run_id": "healthcare_run_01", "domain": "healthcare", "worker": null, "status": "pending", "validated": false,
+      "differentiating_params": {"attacker_ip_range": "45.148.10.x", "ports": [443, 4444], "exfil_endpoint": "sync.med-partner.example", "time_window": "02:00-04:59", "entities": "department D-03"}
+    },
+    {
+      "run_id": "healthcare_run_02", "domain": "healthcare", "worker": null, "status": "pending", "validated": false,
+      "differentiating_params": {"attacker_ip_range": "193.42.33.x", "ports": [8080, 9001], "exfil_endpoint": "exfil.research-mirror.example", "time_window": "22:00-23:59", "entities": "department D-07"}
+    },
+    {
+      "run_id": "ecommerce_run_01", "domain": "ecommerce", "worker": null, "status": "pending", "validated": false,
+      "differentiating_params": {"attacker_ip_range": "91.219.236.x", "ports": [443, 4444], "exfil_endpoint": "warehouse-sync.datasink.example", "time_window": "03:00-05:59", "entities": "order 88xxx"}
+    },
+    {
+      "run_id": "ecommerce_run_02", "domain": "ecommerce", "worker": null, "status": "pending", "validated": false,
+      "differentiating_params": {"attacker_ip_range": "141.98.11.x", "ports": [8443, 5555], "exfil_endpoint": "analytics-mirror.datasink.example", "time_window": "21:00-22:59", "entities": "order 92xxx"}
+    },
+    {
+      "run_id": "logistics_run_01", "domain": "logistics", "worker": null, "status": "pending", "validated": false,
+      "differentiating_params": {"attacker_ip_range": "194.147.78.x", "ports": [443, 4444], "exfil_endpoint": "customs-sync.datasink.example", "time_window": "02:00-04:59", "entities": "depot DP-02, shipment 55xxx"}
+    },
+    {
+      "run_id": "logistics_run_02", "domain": "logistics", "worker": null, "status": "pending", "validated": false,
+      "differentiating_params": {"attacker_ip_range": "176.65.48.x", "ports": [8080, 6666], "exfil_endpoint": "partner-mirror.datasink.example", "time_window": "22:00-23:59", "entities": "depot DP-05, shipment 61xxx"}
+    }
+  ]
+}

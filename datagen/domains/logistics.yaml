@@ -1,0 +1,113 @@
+domain: logistics
+institution_name: "Vellarikkapattanam Freight & Logistics"
+
+# Domain model for the logistics corpus. Same contract as banking.yaml:
+# keep table/column/role names stable across every scenario and every run.
+# Not consumed by codegen.py / validate_run.py — author-facing
+# documentation, enforced by spec review. Every scenario authored against
+# `domain: logistics` must use only the tables/columns/roles below.
+
+tables:
+  drivers:
+    columns: [driver_id, full_name, license_number, phone, home_address, depot_id]
+    sensitive_columns: [license_number, phone, home_address]
+
+  vehicles:
+    columns: [vehicle_id, plate_number, model, capacity_kg, depot_id]
+    sensitive_columns: []
+
+  warehouses:
+    columns: [warehouse_id, name, location, manager_id]
+    sensitive_columns: []
+
+  shipments:
+    columns: [shipment_id, origin_warehouse_id, dest_address, driver_id, vehicle_id, status, dispatched_at]
+    sensitive_columns: [dest_address]
+
+  manifests:
+    columns: [manifest_id, shipment_id, description, declared_value, weight_kg]
+    sensitive_columns: [declared_value]
+
+roles:
+  dispatcher:
+    scope: depot
+    normal_access: >
+      SELECT/UPDATE on shipments, vehicles, and drivers for the
+      dispatcher's own depot only. Frequent, business hours. Never DDL,
+      never role management, never reads another depot's drivers, never
+      bulk-exports driver PII.
+
+  warehouse_clerk:
+    scope: warehouse
+    normal_access: >
+      SELECT/UPDATE on shipments and manifests for the clerk's own
+      warehouse. Small-to-moderate row counts tied to inbound/outbound
+      goods. Does not read driver PII beyond the driver assigned to a
+      shipment being processed.
+
+  fleet_manager:
+    scope: region
+    normal_access: >
+      SELECT across shipments, vehicles, and drivers for the manager's
+      region for capacity planning and route optimization. Larger row
+      counts than a dispatcher, still one region — breadth alone is not
+      suspicious for this role; planning is the legitimate reason.
+
+  compliance_auditor:
+    scope: enterprise
+    normal_access: >
+      SELECT across all depots and all tables, including sensitive
+      columns (license_number, home_address, dest_address,
+      declared_value), for scheduled customs and regulatory audits. This
+      is the only role whose normal job includes routine sensitive-column
+      reads enterprise-wide — deliberately, so that "reads sensitive
+      columns" cannot by itself distinguish this role's malicious cases
+      from its benign ones. What differs is destination/intent (external
+      process or network vs. internal audit log), not the columns.
+
+  partner_etl_service:
+    scope: enterprise
+    normal_access: >
+      COPY with scoped columns and an incremental filter (e.g.
+      `WHERE dispatched_at > :checkpoint`) TO PROGRAM, enterprise-wide,
+      to the one documented customs/partner replication endpoint,
+      off-hours. A compromised instance of this account (same role,
+      abused credentials) is the malicious half of the matched
+      exfiltration pair — the tell is query breadth, sensitive-column
+      selection, and destination, not the role, identical on both sides.
+
+padding_profile:
+  dispatcher:
+    pre:
+      - sql: "SELECT 1"
+      - sql: "SELECT column_name FROM information_schema.columns WHERE table_name = 'shipments'"
+    post:
+      - sql: "SELECT status FROM shipments WHERE shipment_id = 55231"
+
+  warehouse_clerk:
+    pre:
+      - sql: "SELECT 1"
+      - sql: "SELECT current_user, session_user"
+    post:
+      - sql: "SELECT count(*) FROM manifests WHERE shipment_id = 55231"
+
+  fleet_manager:
+    pre:
+      - sql: "SELECT 1"
+      - sql: "SELECT setting FROM pg_settings WHERE name = 'work_mem'"
+    post:
+      - sql: "SELECT count(*) FROM vehicles"
+
+  compliance_auditor:
+    pre:
+      - sql: "SELECT 1"
+      - sql: "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'"
+    post:
+      - sql: "SELECT count(*) FROM shipments"
+
+  partner_etl_service:
+    pre:
+      - sql: "SELECT 1"
+      - sql: "SELECT setting FROM pg_settings WHERE name = 'server_version'"
+    post:
+      - sql: "SELECT pg_is_in_recovery()"

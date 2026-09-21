@@ -1,0 +1,25 @@
+scenario_id: banking_osprivesc_mal_02
+family_id: banking_os_priv_escalation_02
+domain: banking
+matched_pair_id: banking_osprivesc_pair_02
+matched_dimensions:
+  fixed: [syscall_sequence, timing_pattern, role]
+  varied: [process_tree_shape]
+time_of_day: "22:45"
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+  - session_label: escalate
+    role: postgres
+    anchor: synthetic
+    anchor_query: "SELECT 1"
+    timing:
+      tempo: bursty
+      step_gaps_seconds: [0.8]
+    events:
+      - step_id: copy_dash
+        process: {comm: cp, args: ["/bin/dash", "/tmp/.svc_helper"]}
+      - step_id: set_suid
+        process: {comm: chmod, args: ["u+s", "/tmp/.svc_helper"], parent: copy_dash}
+      - step_id: run_helper
+        process: {comm: /tmp/.svc_helper, args: ["-p", "-c", "whoami"], parent: set_suid}

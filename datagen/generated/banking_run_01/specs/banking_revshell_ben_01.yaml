@@ -1,0 +1,23 @@
+scenario_id: banking_revshell_ben_01
+family_id: banking_reverse_shell
+domain: banking
+matched_pair_id: banking_revshell_pair_01
+matched_dimensions:
+  fixed: [process_tree_shape, syscall_sequence, timing_pattern, role]
+  varied: [connects_to_destination]
+time_of_day: "01:55"
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+  - session_label: revshell
+    role: postgres
+    anchor: synthetic
+    anchor_query: "SELECT 1"
+    timing:
+      tempo: bursty
+      step_gaps_seconds: [0.5]
+    events:
+      - step_id: spawn_shell
+        process: {comm: bash, args: ["/usr/local/bin/pg_healthcheck.sh"]}
+      - step_id: beacon
+        connect: {ip: "10.20.0.4", port: 9100, parent: spawn_shell}
