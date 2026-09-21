@@ -1,0 +1,26 @@
+# Leak 2 (sql-verb) + Leak 3 (endpoint): malicious tamper via UPDATE --
+# compromised warehouse_clerk credentials under-declare a manifest's value
+# to evade customs duty, archive evidence locally, then pivot to an
+# INTERNAL host (10.x), not an external drop.
+scenario_id: logistics_run03_tamper_declared_value_fraud_01
+family_id: logistics_run03_tamper_declared_value_fraud
+domain: logistics
+time_of_day: "23:40"
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+  - session_label: value_fraud
+    role: warehouse_clerk
+    anchor: db
+    timing:
+      tempo: bursty
+      step_gaps_seconds: [1.0]
+    events:
+      - step_id: update_value
+        sql: "UPDATE manifests SET declared_value = 500 WHERE manifest_id = 88213"
+      - step_id: archive_evidence
+        process: {comm: gzip, args: ["-f", "/var/tmp/manifest_88213_original.csv"], parent: update_value}
+      - step_id: sync_script
+        process: {comm: python3, args: ["/opt/warehouse/sync_manifest_cache.py"], parent: archive_evidence}
+      - step_id: pivot_connect
+        connect: {ip: "10.20.30.41", port: 3389, parent: sync_script}

@@ -1,0 +1,23 @@
+# Leak 1 (sensitive-table): compliance_auditor reads manifests.declared_value
+# for a scheduled customs valuation audit, archives locally and stages the
+# archive on internal compliance storage only.
+scenario_id: logistics_run03_compliance_manifest_value_audit_01
+family_id: logistics_run03_compliance_sensitive_audit
+domain: logistics
+time_of_day: "05:05"
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+  - session_label: audit
+    role: compliance_auditor
+    anchor: db
+    timing:
+      tempo: off_hours
+      step_gaps_seconds: [3.5]
+    events:
+      - step_id: read_value
+        sql: "SELECT manifest_id, shipment_id, declared_value, weight_kg FROM manifests WHERE declared_value > 5000"
+      - step_id: archive_local
+        process: {comm: gzip, args: ["-9", "/var/log/compliance/manifest_audit_q3.csv"], parent: read_value}
+      - step_id: archive_write
+        file: {path: "/var/log/compliance/manifest_audit_q3.csv.gz", syscall: openat, parent: archive_local}

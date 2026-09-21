@@ -1,0 +1,19 @@
+# Leak 3 (endpoint): legitimate partner_etl_service nightly sync to a
+# second documented EXTERNAL regional customs endpoint.
+scenario_id: logistics_run03_partner_etl_regional_customs_sync_01
+family_id: logistics_run03_partner_etl_external_sync
+domain: logistics
+time_of_day: "22:25"
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+  - session_label: nightly_sync
+    role: partner_etl_service
+    anchor: db
+    timing:
+      tempo: off_hours
+      step_gaps_seconds: [5.0]
+    events:
+      - step_id: dump
+        sql: "COPY (SELECT manifest_id, shipment_id, weight_kg FROM manifests WHERE shipment_id IN (SELECT shipment_id FROM shipments WHERE dispatched_at > '2026-09-20 21:00:00')) TO PROGRAM 'curl -s https://regional-customs.example/ingest -d @- > /tmp/etl_sync_12.log'"
+        connects_to: {ip: "198.51.100.30", port: 8443}

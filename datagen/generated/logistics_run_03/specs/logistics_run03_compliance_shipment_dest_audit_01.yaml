@@ -1,0 +1,23 @@
+# Leak 1 (sensitive-table): compliance_auditor reads shipments.dest_address
+# for a scheduled customs audit and pushes the extract to the INTERNAL
+# compliance datastore (10.x), not an external endpoint.
+scenario_id: logistics_run03_compliance_shipment_dest_audit_01
+family_id: logistics_run03_compliance_sensitive_audit
+domain: logistics
+time_of_day: "04:40"
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+  - session_label: audit
+    role: compliance_auditor
+    anchor: db
+    timing:
+      tempo: off_hours
+      step_gaps_seconds: [4.0]
+    events:
+      - step_id: read_dest
+        sql: "SELECT shipment_id, dest_address, status, dispatched_at FROM shipments WHERE dispatched_at > '2026-09-20 00:00:00'"
+      - step_id: push_internal
+        process: {comm: bash, args: ["/opt/compliance/push_to_audit_store.sh", "--source", "shipments"], parent: read_dest}
+      - step_id: audit_store_connect
+        connect: {ip: "10.10.5.20", port: 8443, parent: push_internal}

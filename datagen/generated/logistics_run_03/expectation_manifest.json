@@ -1,0 +1,1324 @@
+{
+  "run_dir": "datagen/generated/logistics_run_03",
+  "generation_date": "2026-09-21",
+  "logging_start_timestamp": 1789949700.0,
+  "scenarios": {
+    "logistics_run03_compliance_driver_pii_audit_01": {
+      "source_file": "logistics_run03_compliance_driver_pii_audit_01.yaml",
+      "family_id": "logistics_run03_compliance_sensitive_audit",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "benign_false_positive",
+      "sessions": {
+        "audit": {
+          "backend_pid": 20000,
+          "class": "benign",
+          "role": "compliance_auditor",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/log/compliance/audit_dp02_drivers.jsonl",
+              "source_step_id": "log_write",
+              "source_event_type": "file"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20001",
+              "source_step_id": "write_log",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "18",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "20",
+              "source_step_id": "read_pii",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "24",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20000",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "drivers",
+              "source_step_id": "read_pii",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "read_pii"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "log_write"
+            }
+          ]
+        }
+      }
+    },
+    "logistics_run03_compliance_manifest_value_audit_01": {
+      "source_file": "logistics_run03_compliance_manifest_value_audit_01.yaml",
+      "family_id": "logistics_run03_compliance_sensitive_audit",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "benign_false_positive",
+      "sessions": {
+        "audit": {
+          "backend_pid": 20002,
+          "class": "benign",
+          "role": "compliance_auditor",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/log/compliance/manifest_audit_q3.csv.gz",
+              "source_step_id": "archive_write",
+              "source_event_type": "file"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20003",
+              "source_step_id": "archive_local",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "34",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "36",
+              "source_step_id": "read_value",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "40",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20002",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "manifests",
+              "source_step_id": "read_value",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "read_value"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "archive_write"
+            }
+          ]
+        }
+      }
+    },
+    "logistics_run03_compliance_multitable_audit_01": {
+      "source_file": "logistics_run03_compliance_multitable_audit_01.yaml",
+      "family_id": "logistics_run03_compliance_sensitive_audit",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "audit": {
+          "backend_pid": 20004,
+          "class": "benign",
+          "role": "compliance_auditor",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(10.10.5.20, 8443)",
+              "source_step_id": "audit_store_connect",
+              "source_event_type": "connect"
+            },
+            {
+              "node_type": "File",
+              "key_hint": "/var/log/compliance/quarterly_audit_q3.csv",
+              "source_step_id": "report_write",
+              "source_event_type": "file"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20005",
+              "source_step_id": "build_report",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20006",
+              "source_step_id": "push_internal",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "42",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "44",
+              "source_step_id": "read_joined",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "50",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20004",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "drivers",
+              "source_step_id": "read_joined",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "read_joined"
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "audit_store_connect"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "report_write"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Process",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "push_internal"
+            }
+          ]
+        }
+      }
+    },
+    "logistics_run03_compliance_shipment_dest_audit_01": {
+      "source_file": "logistics_run03_compliance_shipment_dest_audit_01.yaml",
+      "family_id": "logistics_run03_compliance_sensitive_audit",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "audit": {
+          "backend_pid": 20007,
+          "class": "benign",
+          "role": "compliance_auditor",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(10.10.5.20, 8443)",
+              "source_step_id": "audit_store_connect",
+              "source_event_type": "connect"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20008",
+              "source_step_id": "push_internal",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "26",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "28",
+              "source_step_id": "read_dest",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "32",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20007",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "shipments",
+              "source_step_id": "read_dest",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "read_dest"
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "audit_store_connect"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            }
+          ]
+        }
+      }
+    },
+    "logistics_run03_compliance_union_manifest_report_01": {
+      "source_file": "logistics_run03_compliance_union_manifest_report_01.yaml",
+      "family_id": "logistics_run03_compliance_union_report",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "benign_false_positive",
+      "sessions": {
+        "cross_depot_report": {
+          "backend_pid": 20009,
+          "class": "benign",
+          "role": "compliance_auditor",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/log/compliance/manifest_status_report.csv",
+              "source_step_id": "report_write",
+              "source_event_type": "file"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20010",
+              "source_step_id": "archive_report",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "52",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "54",
+              "source_step_id": "union_query",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "58",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20009",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "report_write"
+            }
+          ]
+        }
+      }
+    },
+    "logistics_run03_fleet_union_depot_capacity_01": {
+      "source_file": "logistics_run03_fleet_union_depot_capacity_01.yaml",
+      "family_id": "logistics_run03_fleet_union_capacity_report",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "benign_false_positive",
+      "sessions": {
+        "capacity_report": {
+          "backend_pid": 20011,
+          "class": "benign",
+          "role": "fleet_manager",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/reports/fleet/capacity_dp01_dp02.csv",
+              "source_step_id": "report_write",
+              "source_event_type": "file"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20012",
+              "source_step_id": "build_report",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "60",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "62",
+              "source_step_id": "union_query",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "66",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20011",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "report_write"
+            }
+          ]
+        }
+      }
+    },
+    "logistics_run03_partner_etl_customs_gateway_sync_01": {
+      "source_file": "logistics_run03_partner_etl_customs_gateway_sync_01.yaml",
+      "family_id": "logistics_run03_partner_etl_external_sync",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "benign_false_positive",
+      "sessions": {
+        "nightly_sync": {
+          "backend_pid": 20013,
+          "class": "benign",
+          "role": "partner_etl_service",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(203.0.113.10, 443)",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "File",
+              "key_hint": "/tmp/etl_sync_11.log",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20014",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "68",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "70",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "74",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20013",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "shipments",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            }
+          ]
+        }
+      }
+    },
+    "logistics_run03_partner_etl_pivot_pair_ben_01": {
+      "source_file": "logistics_run03_partner_etl_pivot_pair_ben_01.yaml",
+      "family_id": "logistics_run03_partner_etl_pivot_pair",
+      "matched_pair_id": "logistics_run_03_partner_pivot_01",
+      "matched_dimensions": {
+        "fixed": [
+          "process_tree_shape",
+          "syscall_sequence",
+          "timing_pattern",
+          "role"
+        ],
+        "varied": [
+          "sql_content",
+          "connects_to_destination"
+        ]
+      },
+      "default_class": "benign",
+      "rule_engine_relationship": "benign_false_positive",
+      "sessions": {
+        "sync": {
+          "backend_pid": 20015,
+          "class": "benign",
+          "role": "partner_etl_service",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(203.0.113.55, 443)",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "File",
+              "key_hint": "/tmp/etl_pivot.log",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20016",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "84",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "88",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "96",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20015",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "shipments",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            }
+          ]
+        }
+      }
+    },
+    "logistics_run03_partner_etl_pivot_pair_mal_01": {
+      "source_file": "logistics_run03_partner_etl_pivot_pair_mal_01.yaml",
+      "family_id": "logistics_run03_partner_etl_pivot_pair",
+      "matched_pair_id": "logistics_run_03_partner_pivot_01",
+      "matched_dimensions": {
+        "fixed": [
+          "process_tree_shape",
+          "syscall_sequence",
+          "timing_pattern",
+          "role"
+        ],
+        "varied": [
+          "sql_content",
+          "connects_to_destination"
+        ]
+      },
+      "default_class": "malicious",
+      "rule_engine_relationship": "malicious_false_negative",
+      "sessions": {
+        "sync": {
+          "backend_pid": 20017,
+          "class": "malicious",
+          "role": "partner_etl_service",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(10.5.20.9, 8080)",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "File",
+              "key_hint": "/tmp/etl_pivot.log",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20018",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "85",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "89",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "97",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20017",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "drivers",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            }
+          ]
+        }
+      }
+    },
+    "logistics_run03_partner_etl_regional_customs_sync_01": {
+      "source_file": "logistics_run03_partner_etl_regional_customs_sync_01.yaml",
+      "family_id": "logistics_run03_partner_etl_external_sync",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "nightly_sync": {
+          "backend_pid": 20019,
+          "class": "benign",
+          "role": "partner_etl_service",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(198.51.100.30, 8443)",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "File",
+              "key_hint": "/tmp/etl_sync_12.log",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20020",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "76",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "78",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "82",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20019",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "manifests",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            }
+          ]
+        }
+      }
+    },
+    "logistics_run03_privabuse_create_role_superuser_01": {
+      "source_file": "logistics_run03_privabuse_create_role_superuser_01.yaml",
+      "family_id": "logistics_run03_privabuse_create_role",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "malicious",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "escalate": {
+          "backend_pid": 20021,
+          "class": "malicious",
+          "role": "dispatcher",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(185.220.101.7, 4444)",
+              "source_step_id": "beacon",
+              "source_event_type": "connect"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20022",
+              "source_step_id": "persist_script",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "1",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "3",
+              "source_step_id": "create_role",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "6",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Role",
+              "key_hint": "dp03_shadow_admin",
+              "source_step_id": "create_role",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20021",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Role",
+              "source_step_id": null,
+              "target_step_id": "create_role"
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "beacon"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            }
+          ]
+        }
+      }
+    },
+    "logistics_run03_rogue_insert_ghost_shipment_01": {
+      "source_file": "logistics_run03_rogue_insert_ghost_shipment_01.yaml",
+      "family_id": "logistics_run03_rogue_insert_ghost_shipment",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "malicious",
+      "rule_engine_relationship": "malicious_false_negative",
+      "sessions": {
+        "ghost_shipment": {
+          "backend_pid": 20023,
+          "class": "malicious",
+          "role": "warehouse_clerk",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(185.220.101.44, 443)",
+              "source_step_id": "exfil_curl",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "File",
+              "key_hint": "/tmp/ghost_manifest.json",
+              "source_step_id": "write_file",
+              "source_event_type": "file"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20024",
+              "source_step_id": "dump_json",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20025",
+              "source_step_id": "exfil_curl",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "10",
+              "source_step_id": "insert_ghost",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "16",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "8",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20023",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "shipments",
+              "source_step_id": "insert_ghost",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "insert_ghost"
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "exfil_curl"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "write_file"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Process",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "exfil_curl"
+            }
+          ]
+        }
+      }
+    },
+    "logistics_run03_tamper_declared_value_fraud_01": {
+      "source_file": "logistics_run03_tamper_declared_value_fraud_01.yaml",
+      "family_id": "logistics_run03_tamper_declared_value_fraud",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "malicious",
+      "rule_engine_relationship": "malicious_false_negative",
+      "sessions": {
+        "value_fraud": {
+          "backend_pid": 20026,
+          "class": "malicious",
+          "role": "warehouse_clerk",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(10.20.30.41, 3389)",
+              "source_step_id": "pivot_connect",
+              "source_event_type": "connect"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20027",
+              "source_step_id": "archive_evidence",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20028",
+              "source_step_id": "sync_script",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "108",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "110",
+              "source_step_id": "update_value",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "115",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20026",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "manifests",
+              "source_step_id": "update_value",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "update_value"
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "pivot_connect"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Process",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "sync_script"
+            }
+          ]
+        }
+      }
+    },
+    "logistics_run03_tamper_dest_diversion_01": {
+      "source_file": "logistics_run03_tamper_dest_diversion_01.yaml",
+      "family_id": "logistics_run03_tamper_dest_diversion",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "malicious",
+      "rule_engine_relationship": "malicious_false_negative",
+      "sessions": {
+        "diversion": {
+          "backend_pid": 20029,
+          "class": "malicious",
+          "role": "dispatcher",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(10.20.30.40, 445)",
+              "source_step_id": "pivot_connect",
+              "source_event_type": "connect"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20030",
+              "source_step_id": "spawn_bash",
+              "source_event_type": "process"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "100",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "102",
+              "source_step_id": "update_dest",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "106",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20029",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "shipments",
+              "source_step_id": "update_dest",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "update_dest"
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "pivot_connect"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            }
+          ]
+        }
+      }
+    }
+  }
+}
