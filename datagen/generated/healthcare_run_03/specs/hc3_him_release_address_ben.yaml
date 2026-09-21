@@ -1,0 +1,21 @@
+scenario_id: hc3_him_release_address_ben
+family_id: healthcare_him_record_release
+domain: healthcare
+time_of_day: "20:15"
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+  - session_label: legal_discovery_release
+    role: him_officer
+    anchor: db
+    timing:
+      tempo: steady
+      step_gaps_seconds: [4.0]
+    events:
+      - step_id: query_identity
+        sql: "SELECT patient_id, full_name, ssn, address FROM patients WHERE patient_id = 91027"
+      - step_id: query_records
+        sql: "SELECT diagnosis_code, diagnosis_notes FROM medical_records WHERE patient_id = 91027"
+      - step_id: send_release
+        process: {comm: curl, args: ["-sX", "POST", "https://casemgmt.hospital-internal.example/release", "-d", "@/tmp/release_91027.json"], parent: query_records}
+        connects_to: {ip: "10.30.0.9", port: 443}

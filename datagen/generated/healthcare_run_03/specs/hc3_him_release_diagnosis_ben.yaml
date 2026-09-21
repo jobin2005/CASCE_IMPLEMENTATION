@@ -1,0 +1,23 @@
+scenario_id: hc3_him_release_diagnosis_ben
+family_id: healthcare_him_record_release
+domain: healthcare
+time_of_day: "23:10"
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+  - session_label: authorized_release
+    role: him_officer
+    anchor: db
+    timing:
+      tempo: steady
+      step_gaps_seconds: [4.0]
+    events:
+      - step_id: locate_records
+        sql: "SELECT record_id, diagnosis_code, diagnosis_notes FROM medical_records WHERE patient_id = 58231"
+      - step_id: locate_rx
+        sql: "SELECT prescription_id, drug_name, dosage FROM prescriptions WHERE patient_id = 58231"
+      - step_id: package_release
+        process: {comm: python3, args: ["/opt/him/package_release.py", "--patient", "58231", "--case", "LEGAL-2026-0417"], parent: locate_rx}
+      - step_id: write_release_log
+        process: {comm: bash, args: ["-c", "cat /tmp/release_58231.json >> /var/log/him_audit/record_release_58231.log"], parent: package_release}
+      - file: {path: "/var/log/him_audit/record_release_58231.log", syscall: openat, parent: write_release_log}
