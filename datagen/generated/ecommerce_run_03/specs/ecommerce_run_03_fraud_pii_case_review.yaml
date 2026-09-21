@@ -1,0 +1,20 @@
+scenario_id: ecommerce_run_03_fraud_pii_case_review
+family_id: ecommerce_run_03_fam_fraud_pii_review
+domain: ecommerce
+default_class: benign
+rule_engine_relationship: agrees
+time_of_day: "05:10"
+sessions:
+  - session_label: review
+    role: fraud_analyst
+    anchor: db
+    timing:
+      tempo: steady
+      step_gaps_seconds: [3.0]
+    events:
+      - step_id: scan_flagged
+        sql: "SELECT o.order_id, c.email, c.phone, p.card_last4 FROM orders o JOIN customers c ON c.customer_id = o.customer_id JOIN payments p ON p.order_id = o.order_id WHERE o.status = 'flagged'"
+      - step_id: log_case
+        process: {comm: python3, args: ["/opt/vbo/fraud/case_logger.py", "--batch", "flagged_2026_09_21"], parent: scan_flagged}
+      - step_id: write_note
+        file: {path: "/var/vbo/fraud/reviewed/flagged_2026-09-21.json", syscall: openat, parent: log_case}

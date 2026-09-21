@@ -1,0 +1,17 @@
+scenario_id: ecommerce_run_03_analytics_nightly_export_catalog
+family_id: ecommerce_run_03_fam_analytics_export_catalog
+domain: ecommerce
+default_class: benign
+rule_engine_relationship: agrees
+time_of_day: "02:25"
+sessions:
+  - session_label: nightly_export_catalog
+    role: analytics_etl_service
+    anchor: db
+    timing:
+      tempo: off_hours
+      step_gaps_seconds: [4.0]
+    events:
+      - step_id: export_catalog
+        sql: "COPY (SELECT product_id, category, price, stock_qty FROM products) TO PROGRAM 'curl -sX POST https://reports.partner-analytics.example/ingest -d @-'"
+        connects_to: {ip: "198.51.100.77", port: 443}
