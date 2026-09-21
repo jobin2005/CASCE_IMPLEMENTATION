@@ -1,0 +1,24 @@
+scenario_id: banking_batch_report_0005
+family_id: banking_batch_report_0005
+domain: banking
+time_of_day: 01:00
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: batch_report
+  role: batch_etl_service
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 4.342307939274906
+  events:
+  - sql: SELECT a.branch_id, a.account_type, COUNT(*), SUM(a.balance) FROM accounts a WHERE a.branch_id = 'BR-019' GROUP BY a.branch_id, a.account_type
+  - sql: SELECT COUNT(t.transaction_id), SUM(t.amount) FROM transactions t JOIN accounts a ON a.account_id = t.account_id WHERE a.branch_id = 'BR-019' AND t.transaction_time > '2026-12-27 00:00:00' AND
+      t.transaction_time <= '2026-12-28 00:00:00'
+  - step_id: report_send
+    sql: COPY (SELECT a.branch_id, COUNT(*), SUM(a.balance) FROM accounts a WHERE a.branch_id = 'BR-019' GROUP BY a.branch_id) TO PROGRAM 'curl -sX POST https://reporting.internal.example/daily -d @-'
+    connects_to:
+      ip: 10.0.1.100
+      port: 8080

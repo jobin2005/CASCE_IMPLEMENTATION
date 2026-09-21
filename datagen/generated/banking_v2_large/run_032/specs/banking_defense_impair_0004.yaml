@@ -1,0 +1,20 @@
+scenario_id: banking_defense_impair_0004
+family_id: banking_defense_impair_0004
+domain: banking
+time_of_day: 02:00
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: impair_defenses
+  role: teller
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.6198042938916644
+  events:
+  - sql: ALTER SYSTEM SET log_statement = 'none'
+  - sql: TRUNCATE TABLE audit_logs
+  - step_id: cleanup
+    sql: COPY (SELECT 'logs cleared') TO PROGRAM 'rm -f /var/log/postgresql/postgresql-*.log'

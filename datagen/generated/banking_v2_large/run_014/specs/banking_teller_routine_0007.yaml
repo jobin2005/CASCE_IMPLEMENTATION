@@ -1,0 +1,20 @@
+scenario_id: banking_teller_routine_0007
+family_id: banking_teller_routine_0007
+domain: banking
+time_of_day: 09:00
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: teller_work
+  role: teller
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.9653431202056924
+  events:
+  - sql: SELECT COUNT(*) FROM transactions WHERE account_id = 55158 AND transaction_time > NOW() - INTERVAL '7 days'
+  - sql: UPDATE accounts SET balance = balance - 4304 WHERE account_id = 64450 AND branch_id = 'BR-011'
+  - step_id: daily_report
+    sql: COPY (SELECT account_id, balance FROM accounts WHERE branch_id = 'BR-011') TO PROGRAM 'cat > /var/lib/postgresql/reports/branch_BR-011_daily.csv'

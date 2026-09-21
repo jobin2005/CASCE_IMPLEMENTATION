@@ -1,0 +1,24 @@
+scenario_id: banking_manager_eod_1009
+family_id: banking_manager_eod_1009
+domain: banking
+time_of_day: '18:30'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: branch_manager
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.4893533040113343
+  events:
+  - sql: SELECT c.full_name, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE a.branch_id = 'BR-063' AND a.balance > 25812 ORDER BY a.balance DESC
+  - sql: SELECT DATE(t.transaction_time), SUM(t.amount) FROM transactions t JOIN accounts a ON a.account_id = t.account_id WHERE a.branch_id = 'BR-063' AND t.transaction_time > NOW() - INTERVAL '30 days'
+      GROUP BY DATE(t.transaction_time)
+  - sql: SELECT c.customer_id, c.full_name, COUNT(t.transaction_id) as txn_count FROM customers c JOIN accounts a ON a.customer_id = c.customer_id JOIN transactions t ON t.account_id = a.account_id WHERE
+      a.branch_id = 'BR-063' GROUP BY c.customer_id, c.full_name ORDER BY txn_count DESC LIMIT 20
+  - sql: SELECT c.full_name, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE a.branch_id = 'BR-063' AND a.balance > 25812 ORDER BY a.balance DESC
+  - step_id: eod_report
+    sql: COPY (SELECT a.account_id, a.balance FROM accounts a WHERE a.branch_id = 'BR-035') TO PROGRAM 'cat > /var/lib/postgresql/reports/eod_BR-035.csv'

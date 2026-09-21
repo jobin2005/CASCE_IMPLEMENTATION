@@ -1,0 +1,21 @@
+scenario_id: banking_manager_eod_0006
+family_id: banking_manager_eod_0006
+domain: banking
+time_of_day: '17:30'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: branch_manager
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.263048321446356
+  events:
+  - sql: SELECT a.account_type, COUNT(*), SUM(a.balance) FROM accounts a WHERE a.branch_id = 'BR-019' GROUP BY a.account_type
+  - sql: SELECT a.account_type, COUNT(*), SUM(a.balance) FROM accounts a WHERE a.branch_id = 'BR-019' GROUP BY a.account_type
+  - sql: SELECT c.full_name, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE a.branch_id = 'BR-019' AND a.balance > 11413 ORDER BY a.balance DESC
+  - step_id: eod_report
+    sql: COPY (SELECT a.account_id, a.balance FROM accounts a WHERE a.branch_id = 'BR-063') TO PROGRAM 'cat > /var/lib/postgresql/reports/eod_BR-063.csv'

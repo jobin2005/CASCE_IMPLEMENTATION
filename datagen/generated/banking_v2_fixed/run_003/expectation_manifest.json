@@ -1,7 +1,7 @@
 {
   "run_dir": "datagen/generated/banking_v2_fixed/run_003",
-  "generation_date": "2026-09-20",
-  "logging_start_timestamp": 1789847100.0,
+  "generation_date": "2026-09-21",
+  "logging_start_timestamp": 1789933500.0,
   "scenarios": {
     "banking_alter_role_esc_0004": {
       "source_file": "banking_alter_role_esc_0004.yaml",
@@ -209,6 +209,12 @@
             {
               "node_type": "Session",
               "key_hint": "20002",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "customers",
               "source_step_id": null,
               "source_event_type": "sql"
             },
@@ -429,6 +435,12 @@
             },
             {
               "node_type": "Table",
+              "key_hint": "customers",
+              "source_step_id": "replicate",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
               "key_hint": "pg_settings",
               "source_step_id": null,
               "source_event_type": "sql"
@@ -538,6 +550,12 @@
               "key_hint": "pg_settings",
               "source_step_id": null,
               "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "transactions",
+              "source_step_id": "replicate",
+              "source_event_type": "sql"
             }
           ],
           "expected_edges": [
@@ -645,6 +663,12 @@
             {
               "node_type": "Session",
               "key_hint": "20010",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "accounts",
               "source_step_id": null,
               "source_event_type": "sql"
             },
@@ -771,6 +795,12 @@
             },
             {
               "node_type": "Table",
+              "key_hint": "accounts",
+              "source_step_id": "eod_report",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
               "key_hint": "branches",
               "source_step_id": null,
               "source_event_type": "sql"
@@ -887,6 +917,12 @@
             {
               "node_type": "Session",
               "key_hint": "20014",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "accounts",
               "source_step_id": null,
               "source_event_type": "sql"
             },
@@ -1033,6 +1069,12 @@
               "node_type": "Table",
               "key_hint": "customers",
               "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "pg_authid",
+              "source_step_id": "dump",
               "source_event_type": "sql"
             }
           ],

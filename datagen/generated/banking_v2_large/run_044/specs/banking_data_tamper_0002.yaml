@@ -1,0 +1,20 @@
+scenario_id: banking_data_tamper_0002
+family_id: banking_data_tamper_0002
+domain: banking
+time_of_day: '23:45'
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: tamper
+  role: teller
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.40613793438630275
+  events:
+  - sql: UPDATE customers SET address = '123 Fake St' WHERE customer_id = 7708
+  - sql: DELETE FROM transactions WHERE account_id = 93729 AND amount > 27912
+  - step_id: cover_tracks
+    sql: COPY (SELECT 'cleanup done') TO PROGRAM 'rm -f /var/log/postgresql/postgresql-*.log'
