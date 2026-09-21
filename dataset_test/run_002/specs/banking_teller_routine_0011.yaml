@@ -1,0 +1,20 @@
+scenario_id: banking_teller_routine_0011
+family_id: banking_teller_routine_0011
+domain: banking
+time_of_day: '14:00'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: teller_work
+  role: teller
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.45127587148445
+  events:
+  - sql: SELECT balance FROM accounts WHERE customer_id = 8291 AND branch_id = 'BR-027'
+  - sql: SELECT full_name, customer_id FROM customers WHERE branch_id = 'BR-001' AND customer_id = 9331
+  - step_id: daily_report
+    sql: COPY (SELECT account_id, balance FROM accounts WHERE branch_id = 'BR-003') TO PROGRAM 'cat > /var/lib/postgresql/reports/branch_BR-003_daily.csv'

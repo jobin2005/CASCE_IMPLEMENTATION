@@ -1,0 +1,22 @@
+scenario_id: banking_manager_eod_0020
+family_id: banking_manager_eod_0020
+domain: banking
+time_of_day: '16:30'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: branch_manager
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 4.92590353196403
+  events:
+  - sql: SELECT a.account_id, a.balance, c.full_name FROM accounts a JOIN customers c ON c.customer_id = a.customer_id WHERE a.branch_id = 'BR-002'
+  - sql: SELECT COUNT(*) FROM customers WHERE branch_id = 'BR-002'
+  - sql: SELECT COUNT(*) FROM customers WHERE branch_id = 'BR-002'
+  - sql: SELECT a.account_id, a.balance, c.full_name FROM accounts a JOIN customers c ON c.customer_id = a.customer_id WHERE a.branch_id = 'BR-002'
+  - step_id: eod_report
+    sql: COPY (SELECT a.account_id, a.balance FROM accounts a WHERE a.branch_id = 'BR-014') TO PROGRAM 'cat > /var/lib/postgresql/reports/eod_BR-014.csv'

