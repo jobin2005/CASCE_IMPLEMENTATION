@@ -1,0 +1,31 @@
+scenario_id: gen_healthcare_33_copy_to_program_ben_856b
+family_id: gen_healthcare_33_copy_to_program_fam_856
+domain: healthcare
+time_of_day: 00:50
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: exfil
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT appointment_id, status FROM appointments WHERE department_id
+      = '7') TO PROGRAM 'python3 -c "import urllib.request,sys; urllib.request.urlopen(urllib.request.Request(\"https://audit-intake.corp/ingest\",
+      data=sys.stdin.buffer.read(), method=\"POST\"))"'
+    connects_to:
+      ip: 192.168.32.114
+      port: 8080
+matched_pair_id: gen_healthcare_33_copy_to_program_pair_856
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

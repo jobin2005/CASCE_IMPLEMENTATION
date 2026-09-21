@@ -1,0 +1,27 @@
+scenario_id: gen_logistics_79_legit_routine_ben_2208
+family_id: gen_logistics_79_legit_routine_ben_fam2208
+domain: logistics
+time_of_day: '12:40'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: routine
+  role: fleet_manager
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: op
+    sql: SELECT shipment_id, status FROM shipments WHERE depot_id = 'DP-11'
+  - step_id: notify
+    process:
+      comm: python3
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.59.35.216
+      port: 9200
+      parent: notify

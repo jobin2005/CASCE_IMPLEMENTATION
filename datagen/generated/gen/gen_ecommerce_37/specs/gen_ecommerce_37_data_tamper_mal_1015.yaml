@@ -1,0 +1,32 @@
+scenario_id: gen_ecommerce_37_data_tamper_mal_1015
+family_id: gen_ecommerce_37_data_tamper_mal_fam1015
+domain: ecommerce
+time_of_day: 00:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: support_agent
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: INSERT INTO payments DEFAULT VALUES
+  - step_id: stage
+    process:
+      comm: bash
+      args:
+      - -c
+      - stage
+      parent: act
+  - file:
+      path: /tmp/stage_15701.bin
+      syscall: openat
+      parent: stage
+  - connect:
+      ip: 141.98.11.92.216
+      port: 8080
+      parent: stage

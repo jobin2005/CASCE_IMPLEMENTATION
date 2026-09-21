@@ -1,0 +1,32 @@
+scenario_id: gen_banking_27_data_tamper_mal_647
+family_id: gen_banking_27_data_tamper_mal_fam647
+domain: banking
+time_of_day: '22:20'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: postgres
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: TRUNCATE TABLE accounts
+  - step_id: stage
+    process:
+      comm: bash
+      args:
+      - -c
+      - stage
+      parent: act
+  - file:
+      path: /tmp/stage_722694.bin
+      syscall: openat
+      parent: stage
+  - connect:
+      ip: 194.147.78.102.226
+      port: 23
+      parent: stage

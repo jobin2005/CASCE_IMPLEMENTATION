@@ -24,3 +24,13 @@ tmp/
 *.swp
 *~
 
+
+# Scale generator: bulky, regenerable per-run event logs.
+# The committed source of truth is specs/*.yaml + labels.csv + manifest.jsonl;
+# regenerate the event logs with: python datagen/codegen.py <run_dir>
+datagen/generated/gen/*/postgres_events.json
+datagen/generated/gen/*/kernel_events.json
+datagen/generated/gen/*/expectation_manifest.json
+datagen/generated/gen/*/validation_report.json
+datagen/generated/gen/*/tmp_validate/
+datagen/scale/_full_logs/

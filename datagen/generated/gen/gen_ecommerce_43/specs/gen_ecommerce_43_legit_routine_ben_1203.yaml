@@ -1,0 +1,27 @@
+scenario_id: gen_ecommerce_43_legit_routine_ben_1203
+family_id: gen_ecommerce_43_legit_routine_ben_fam1203
+domain: ecommerce
+time_of_day: '13:40'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: routine
+  role: catalog_manager
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: op
+    sql: SELECT order_id, status FROM orders WHERE status = 'flagged'
+  - step_id: notify
+    process:
+      comm: curl
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.32.37.182
+      port: 443
+      parent: notify

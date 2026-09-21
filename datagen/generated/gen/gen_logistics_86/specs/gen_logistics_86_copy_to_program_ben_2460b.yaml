@@ -1,0 +1,30 @@
+scenario_id: gen_logistics_86_copy_to_program_ben_2460b
+family_id: gen_logistics_86_copy_to_program_fam_2460
+domain: logistics
+time_of_day: '15:10'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT vehicle_id, plate_number FROM vehicles WHERE depot_id = 'DP-05')
+      TO PROGRAM 'curl -sX POST https://deid-partner.example/ingest -d @-'
+    connects_to:
+      ip: 198.51.100.31
+      port: 8080
+matched_pair_id: gen_logistics_86_copy_to_program_pair_2460
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

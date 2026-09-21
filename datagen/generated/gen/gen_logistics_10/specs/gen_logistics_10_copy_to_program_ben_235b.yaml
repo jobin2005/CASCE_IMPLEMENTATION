@@ -1,0 +1,30 @@
+scenario_id: gen_logistics_10_copy_to_program_ben_235b
+family_id: gen_logistics_10_copy_to_program_fam_235
+domain: logistics
+time_of_day: '12:40'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT shipment_id, status FROM shipments WHERE depot_id = 'DP-02')
+      TO PROGRAM 'nc audit-intake.corp 443'
+    connects_to:
+      ip: 192.168.36.93
+      port: 443
+matched_pair_id: gen_logistics_10_copy_to_program_pair_235
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

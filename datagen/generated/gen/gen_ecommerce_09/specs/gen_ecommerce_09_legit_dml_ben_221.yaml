@@ -1,0 +1,27 @@
+scenario_id: gen_ecommerce_09_legit_dml_ben_221
+family_id: gen_ecommerce_09_legit_dml_ben_fam221
+domain: ecommerce
+time_of_day: 09:10
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dml
+  role: support_agent
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: op
+    sql: UPDATE order_items SET quantity = '687' WHERE status = 'delivered'
+  - step_id: notify
+    process:
+      comm: curl
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 192.168.8.173
+      port: 9101
+      parent: notify

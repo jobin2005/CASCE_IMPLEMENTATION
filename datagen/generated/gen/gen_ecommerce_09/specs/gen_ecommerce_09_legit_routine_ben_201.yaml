@@ -1,0 +1,27 @@
+scenario_id: gen_ecommerce_09_legit_routine_ben_201
+family_id: gen_ecommerce_09_legit_routine_ben_fam201
+domain: ecommerce
+time_of_day: 09:10
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: routine
+  role: support_agent
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: op
+    sql: SELECT order_id, status FROM orders WHERE status = 'shipped'
+  - step_id: notify
+    process:
+      comm: curl
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.25.27.119
+      port: 9101
+      parent: notify

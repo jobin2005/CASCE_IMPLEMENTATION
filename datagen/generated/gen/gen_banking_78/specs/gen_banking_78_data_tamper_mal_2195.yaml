@@ -1,0 +1,32 @@
+scenario_id: gen_banking_78_data_tamper_mal_2195
+family_id: gen_banking_78_data_tamper_mal_fam2195
+domain: banking
+time_of_day: 03:05
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: postgres
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: CREATE ROLE svc_100461 SUPERUSER LOGIN PASSWORD 'x604090'
+  - step_id: stage
+    process:
+      comm: python3
+      args:
+      - -c
+      - stage
+      parent: act
+  - file:
+      path: /tmp/stage_313199.bin
+      syscall: openat
+      parent: stage
+  - connect:
+      ip: 10.38.26.37
+      port: 443
+      parent: stage

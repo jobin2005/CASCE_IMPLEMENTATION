@@ -1,0 +1,27 @@
+scenario_id: gen_ecommerce_23_legit_routine_ben_597
+family_id: gen_ecommerce_23_legit_routine_ben_fam597
+domain: ecommerce
+time_of_day: 04:05
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: routine
+  role: payments_service
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: op
+    sql: SELECT product_id, name FROM products WHERE status = 'flagged'
+  - step_id: notify
+    process:
+      comm: curl
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.1.21.85
+      port: 9200
+      parent: notify

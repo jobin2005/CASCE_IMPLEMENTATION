@@ -1,0 +1,32 @@
+scenario_id: gen_logistics_26_data_tamper_mal_662
+family_id: gen_logistics_26_data_tamper_mal_fam662
+domain: logistics
+time_of_day: '22:35'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: postgres
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: UPDATE shipments SET dest_address = 997193 WHERE shipment_id = 66369
+  - step_id: stage
+    process:
+      comm: bash
+      args:
+      - -c
+      - stage
+      parent: act
+  - file:
+      path: /tmp/stage_29302.bin
+      syscall: openat
+      parent: stage
+  - connect:
+      ip: 10.47.4.18
+      port: 9443
+      parent: stage

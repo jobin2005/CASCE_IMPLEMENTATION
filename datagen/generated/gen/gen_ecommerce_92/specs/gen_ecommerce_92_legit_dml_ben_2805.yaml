@@ -1,0 +1,27 @@
+scenario_id: gen_ecommerce_92_legit_dml_ben_2805
+family_id: gen_ecommerce_92_legit_dml_ben_fam2805
+domain: ecommerce
+time_of_day: 04:35
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: dml
+  role: catalog_manager
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: op
+    sql: UPDATE orders SET total_amount = '849' WHERE status = 'pending'
+  - step_id: notify
+    process:
+      comm: bash
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.50.26.68
+      port: 443
+      parent: notify

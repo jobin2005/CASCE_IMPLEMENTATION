@@ -1,0 +1,27 @@
+scenario_id: gen_logistics_49_legit_dml_ben_1281
+family_id: gen_logistics_49_legit_dml_ben_fam1281
+domain: logistics
+time_of_day: '10:40'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: dml
+  role: dispatcher
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: op
+    sql: INSERT INTO shipments DEFAULT VALUES
+  - step_id: notify
+    process:
+      comm: curl
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.76.15.162
+      port: 443
+      parent: notify

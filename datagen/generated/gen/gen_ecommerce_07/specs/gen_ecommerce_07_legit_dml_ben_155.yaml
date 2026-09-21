@@ -1,0 +1,27 @@
+scenario_id: gen_ecommerce_07_legit_dml_ben_155
+family_id: gen_ecommerce_07_legit_dml_ben_fam155
+domain: ecommerce
+time_of_day: 09:10
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: dml
+  role: payments_service
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: op
+    sql: UPDATE orders SET total_amount = '292' WHERE status = 'shipped'
+  - step_id: notify
+    process:
+      comm: python3
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.54.1.78
+      port: 9101
+      parent: notify

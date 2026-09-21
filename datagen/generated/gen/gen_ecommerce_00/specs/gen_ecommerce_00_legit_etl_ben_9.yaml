@@ -1,0 +1,22 @@
+scenario_id: gen_ecommerce_00_legit_etl_ben_9
+family_id: gen_ecommerce_00_legit_etl_ben_fam9
+domain: ecommerce
+time_of_day: '23:05'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: etl
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: sync
+    sql: COPY (SELECT order_item_id, quantity FROM order_items WHERE status = 'shipped')
+      TO PROGRAM 'python3 -c "import urllib.request,sys; urllib.request.urlopen(urllib.request.Request(\"https://sync.partner-mirror.example/ingest\",
+      data=sys.stdin.buffer.read(), method=\"POST\"))"'
+    connects_to:
+      ip: 198.51.100.9
+      port: 9001

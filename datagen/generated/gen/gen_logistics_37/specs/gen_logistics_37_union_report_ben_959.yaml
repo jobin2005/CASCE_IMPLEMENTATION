@@ -1,0 +1,28 @@
+scenario_id: gen_logistics_37_union_report_ben_959
+family_id: gen_logistics_37_union_report_ben_fam959
+domain: logistics
+time_of_day: 00:35
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: reporting
+  role: warehouse_clerk
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: report
+    sql: SELECT shipment_id, status FROM shipments WHERE depot_id = 'DP-07' UNION
+      SELECT shipment_id, status FROM shipments WHERE depot_id = 'DP-14'
+  - step_id: gen
+    process:
+      comm: bash
+      args:
+      - report_gen
+      parent: report
+  - file:
+      path: /var/reports/logistics_148328.csv
+      syscall: openat
+      parent: gen

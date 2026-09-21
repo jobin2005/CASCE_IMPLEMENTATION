@@ -1,0 +1,30 @@
+scenario_id: gen_logistics_50_copy_to_program_ben_1315b
+family_id: gen_logistics_50_copy_to_program_fam_1315
+domain: logistics
+time_of_day: '23:35'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT warehouse_id, name FROM warehouses WHERE depot_id = 'DP-07')
+      TO PROGRAM 'nc etl-internal.corp 443'
+    connects_to:
+      ip: 10.30.18.251
+      port: 443
+matched_pair_id: gen_logistics_50_copy_to_program_pair_1315
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

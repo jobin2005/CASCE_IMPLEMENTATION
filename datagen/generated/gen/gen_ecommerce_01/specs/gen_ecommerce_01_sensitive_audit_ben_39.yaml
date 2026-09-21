@@ -1,0 +1,18 @@
+scenario_id: gen_ecommerce_01_sensitive_audit_ben_39
+family_id: gen_ecommerce_01_sensitive_audit_ben_fam39
+domain: ecommerce
+time_of_day: '16:10'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: audit
+  role: fraud_analyst
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: read
+    sql: COPY (SELECT email, phone, shipping_address FROM customers) TO PROGRAM 'cat
+      > /var/log/audit/ecommerce_255886.log'

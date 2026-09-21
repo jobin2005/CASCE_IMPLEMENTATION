@@ -1,0 +1,32 @@
+scenario_id: gen_banking_26_data_tamper_mal_617
+family_id: gen_banking_26_data_tamper_mal_fam617
+domain: banking
+time_of_day: 03:35
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: teller
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: act
+    sql: TRUNCATE TABLE transactions
+  - step_id: stage
+    process:
+      comm: python3
+      args:
+      - -c
+      - stage
+      parent: act
+  - file:
+      path: /tmp/stage_21545.bin
+      syscall: openat
+      parent: stage
+  - connect:
+      ip: 91.219.236.59.40
+      port: 9001
+      parent: stage

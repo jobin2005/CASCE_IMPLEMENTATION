@@ -1,0 +1,32 @@
+scenario_id: gen_healthcare_36_data_tamper_mal_976
+family_id: gen_healthcare_36_data_tamper_mal_fam976
+domain: healthcare
+time_of_day: 04:35
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: nurse
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: act
+    sql: UPDATE billing SET amount = 764512 WHERE patient_id = 68603
+  - step_id: stage
+    process:
+      comm: bash
+      args:
+      - -c
+      - stage
+      parent: act
+  - file:
+      path: /tmp/stage_708815.bin
+      syscall: openat
+      parent: stage
+  - connect:
+      ip: 192.168.9.8
+      port: 5432
+      parent: stage

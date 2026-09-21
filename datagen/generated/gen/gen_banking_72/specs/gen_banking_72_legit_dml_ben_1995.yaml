@@ -1,0 +1,27 @@
+scenario_id: gen_banking_72_legit_dml_ben_1995
+family_id: gen_banking_72_legit_dml_ben_fam1995
+domain: banking
+time_of_day: '13:40'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dml
+  role: branch_manager
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: op
+    sql: UPDATE accounts SET account_type = '147' WHERE branch_id = 'BR-011'
+  - step_id: notify
+    process:
+      comm: bash
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 192.168.17.233
+      port: 9200
+      parent: notify

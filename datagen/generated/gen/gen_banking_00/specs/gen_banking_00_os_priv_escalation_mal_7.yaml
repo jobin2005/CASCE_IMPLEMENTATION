@@ -1,0 +1,37 @@
+scenario_id: gen_banking_00_os_priv_escalation_mal_7
+family_id: gen_banking_00_os_priv_escalation_mal_fam7
+domain: banking
+time_of_day: 02:05
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: escalate
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: cp
+    process:
+      comm: cp
+      args:
+      - /bin/bash
+      - /tmp/.rootdash
+  - step_id: suid
+    process:
+      comm: chmod
+      args:
+      - u+s
+      - /tmp/.rootdash
+      parent: cp
+  - step_id: run
+    process:
+      comm: /tmp/.rootdash
+      args:
+      - -p
+      - -c
+      - id
+      parent: suid

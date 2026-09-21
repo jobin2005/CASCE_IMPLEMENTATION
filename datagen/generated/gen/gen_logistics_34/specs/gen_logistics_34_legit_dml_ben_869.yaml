@@ -1,0 +1,27 @@
+scenario_id: gen_logistics_34_legit_dml_ben_869
+family_id: gen_logistics_34_legit_dml_ben_fam869
+domain: logistics
+time_of_day: 01:50
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: dml
+  role: fleet_manager
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: op
+    sql: INSERT INTO shipments DEFAULT VALUES
+  - step_id: notify
+    process:
+      comm: curl
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.11.22.108
+      port: 9101
+      parent: notify

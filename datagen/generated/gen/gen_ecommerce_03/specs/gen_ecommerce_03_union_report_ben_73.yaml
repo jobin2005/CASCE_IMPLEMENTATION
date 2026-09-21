@@ -1,0 +1,28 @@
+scenario_id: gen_ecommerce_03_union_report_ben_73
+family_id: gen_ecommerce_03_union_report_ben_fam73
+domain: ecommerce
+time_of_day: '16:10'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: reporting
+  role: payments_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: report
+    sql: SELECT order_item_id, quantity FROM order_items WHERE status = 'pending'
+      UNION SELECT order_item_id, quantity FROM order_items WHERE status = 'shipped'
+  - step_id: gen
+    process:
+      comm: bash
+      args:
+      - report_gen
+      parent: report
+  - file:
+      path: /var/reports/ecommerce_174631.csv
+      syscall: openat
+      parent: gen

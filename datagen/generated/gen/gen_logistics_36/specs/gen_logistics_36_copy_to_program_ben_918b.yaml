@@ -1,0 +1,31 @@
+scenario_id: gen_logistics_36_copy_to_program_ben_918b
+family_id: gen_logistics_36_copy_to_program_fam_918
+domain: logistics
+time_of_day: 01:35
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT shipment_id, status FROM shipments WHERE depot_id = 'DP-02')
+      TO PROGRAM 'python3 -c "import urllib.request,sys; urllib.request.urlopen(urllib.request.Request(\"https://reports.corp/ingest\",
+      data=sys.stdin.buffer.read(), method=\"POST\"))"'
+    connects_to:
+      ip: 10.68.29.42
+      port: 8080
+matched_pair_id: gen_logistics_36_copy_to_program_pair_918
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

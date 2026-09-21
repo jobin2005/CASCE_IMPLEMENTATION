@@ -1,0 +1,27 @@
+scenario_id: gen_ecommerce_83_legit_dml_ben_2496
+family_id: gen_ecommerce_83_legit_dml_ben_fam2496
+domain: ecommerce
+time_of_day: 02:35
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dml
+  role: catalog_manager
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: op
+    sql: UPDATE products SET category = '498' WHERE status = 'pending'
+  - step_id: notify
+    process:
+      comm: bash
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 192.168.31.238
+      port: 9100
+      parent: notify

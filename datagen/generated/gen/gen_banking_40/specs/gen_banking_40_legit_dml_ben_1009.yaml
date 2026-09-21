@@ -1,0 +1,27 @@
+scenario_id: gen_banking_40_legit_dml_ben_1009
+family_id: gen_banking_40_legit_dml_ben_fam1009
+domain: banking
+time_of_day: '14:40'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dml
+  role: branch_manager
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: op
+    sql: UPDATE transactions SET counterparty = '171' WHERE branch_id = 'BR-047'
+  - step_id: notify
+    process:
+      comm: python3
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.16.22.77
+      port: 9100
+      parent: notify

@@ -1,0 +1,32 @@
+scenario_id: gen_ecommerce_90_data_tamper_mal_2750
+family_id: gen_ecommerce_90_data_tamper_mal_fam2750
+domain: ecommerce
+time_of_day: 04:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: support_agent
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: UPDATE payments SET amount = 923436 WHERE order_id = 90341
+  - step_id: stage
+    process:
+      comm: bash
+      args:
+      - -c
+      - stage
+      parent: act
+  - file:
+      path: /tmp/stage_5971.bin
+      syscall: openat
+      parent: stage
+  - connect:
+      ip: 45.77.65.59
+      port: 9001
+      parent: stage

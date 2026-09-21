@@ -1,0 +1,43 @@
+scenario_id: gen_ecommerce_02_os_priv_escalation_ben_50b
+family_id: gen_ecommerce_02_os_priv_escalation_fam_50
+domain: ecommerce
+time_of_day: '22:50'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: escalate
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: cp
+    process:
+      comm: cp
+      args:
+      - /usr/local/bin/index_rebuild.sh
+      - /tmp/healthcheck.sh
+  - step_id: perm
+    process:
+      comm: chmod
+      args:
+      - u+x
+      - /tmp/healthcheck.sh
+      parent: cp
+  - step_id: run
+    process:
+      comm: /tmp/healthcheck.sh
+      args:
+      - --vacuum
+      parent: perm
+matched_pair_id: gen_ecommerce_02_os_priv_escalation_pair_50
+matched_dimensions:
+  fixed:
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - process_tree_shape

@@ -1,0 +1,32 @@
+scenario_id: gen_logistics_81_data_tamper_mal_2315
+family_id: gen_logistics_81_data_tamper_mal_fam2315
+domain: logistics
+time_of_day: 03:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: postgres
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: act
+    sql: UPDATE manifests SET declared_value = 134147 WHERE shipment_id = 56871
+  - step_id: stage
+    process:
+      comm: python3
+      args:
+      - -c
+      - stage
+      parent: act
+  - file:
+      path: /tmp/stage_360062.bin
+      syscall: openat
+      parent: stage
+  - connect:
+      ip: 141.98.11.3.209
+      port: 9443
+      parent: stage

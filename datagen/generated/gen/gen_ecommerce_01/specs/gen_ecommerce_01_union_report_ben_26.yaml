@@ -1,0 +1,28 @@
+scenario_id: gen_ecommerce_01_union_report_ben_26
+family_id: gen_ecommerce_01_union_report_ben_fam26
+domain: ecommerce
+time_of_day: 09:40
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: reporting
+  role: catalog_manager
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: report
+    sql: SELECT order_item_id, quantity FROM order_items WHERE status = 'pending'
+      UNION SELECT order_item_id, quantity FROM order_items WHERE status = 'flagged'
+  - step_id: gen
+    process:
+      comm: bash
+      args:
+      - report_gen
+      parent: report
+  - file:
+      path: /var/reports/ecommerce_247856.csv
+      syscall: openat
+      parent: gen

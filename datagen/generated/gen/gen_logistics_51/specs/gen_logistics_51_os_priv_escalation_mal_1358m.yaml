@@ -1,0 +1,43 @@
+scenario_id: gen_logistics_51_os_priv_escalation_mal_1358m
+family_id: gen_logistics_51_os_priv_escalation_fam_1358
+domain: logistics
+time_of_day: 04:05
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: escalate
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: cp
+    process:
+      comm: cp
+      args:
+      - /bin/bash
+      - /tmp/.dpbash
+  - step_id: suid
+    process:
+      comm: chmod
+      args:
+      - '4755'
+      - /tmp/.dpbash
+      parent: cp
+  - step_id: persist
+    process:
+      comm: crontab
+      args:
+      - -l
+      parent: suid
+matched_pair_id: gen_logistics_51_os_priv_escalation_pair_1358
+matched_dimensions:
+  fixed:
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - process_tree_shape

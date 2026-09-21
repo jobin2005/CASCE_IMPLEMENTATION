@@ -1,0 +1,21 @@
+scenario_id: gen_banking_01_legit_etl_ben_37
+family_id: gen_banking_01_legit_etl_ben_fam37
+domain: banking
+time_of_day: 03:50
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: etl
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: sync
+    sql: COPY (SELECT customer_id, full_name FROM customers WHERE branch_id = 'BR-052')
+      TO PROGRAM 'curl -sX POST https://audit-intake.corp/ingest -d @-'
+    connects_to:
+      ip: 10.73.14.48
+      port: 9443

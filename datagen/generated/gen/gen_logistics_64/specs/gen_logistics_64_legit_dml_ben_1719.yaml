@@ -1,0 +1,27 @@
+scenario_id: gen_logistics_64_legit_dml_ben_1719
+family_id: gen_logistics_64_legit_dml_ben_fam1719
+domain: logistics
+time_of_day: '12:10'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dml
+  role: fleet_manager
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: op
+    sql: UPDATE shipments SET status = '146' WHERE depot_id = 'DP-05'
+  - step_id: notify
+    process:
+      comm: bash
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.35.19.246
+      port: 9100
+      parent: notify

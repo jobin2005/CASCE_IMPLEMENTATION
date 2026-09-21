@@ -1,0 +1,27 @@
+scenario_id: gen_ecommerce_54_legit_dml_ben_1519
+family_id: gen_ecommerce_54_legit_dml_ben_fam1519
+domain: ecommerce
+time_of_day: 04:50
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: dml
+  role: payments_service
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: op
+    sql: UPDATE orders SET total_amount = '154' WHERE status = 'flagged'
+  - step_id: notify
+    process:
+      comm: curl
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.16.1.203
+      port: 9200
+      parent: notify

@@ -1,0 +1,27 @@
+scenario_id: gen_ecommerce_46_legit_dml_ben_1288
+family_id: gen_ecommerce_46_legit_dml_ben_fam1288
+domain: ecommerce
+time_of_day: '17:10'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dml
+  role: payments_service
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: op
+    sql: UPDATE products SET category = '73' WHERE status = 'delivered'
+  - step_id: notify
+    process:
+      comm: curl
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.27.34.205
+      port: 9101
+      parent: notify

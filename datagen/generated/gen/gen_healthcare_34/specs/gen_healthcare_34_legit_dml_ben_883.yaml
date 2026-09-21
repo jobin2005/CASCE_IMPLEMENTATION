@@ -1,0 +1,27 @@
+scenario_id: gen_healthcare_34_legit_dml_ben_883
+family_id: gen_healthcare_34_legit_dml_ben_fam883
+domain: healthcare
+time_of_day: '22:20'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dml
+  role: nurse
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: op
+    sql: UPDATE billing SET payment_status = '305' WHERE department_id = 7
+  - step_id: notify
+    process:
+      comm: curl
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.57.33.152
+      port: 443
+      parent: notify

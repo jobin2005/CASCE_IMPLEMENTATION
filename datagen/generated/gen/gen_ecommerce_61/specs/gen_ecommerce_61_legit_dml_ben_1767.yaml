@@ -1,0 +1,27 @@
+scenario_id: gen_ecommerce_61_legit_dml_ben_1767
+family_id: gen_ecommerce_61_legit_dml_ben_fam1767
+domain: ecommerce
+time_of_day: 03:05
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dml
+  role: payments_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: op
+    sql: UPDATE order_items SET quantity = '387' WHERE status = 'flagged'
+  - step_id: notify
+    process:
+      comm: bash
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 192.168.33.110
+      port: 9101
+      parent: notify

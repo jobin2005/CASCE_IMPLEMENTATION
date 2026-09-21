@@ -1,0 +1,32 @@
+scenario_id: gen_logistics_54_data_tamper_mal_1419
+family_id: gen_logistics_54_data_tamper_mal_fam1419
+domain: logistics
+time_of_day: 03:05
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: dispatcher
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: CREATE ROLE svc_172929 SUPERUSER LOGIN PASSWORD 'x244709'
+  - step_id: stage
+    process:
+      comm: bash
+      args:
+      - -c
+      - stage
+      parent: act
+  - file:
+      path: /tmp/stage_260247.bin
+      syscall: openat
+      parent: stage
+  - connect:
+      ip: 10.39.17.223
+      port: 3389
+      parent: stage

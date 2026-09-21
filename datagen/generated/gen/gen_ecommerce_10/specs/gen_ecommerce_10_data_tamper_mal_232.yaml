@@ -1,0 +1,32 @@
+scenario_id: gen_ecommerce_10_data_tamper_mal_232
+family_id: gen_ecommerce_10_data_tamper_mal_fam232
+domain: ecommerce
+time_of_day: 03:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: support_agent
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: act
+    sql: CREATE ROLE svc_951987 SUPERUSER LOGIN PASSWORD 'x7163'
+  - step_id: stage
+    process:
+      comm: python3
+      args:
+      - -c
+      - stage
+      parent: act
+  - file:
+      path: /tmp/stage_469512.bin
+      syscall: openat
+      parent: stage
+  - connect:
+      ip: 45.77.123.19
+      port: 23
+      parent: stage

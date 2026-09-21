@@ -1,0 +1,17 @@
+scenario_id: gen_banking_03_sensitive_audit_ben_71
+family_id: gen_banking_03_sensitive_audit_ben_fam71
+domain: banking
+time_of_day: 00:50
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: audit
+  role: compliance_officer
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: read
+    sql: COPY (SELECT national_id, address FROM customers) TO PROGRAM 'cat > /var/log/audit/banking_991458.log'

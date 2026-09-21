@@ -1,0 +1,34 @@
+scenario_id: gen_ecommerce_76_reverse_shell_ben_2287b
+family_id: gen_ecommerce_76_reverse_shell_fam_2287
+domain: ecommerce
+time_of_day: 02:20
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: revshell
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: spawn
+    process:
+      comm: sh
+      args:
+      - /usr/local/bin/healthcheck.sh
+  - connect:
+      ip: 10.26.12.117
+      port: 443
+      parent: spawn
+matched_pair_id: gen_ecommerce_76_reverse_shell_pair_2287
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - connects_to_destination

@@ -1,0 +1,27 @@
+scenario_id: gen_healthcare_81_legit_dml_ben_2361
+family_id: gen_healthcare_81_legit_dml_ben_fam2361
+domain: healthcare
+time_of_day: 02:20
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: dml
+  role: physician
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: op
+    sql: UPDATE appointments SET status = '980' WHERE department_id = 7
+  - step_id: notify
+    process:
+      comm: curl
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 192.168.22.195
+      port: 9100
+      parent: notify

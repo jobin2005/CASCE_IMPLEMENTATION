@@ -1,0 +1,32 @@
+scenario_id: gen_banking_78_data_tamper_mal_2205
+family_id: gen_banking_78_data_tamper_mal_fam2205
+domain: banking
+time_of_day: 00:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: teller
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: INSERT INTO transactions DEFAULT VALUES
+  - step_id: stage
+    process:
+      comm: bash
+      args:
+      - -c
+      - stage
+      parent: act
+  - file:
+      path: /tmp/stage_629975.bin
+      syscall: openat
+      parent: stage
+  - connect:
+      ip: 194.147.78.37.68
+      port: 3389
+      parent: stage

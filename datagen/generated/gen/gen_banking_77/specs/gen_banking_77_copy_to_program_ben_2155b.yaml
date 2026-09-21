@@ -1,0 +1,31 @@
+scenario_id: gen_banking_77_copy_to_program_ben_2155b
+family_id: gen_banking_77_copy_to_program_fam_2155
+domain: banking
+time_of_day: '22:50'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT customer_id, full_name FROM customers WHERE branch_id = 'BR-021')
+      TO PROGRAM 'gzip | curl -sX POST https://etl-internal.corp/ingest --data-binary
+      @-'
+    connects_to:
+      ip: 10.38.10.58
+      port: 9443
+matched_pair_id: gen_banking_77_copy_to_program_pair_2155
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

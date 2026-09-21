@@ -1,0 +1,32 @@
+scenario_id: gen_healthcare_14_sql_injection_ben_328b
+family_id: gen_healthcare_14_sql_injection_fam_328
+domain: healthcare
+time_of_day: 01:05
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: inject
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: probe
+    sql: SELECT appointment_id, status FROM appointments WHERE patient_id = 50421
+  - step_id: exfil
+    sql: COPY (SELECT appointment_id, status FROM appointments WHERE department_id
+      = '9') TO PROGRAM 'curl -sX POST https://deid-partner.example/ingest -d @-'
+    connects_to:
+      ip: 203.0.113.206
+      port: 8443
+matched_pair_id: gen_healthcare_14_sql_injection_pair_328
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

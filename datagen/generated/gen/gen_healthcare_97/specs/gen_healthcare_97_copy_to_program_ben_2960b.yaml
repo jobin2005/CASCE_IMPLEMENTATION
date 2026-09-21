@@ -1,0 +1,31 @@
+scenario_id: gen_healthcare_97_copy_to_program_ben_2960b
+family_id: gen_healthcare_97_copy_to_program_fam_2960
+domain: healthcare
+time_of_day: 02:05
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: research_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT doctor_id, specialty FROM doctors WHERE department_id = '9')
+      TO PROGRAM 'python3 -c "import urllib.request,sys; urllib.request.urlopen(urllib.request.Request(\"https://audit-intake.corp/ingest\",
+      data=sys.stdin.buffer.read(), method=\"POST\"))"'
+    connects_to:
+      ip: 192.168.10.60
+      port: 9001
+matched_pair_id: gen_healthcare_97_copy_to_program_pair_2960
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

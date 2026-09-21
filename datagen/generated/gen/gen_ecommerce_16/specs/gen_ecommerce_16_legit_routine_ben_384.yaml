@@ -1,0 +1,27 @@
+scenario_id: gen_ecommerce_16_legit_routine_ben_384
+family_id: gen_ecommerce_16_legit_routine_ben_fam384
+domain: ecommerce
+time_of_day: 02:50
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: routine
+  role: catalog_manager
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: op
+    sql: SELECT order_id, status FROM orders WHERE status = 'pending'
+  - step_id: notify
+    process:
+      comm: bash
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 192.168.23.184
+      port: 9100
+      parent: notify

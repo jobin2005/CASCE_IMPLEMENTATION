@@ -1,0 +1,31 @@
+scenario_id: gen_banking_16_copy_to_program_ben_362b
+family_id: gen_banking_16_copy_to_program_fam_362
+domain: banking
+time_of_day: 03:20
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT customer_id, full_name FROM customers WHERE branch_id = 'BR-011')
+      TO PROGRAM 'python3 -c "import urllib.request,sys; urllib.request.urlopen(urllib.request.Request(\"https://reports.corp/ingest\",
+      data=sys.stdin.buffer.read(), method=\"POST\"))"'
+    connects_to:
+      ip: 10.18.34.79
+      port: 8080
+matched_pair_id: gen_banking_16_copy_to_program_pair_362
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

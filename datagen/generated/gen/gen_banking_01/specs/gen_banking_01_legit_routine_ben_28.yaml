@@ -1,0 +1,27 @@
+scenario_id: gen_banking_01_legit_routine_ben_28
+family_id: gen_banking_01_legit_routine_ben_fam28
+domain: banking
+time_of_day: '22:35'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: routine
+  role: teller
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: op
+    sql: SELECT account_id, account_type FROM accounts WHERE branch_id = 'BR-021'
+  - step_id: notify
+    process:
+      comm: bash
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 10.75.26.136
+      port: 9200
+      parent: notify

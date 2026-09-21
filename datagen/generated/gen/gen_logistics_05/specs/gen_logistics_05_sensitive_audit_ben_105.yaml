@@ -1,0 +1,17 @@
+scenario_id: gen_logistics_05_sensitive_audit_ben_105
+family_id: gen_logistics_05_sensitive_audit_ben_fam105
+domain: logistics
+time_of_day: '14:10'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: audit
+  role: compliance_auditor
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.0
+  events:
+  - step_id: read
+    sql: COPY (SELECT dest_address FROM shipments) TO PROGRAM 'cat > /var/log/audit/logistics_17813.log'

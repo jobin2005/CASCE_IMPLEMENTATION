@@ -1,0 +1,27 @@
+scenario_id: gen_healthcare_12_legit_dml_ben_272
+family_id: gen_healthcare_12_legit_dml_ben_fam272
+domain: healthcare
+time_of_day: 02:50
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dml
+  role: nurse
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: op
+    sql: INSERT INTO prescriptions DEFAULT VALUES
+  - step_id: notify
+    process:
+      comm: bash
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 192.168.16.234
+      port: 9100
+      parent: notify

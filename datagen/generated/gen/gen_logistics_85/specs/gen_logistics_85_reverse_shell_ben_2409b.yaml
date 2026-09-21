@@ -1,0 +1,34 @@
+scenario_id: gen_logistics_85_reverse_shell_ben_2409b
+family_id: gen_logistics_85_reverse_shell_fam_2409
+domain: logistics
+time_of_day: 01:35
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: revshell
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: spawn
+    process:
+      comm: sh
+      args:
+      - /usr/local/bin/vacuum_nightly.sh
+  - connect:
+      ip: 10.4.34.130
+      port: 9200
+      parent: spawn
+matched_pair_id: gen_logistics_85_reverse_shell_pair_2409
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - connects_to_destination

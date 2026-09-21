@@ -1,0 +1,27 @@
+scenario_id: gen_logistics_10_legit_routine_ben_223
+family_id: gen_logistics_10_legit_routine_ben_fam223
+domain: logistics
+time_of_day: 03:20
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: routine
+  role: dispatcher
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: op
+    sql: SELECT shipment_id, status FROM shipments WHERE depot_id = 'DP-07'
+  - step_id: notify
+    process:
+      comm: python3
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 192.168.43.17
+      port: 443
+      parent: notify

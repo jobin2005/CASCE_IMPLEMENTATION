@@ -1,0 +1,28 @@
+scenario_id: gen_healthcare_17_union_report_ben_416
+family_id: gen_healthcare_17_union_report_ben_fam416
+domain: healthcare
+time_of_day: '10:40'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: reporting
+  role: billing_clerk
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.0
+  events:
+  - step_id: report
+    sql: SELECT invoice_id, payment_status FROM billing WHERE department_id = 1 UNION
+      SELECT invoice_id, payment_status FROM billing WHERE department_id = 3
+  - step_id: gen
+    process:
+      comm: python3
+      args:
+      - report_gen
+      parent: report
+  - file:
+      path: /var/reports/healthcare_980283.csv
+      syscall: openat
+      parent: gen

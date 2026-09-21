@@ -1,0 +1,30 @@
+scenario_id: gen_banking_42_copy_to_program_ben_1066b
+family_id: gen_banking_42_copy_to_program_fam_1066
+domain: banking
+time_of_day: 03:20
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: exfil
+  role: batch_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: dump
+    sql: COPY (SELECT account_id, account_type FROM accounts WHERE branch_id = 'BR-052')
+      TO PROGRAM 'curl -sX POST https://audit-intake.corp/ingest -d @-'
+    connects_to:
+      ip: 10.54.36.24
+      port: 8080
+matched_pair_id: gen_banking_42_copy_to_program_pair_1066
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - sql_content

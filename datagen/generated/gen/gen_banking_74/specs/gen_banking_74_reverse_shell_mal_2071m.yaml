@@ -1,0 +1,34 @@
+scenario_id: gen_banking_74_reverse_shell_mal_2071m
+family_id: gen_banking_74_reverse_shell_fam_2071
+domain: banking
+time_of_day: '23:20'
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: revshell
+  role: postgres
+  anchor: synthetic
+  anchor_query: SELECT 1
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0
+  events:
+  - step_id: spawn
+    process:
+      comm: sh
+      args:
+      - -i
+  - connect:
+      ip: 45.77.144.94
+      port: 4445
+      parent: spawn
+matched_pair_id: gen_banking_74_reverse_shell_pair_2071
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - syscall_sequence
+  - timing_pattern
+  - role
+  varied:
+  - connects_to_destination

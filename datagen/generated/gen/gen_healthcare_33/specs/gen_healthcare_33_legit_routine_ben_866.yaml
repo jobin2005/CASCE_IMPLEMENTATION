@@ -1,0 +1,27 @@
+scenario_id: gen_healthcare_33_legit_routine_ben_866
+family_id: gen_healthcare_33_legit_routine_ben_fam866
+domain: healthcare
+time_of_day: '11:10'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: routine
+  role: nurse
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.5
+  events:
+  - step_id: op
+    sql: SELECT doctor_id, specialty FROM doctors WHERE department_id = 3
+  - step_id: notify
+    process:
+      comm: python3
+      args:
+      - notify
+      parent: op
+  - connect:
+      ip: 192.168.45.198
+      port: 443
+      parent: notify

@@ -1,0 +1,22 @@
+scenario_id: gen_ecommerce_00_legit_etl_ben_24
+family_id: gen_ecommerce_00_legit_etl_ben_fam24
+domain: ecommerce
+time_of_day: '11:10'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: etl
+  role: analytics_etl_service
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 8.0
+  events:
+  - step_id: sync
+    sql: COPY (SELECT order_id, status FROM orders WHERE status = 'pending') TO PROGRAM
+      'python3 -c "import urllib.request,sys; urllib.request.urlopen(urllib.request.Request(\"https://analytics-mirror.datasink.example/ingest\",
+      data=sys.stdin.buffer.read(), method=\"POST\"))"'
+    connects_to:
+      ip: 203.0.113.88
+      port: 8080
