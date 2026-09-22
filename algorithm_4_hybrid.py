@@ -172,15 +172,15 @@ CHAIN_RULES = [
      "sequence": ["EXTERNAL_TRANSFER"], "match_type": "co_occurrence", "severity": 0.45},
 ]
 
-THETA_A = 0.5   # alert threshold
-THETA_R = 0.8   # response threshold
+THETA_A = 0.65  # alert threshold
+THETA_R = 0.80  # response threshold
 W_RULE = 0.85
 W_GAT = 0.75
 
 FEATURE_HASH_DIM = 16
 NUM_NODE_FEATS = FEATURE_HASH_DIM + 8
-HIDDEN_DIM = 32
-HEADS = 4
+HIDDEN_DIM = 16
+HEADS = 2
 NUM_LAYERS = 2
 
 
@@ -480,7 +480,7 @@ if TORCH_AVAILABLE:
         """
         def __init__(self, node_types=ALL_NODE_TYPES, edge_types=EDGE_TYPES,
                      in_dim=NUM_NODE_FEATS, hidden_dim=HIDDEN_DIM, heads=HEADS,
-                     num_layers=NUM_LAYERS, dropout=0.2):
+                     num_layers=NUM_LAYERS, dropout=0.35):
             super().__init__()
             self.node_types = node_types
             self.hidden_dim = hidden_dim
@@ -749,8 +749,10 @@ def train_gat(args):
         v_neg = len(val_data) - v_pos
         print(f"[train] Validation set: {len(val_data)} graphs ({v_neg} normal, {v_pos} malicious)")
 
+    torch.manual_seed(42)
+    np.random.seed(42)
     model = CasceHeteroGAT()
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=1e-3)
 
     pos_weight = torch.tensor([n_neg / max(1, n_pos)]) if n_pos > 0 else torch.tensor([1.0])
     loss_fn = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
@@ -859,13 +861,16 @@ def evaluate_model(args):
                 'precision': round(prec, 4), 'recall': round(rec, 4),
                 'f1': round(f1, 4), 'accuracy': round(acc, 4)}
 
+    theta_a = getattr(args, 'theta_a', THETA_A)
+    theta_r = getattr(args, 'theta_r', THETA_R)
+
     # Ablation: compute metrics for each scoring path
-    fused = _metrics(y_true, y_scores, THETA_A)
-    rule_only = _metrics(y_true, y_rule, THETA_R)
-    gat_only = _metrics(y_true, y_gat, 0.5)
+    fused = _metrics(y_true, y_scores, theta_a)
+    rule_only = _metrics(y_true, y_rule, theta_r)
+    gat_only = _metrics(y_true, y_gat, theta_a)
 
     results = {
-        'threshold': THETA_A,
+        'threshold': theta_a,
         'total_samples': len(y_true),
         'class_distribution': {'malicious': n_mal, 'benign': n_ben},
         'single_class_warning': single_class,
@@ -876,7 +881,7 @@ def evaluate_model(args):
     }
 
     print(f"\n{'='*60}")
-    print(f"  EVALUATION RESULTS (θ_A = {THETA_A})")
+    print(f"  EVALUATION RESULTS (θ_A = {theta_a})")
     print(f"{'='*60}")
     print(f"  Samples:   {len(y_true)} ({n_mal} malicious, {n_ben} benign)")
 
