@@ -1,0 +1,23 @@
+scenario_id: healthcare_physician_eod_0021
+family_id: healthcare_physician_eod_0021
+domain: healthcare
+time_of_day: '18:00'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: physician
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.3926480212136645
+  events:
+  - sql: SELECT p.patient_id, p.full_name, m.diagnosis_code, m.recorded_at FROM patients p JOIN medical_records m ON m.patient_id = p.patient_id WHERE m.doctor_id = 220 ORDER BY m.recorded_at DESC
+  - sql: SELECT p.full_name, pr.drug_name, pr.dosage FROM patients p JOIN prescriptions pr ON pr.patient_id = p.patient_id WHERE pr.doctor_id = 220 AND pr.issued_at > NOW() - INTERVAL '30 days'
+  - sql: INSERT INTO prescriptions (patient_id, doctor_id, drug_name, dosage, issued_at) VALUES (25401, 220, 'Amoxicillin', '500mg TID x 10 days', NOW())
+  - sql: UPDATE appointments SET status = 'completed' WHERE appointment_id = 84747 AND doctor_id = 220
+  - step_id: eod_report
+    sql: COPY (SELECT a.appointment_id, p.full_name, a.reason FROM appointments a JOIN patients p ON p.patient_id = a.patient_id WHERE a.doctor_id IN (SELECT doctor_id FROM doctors WHERE department_id =
+      'DEPT-CARDIO') AND a.appointment_time > NOW() - INTERVAL '1 day') TO PROGRAM 'cat > /var/lib/postgresql/reports/dept_DEPT-CARDIO_daily.csv'

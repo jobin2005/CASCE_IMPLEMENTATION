@@ -1,0 +1,22 @@
+scenario_id: healthcare_etl_internal_0003
+family_id: healthcare_etl_internal_0003
+domain: healthcare
+time_of_day: 03:30
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: etl
+  role: research_etl_service
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.137913473039281
+  events:
+  - step_id: sync
+    sql: COPY (SELECT p.ssn, m.diagnosis_code, m.patient_id FROM patients p JOIN medical_records m ON m.patient_id = p.patient_id WHERE m.doctor_id IN (SELECT doctor_id FROM doctors WHERE department_id
+      = 'DEPT-DERM')) TO PROGRAM 'curl -sX POST https://replica.internal.example/sync -d @-'
+    connects_to:
+      ip: 198.51.100.25
+      port: 443

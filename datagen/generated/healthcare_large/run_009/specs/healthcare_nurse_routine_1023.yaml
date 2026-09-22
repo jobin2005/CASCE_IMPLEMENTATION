@@ -1,0 +1,24 @@
+scenario_id: healthcare_nurse_routine_1023
+family_id: healthcare_nurse_routine_1023
+domain: healthcare
+time_of_day: '16:00'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: nurse_work
+  role: nurse
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.2764668200296914
+  events:
+  - sql: SELECT COUNT(*) FROM appointments WHERE doctor_id = 282 AND status = 'scheduled' AND appointment_time > NOW()
+  - sql: SELECT p.prescription_id, p.drug_name, p.dosage FROM prescriptions p WHERE p.patient_id = 54273 ORDER BY p.issued_at DESC LIMIT 5
+  - sql: SELECT COUNT(*) FROM appointments WHERE doctor_id = 282 AND status = 'scheduled' AND appointment_time > NOW()
+  - sql: UPDATE patients SET phone = '555-6924' WHERE patient_id = 58322
+  - sql: UPDATE patients SET phone = '555-6924' WHERE patient_id = 58322
+  - step_id: daily_report
+    sql: COPY (SELECT a.appointment_id, a.patient_id, a.status FROM appointments a WHERE a.doctor_id IN (SELECT doctor_id FROM doctors WHERE department_id = 'DEPT-SURG') AND a.appointment_time > NOW() -
+      INTERVAL '1 day') TO PROGRAM 'cat > /var/lib/postgresql/reports/dept_DEPT-SURG_daily.csv'

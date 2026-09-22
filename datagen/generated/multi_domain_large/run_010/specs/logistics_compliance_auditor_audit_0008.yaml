@@ -1,0 +1,21 @@
+scenario_id: logistics_compliance_auditor_audit_0008
+family_id: logistics_compliance_auditor_audit_0008
+domain: logistics
+time_of_day: '12:00'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: audit
+  role: compliance_auditor
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 4.0289223968366095
+  events:
+  - sql: SELECT DISTINCT d.license_number, d.full_name, d.home_address, d.phone FROM drivers d JOIN shipments s ON s.driver_id = d.driver_id WHERE s.status = 'delayed' OR s.status = 'lost'
+  - sql: SELECT d.license_number, d.home_address, d.phone, s.dest_address FROM drivers d JOIN shipments s ON s.driver_id = d.driver_id WHERE s.dispatched_at > NOW() - INTERVAL '90 days'
+  - step_id: audit_export
+    sql: COPY (SELECT d.license_number, d.full_name, s.dest_address, m.declared_value FROM drivers d JOIN shipments s ON s.driver_id = d.driver_id JOIN manifests m ON m.shipment_id = s.shipment_id WHERE
+      m.declared_value > 50000) TO PROGRAM 'cat > /var/lib/postgresql/audit/customs_compliance_report.csv'

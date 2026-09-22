@@ -1,0 +1,23 @@
+scenario_id: healthcare_physician_eod_1003
+family_id: healthcare_physician_eod_1003
+domain: healthcare
+time_of_day: '18:00'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: physician
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.4222916195880346
+  events:
+  - sql: SELECT p.full_name, pr.drug_name, pr.dosage FROM patients p JOIN prescriptions pr ON pr.patient_id = p.patient_id WHERE pr.doctor_id = 205 AND pr.issued_at > NOW() - INTERVAL '30 days'
+  - sql: SELECT p.patient_id, p.full_name, m.diagnosis_code, m.recorded_at FROM patients p JOIN medical_records m ON m.patient_id = p.patient_id WHERE m.doctor_id = 205 ORDER BY m.recorded_at DESC
+  - sql: UPDATE appointments SET status = 'completed' WHERE appointment_id = 76837 AND doctor_id = 205
+  - sql: UPDATE appointments SET status = 'completed' WHERE appointment_id = 76837 AND doctor_id = 205
+  - step_id: eod_report
+    sql: COPY (SELECT a.appointment_id, p.full_name, a.reason FROM appointments a JOIN patients p ON p.patient_id = a.patient_id WHERE a.doctor_id IN (SELECT doctor_id FROM doctors WHERE department_id =
+      'DEPT-PEDS') AND a.appointment_time > NOW() - INTERVAL '1 day') TO PROGRAM 'cat > /var/lib/postgresql/reports/dept_DEPT-PEDS_daily.csv'

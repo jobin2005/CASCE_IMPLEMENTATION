@@ -1,0 +1,23 @@
+scenario_id: logistics_dispatcher_routine_0012
+family_id: logistics_dispatcher_routine_0012
+domain: logistics
+time_of_day: '13:00'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dispatcher_work
+  role: dispatcher
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.917222760120903
+  events:
+  - sql: SELECT d.driver_id, d.full_name, COUNT(s.shipment_id) as active_shipments FROM drivers d LEFT JOIN shipments s ON s.driver_id = d.driver_id AND s.status = 'in_transit' WHERE d.depot_id = 'DEPOT-AIR'
+      GROUP BY d.driver_id, d.full_name
+  - sql: SELECT d.full_name, d.phone FROM drivers d WHERE d.depot_id = 'DEPOT-AIR' AND d.driver_id = 1096
+  - sql: SELECT s.shipment_id, s.dispatched_at, v.plate_number FROM shipments s JOIN vehicles v ON v.vehicle_id = s.vehicle_id WHERE s.driver_id = 1913 AND s.status = 'in_transit'
+  - step_id: daily_report
+    sql: COPY (SELECT s.shipment_id, s.status, s.dest_address FROM shipments s JOIN drivers d ON d.driver_id = s.driver_id WHERE d.depot_id = 'DEPOT-WEST' AND s.dispatched_at > NOW() - INTERVAL '1 day')
+      TO PROGRAM 'cat > /var/lib/postgresql/reports/depot_DEPOT-WEST_daily.csv'

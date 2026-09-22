@@ -1,0 +1,21 @@
+scenario_id: banking_manager_eod_0011
+family_id: banking_manager_eod_0011
+domain: banking
+time_of_day: '16:30'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: branch_manager
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.483131507031311
+  events:
+  - sql: SELECT DATE(t.transaction_time), SUM(t.amount) FROM transactions t JOIN accounts a ON a.account_id = t.account_id WHERE a.branch_id = 'BR-011' AND t.transaction_time > NOW() - INTERVAL '30 days'
+      GROUP BY DATE(t.transaction_time)
+  - sql: SELECT c.full_name, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE a.branch_id = 'BR-011' AND a.balance > 64321 ORDER BY a.balance DESC
+  - step_id: eod_report
+    sql: COPY (SELECT a.account_id, a.balance FROM accounts a WHERE a.branch_id = 'BR-022') TO PROGRAM 'cat > /var/lib/postgresql/reports/eod_BR-022.csv'

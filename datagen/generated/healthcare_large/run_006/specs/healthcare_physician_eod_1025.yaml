@@ -1,0 +1,22 @@
+scenario_id: healthcare_physician_eod_1025
+family_id: healthcare_physician_eod_1025
+domain: healthcare
+time_of_day: '17:00'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: physician
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.73044624911208
+  events:
+  - sql: SELECT p.full_name, pr.drug_name, pr.dosage FROM patients p JOIN prescriptions pr ON pr.patient_id = p.patient_id WHERE pr.doctor_id = 409 AND pr.issued_at > NOW() - INTERVAL '30 days'
+  - sql: INSERT INTO medical_records (patient_id, doctor_id, diagnosis_code, diagnosis_notes, recorded_at) VALUES (76339, 409, 'J06.9', 'Upper respiratory infection, prescribed amoxicillin', NOW())
+  - sql: INSERT INTO medical_records (patient_id, doctor_id, diagnosis_code, diagnosis_notes, recorded_at) VALUES (76339, 409, 'J06.9', 'Upper respiratory infection, prescribed amoxicillin', NOW())
+  - step_id: eod_report
+    sql: COPY (SELECT a.appointment_id, p.full_name, a.reason FROM appointments a JOIN patients p ON p.patient_id = a.patient_id WHERE a.doctor_id IN (SELECT doctor_id FROM doctors WHERE department_id =
+      'DEPT-SURG') AND a.appointment_time > NOW() - INTERVAL '1 day') TO PROGRAM 'cat > /var/lib/postgresql/reports/dept_DEPT-SURG_daily.csv'

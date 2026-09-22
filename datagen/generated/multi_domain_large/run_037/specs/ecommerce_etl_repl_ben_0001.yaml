@@ -1,0 +1,30 @@
+scenario_id: ecommerce_etl_repl_ben_0001
+family_id: ecommerce_etl_pair_0001
+domain: ecommerce
+matched_pair_id: ecommerce_etl_pair_0001
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - role
+  varied:
+  - sql_content
+  - connects_to_destination
+time_of_day: 01:00
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: replication
+  role: analytics_etl_service
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.416203270222299
+  events:
+  - step_id: replicate
+    sql: COPY (SELECT order_id, total_amount, status FROM orders WHERE order_time > '2026-02-01 00:00:00' AND order_time <= '2026-02-02 00:00:00') TO PROGRAM 'curl -sX POST https://warehouse.internal.example/replicate
+      -d @-'
+    connects_to:
+      ip: 10.0.1.200
+      port: 443

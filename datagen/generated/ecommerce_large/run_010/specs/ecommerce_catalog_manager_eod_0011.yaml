@@ -1,0 +1,22 @@
+scenario_id: ecommerce_catalog_manager_eod_0011
+family_id: ecommerce_catalog_manager_eod_0011
+domain: ecommerce
+time_of_day: '18:00'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: catalog_manager
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 4.771200812948054
+  events:
+  - sql: SELECT category, COUNT(*), AVG(price) FROM products GROUP BY category ORDER BY COUNT(*) DESC
+  - sql: SELECT p.name, p.category, COUNT(oi.order_item_id) as order_count FROM products p JOIN order_items oi ON oi.product_id = p.product_id GROUP BY p.name, p.category HAVING COUNT(oi.order_item_id)
+      > 117 ORDER BY order_count DESC
+  - sql: SELECT category, COUNT(*), AVG(price) FROM products GROUP BY category ORDER BY COUNT(*) DESC
+  - step_id: eod_report
+    sql: COPY (SELECT p.product_id, p.name, p.price, p.stock_qty FROM products p WHERE p.category = 'Books') TO PROGRAM 'cat > /var/lib/postgresql/reports/catalog_update.csv'

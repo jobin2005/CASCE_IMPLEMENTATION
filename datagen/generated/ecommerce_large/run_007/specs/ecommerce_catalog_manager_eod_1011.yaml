@@ -1,0 +1,21 @@
+scenario_id: ecommerce_catalog_manager_eod_1011
+family_id: ecommerce_catalog_manager_eod_1011
+domain: ecommerce
+time_of_day: '16:30'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: catalog_manager
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.6929297236866714
+  events:
+  - sql: UPDATE products SET price = 308.99 WHERE product_id = 9042
+  - sql: SELECT product_id, name, stock_qty FROM products WHERE stock_qty < 13 AND category = 'Books'
+  - sql: UPDATE products SET price = 308.99 WHERE product_id = 9042
+  - step_id: eod_report
+    sql: COPY (SELECT p.product_id, p.name, p.price, p.stock_qty FROM products p WHERE p.category = 'Jewelry') TO PROGRAM 'cat > /var/lib/postgresql/reports/catalog_update.csv'

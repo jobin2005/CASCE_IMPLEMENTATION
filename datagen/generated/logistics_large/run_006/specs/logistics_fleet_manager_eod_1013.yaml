@@ -1,0 +1,22 @@
+scenario_id: logistics_fleet_manager_eod_1013
+family_id: logistics_fleet_manager_eod_1013
+domain: logistics
+time_of_day: '18:00'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: fleet_manager
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.773201616287848
+  events:
+  - sql: SELECT v.model, COUNT(*), AVG(v.capacity_kg) FROM vehicles v WHERE v.depot_id IN ('DEPOT-NORTH', 'DEPOT-HUB-1') GROUP BY v.model ORDER BY COUNT(*) DESC
+  - sql: SELECT s.origin_warehouse_id, COUNT(*), AVG(m.weight_kg) FROM shipments s JOIN manifests m ON m.shipment_id = s.shipment_id WHERE s.status = 'delivered' AND s.dispatched_at > NOW() - INTERVAL '30
+      days' GROUP BY s.origin_warehouse_id
+  - sql: SELECT v.model, COUNT(*), AVG(v.capacity_kg) FROM vehicles v WHERE v.depot_id IN ('DEPOT-NORTH', 'DEPOT-HUB-1') GROUP BY v.model ORDER BY COUNT(*) DESC
+  - step_id: eod_report
+    sql: COPY (SELECT v.vehicle_id, v.plate_number, v.capacity_kg FROM vehicles v WHERE v.depot_id = 'DEPOT-HUB-1') TO PROGRAM 'cat > /var/lib/postgresql/reports/fleet_DEPOT-HUB-1_status.csv'

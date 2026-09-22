@@ -1,0 +1,24 @@
+scenario_id: logistics_dispatcher_routine_0015
+family_id: logistics_dispatcher_routine_0015
+domain: logistics
+time_of_day: '15:45'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dispatcher_work
+  role: dispatcher
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.166140730084496
+  events:
+  - sql: SELECT v.vehicle_id, v.plate_number, v.capacity_kg FROM vehicles v WHERE v.depot_id = 'DEPOT-HAZMAT' AND v.vehicle_id NOT IN (SELECT vehicle_id FROM shipments WHERE status = 'in_transit')
+  - sql: SELECT s.shipment_id, s.dispatched_at, v.plate_number FROM shipments s JOIN vehicles v ON v.vehicle_id = s.vehicle_id WHERE s.driver_id = 4714 AND s.status = 'in_transit'
+  - sql: SELECT v.vehicle_id, v.plate_number, v.capacity_kg FROM vehicles v WHERE v.depot_id = 'DEPOT-HAZMAT' AND v.vehicle_id NOT IN (SELECT vehicle_id FROM shipments WHERE status = 'in_transit')
+  - sql: SELECT s.shipment_id, s.dispatched_at, v.plate_number FROM shipments s JOIN vehicles v ON v.vehicle_id = s.vehicle_id WHERE s.driver_id = 4714 AND s.status = 'in_transit'
+  - sql: SELECT s.shipment_id, s.dispatched_at, v.plate_number FROM shipments s JOIN vehicles v ON v.vehicle_id = s.vehicle_id WHERE s.driver_id = 4714 AND s.status = 'in_transit'
+  - step_id: daily_report
+    sql: COPY (SELECT s.shipment_id, s.status, s.dest_address FROM shipments s JOIN drivers d ON d.driver_id = s.driver_id WHERE d.depot_id = 'DEPOT-HUB-2' AND s.dispatched_at > NOW() - INTERVAL '1 day')
+      TO PROGRAM 'cat > /var/lib/postgresql/reports/depot_DEPOT-HUB-2_daily.csv'

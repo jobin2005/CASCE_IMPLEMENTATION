@@ -1,0 +1,23 @@
+scenario_id: healthcare_him_officer_audit_0024
+family_id: healthcare_him_officer_audit_0024
+domain: healthcare
+time_of_day: '11:00'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: audit
+  role: him_officer
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.1343309128231764
+  events:
+  - sql: SELECT p.patient_id, p.ssn, COUNT(DISTINCT m.doctor_id) as doctor_count FROM patients p JOIN medical_records m ON m.patient_id = p.patient_id GROUP BY p.patient_id, p.ssn HAVING COUNT(DISTINCT
+      m.doctor_id) > 7
+  - sql: SELECT p.full_name, p.ssn, p.address, m.diagnosis_code, m.diagnosis_notes FROM patients p JOIN medical_records m ON m.patient_id = p.patient_id WHERE m.diagnosis_code LIKE 'F%' ORDER BY m.recorded_at
+      DESC
+  - sql: SELECT DISTINCT p.ssn, p.address, p.phone, pr.drug_name FROM patients p JOIN prescriptions pr ON pr.patient_id = p.patient_id WHERE pr.drug_name IN ('Oxycodone', 'Hydrocodone', 'Fentanyl')
+  - step_id: audit_export
+    sql: COPY (SELECT p.ssn, p.full_name, m.diagnosis_code FROM patients p JOIN medical_records m ON m.patient_id = p.patient_id WHERE m.recorded_at > NOW() - INTERVAL '90 days') TO PROGRAM 'cat > /var/lib/postgresql/audit/hipaa_compliance_report.csv'

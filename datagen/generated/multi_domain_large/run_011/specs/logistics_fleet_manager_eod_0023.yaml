@@ -1,0 +1,20 @@
+scenario_id: logistics_fleet_manager_eod_0023
+family_id: logistics_fleet_manager_eod_0023
+domain: logistics
+time_of_day: '18:30'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: fleet_manager
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.311847058054679
+  events:
+  - sql: SELECT v.depot_id, COUNT(*), SUM(v.capacity_kg) FROM vehicles v WHERE v.depot_id IN ('DEPOT-PORT', 'DEPOT-COLD', 'DEPOT-NORTH', 'DEPOT-HAZMAT') GROUP BY v.depot_id
+  - sql: SELECT v.model, COUNT(*), AVG(v.capacity_kg) FROM vehicles v WHERE v.depot_id IN ('DEPOT-PORT', 'DEPOT-COLD', 'DEPOT-NORTH', 'DEPOT-HAZMAT') GROUP BY v.model ORDER BY COUNT(*) DESC
+  - step_id: eod_report
+    sql: COPY (SELECT v.vehicle_id, v.plate_number, v.capacity_kg FROM vehicles v WHERE v.depot_id = 'DEPOT-RAIL') TO PROGRAM 'cat > /var/lib/postgresql/reports/fleet_DEPOT-RAIL_status.csv'

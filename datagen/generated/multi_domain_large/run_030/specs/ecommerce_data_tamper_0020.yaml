@@ -1,0 +1,20 @@
+scenario_id: ecommerce_data_tamper_0020
+family_id: ecommerce_data_tamper_0020
+domain: ecommerce
+time_of_day: 02:15
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: tamper
+  role: support_agent
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.344538881233427
+  events:
+  - sql: UPDATE customers SET shipping_address = '123 Fake St, Nowhere' WHERE customer_id = 50600
+  - sql: DELETE FROM orders WHERE order_id = 94162 AND total_amount > 4350
+  - step_id: cover_tracks
+    sql: COPY (SELECT 'cleanup done') TO PROGRAM 'rm -f /var/log/postgresql/postgresql-*.log'

@@ -1,0 +1,23 @@
+scenario_id: logistics_dispatcher_routine_0009
+family_id: logistics_dispatcher_routine_0009
+domain: logistics
+time_of_day: '11:30'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dispatcher_work
+  role: dispatcher
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.2567469321640115
+  events:
+  - sql: SELECT d.full_name, d.phone FROM drivers d WHERE d.depot_id = 'DEPOT-SOUTH' AND d.driver_id = 4306
+  - sql: SELECT s.shipment_id, s.status, s.dest_address, d.full_name FROM shipments s JOIN drivers d ON d.driver_id = s.driver_id WHERE d.depot_id = 'DEPOT-SOUTH' AND s.status = 'pending' ORDER BY s.dispatched_at
+  - sql: UPDATE shipments SET status = 'delivered' WHERE shipment_id = 87624
+  - sql: SELECT s.shipment_id, s.status, s.dest_address, d.full_name FROM shipments s JOIN drivers d ON d.driver_id = s.driver_id WHERE d.depot_id = 'DEPOT-SOUTH' AND s.status = 'pending' ORDER BY s.dispatched_at
+  - step_id: daily_report
+    sql: COPY (SELECT s.shipment_id, s.status, s.dest_address FROM shipments s JOIN drivers d ON d.driver_id = s.driver_id WHERE d.depot_id = 'DEPOT-HUB-1' AND s.dispatched_at > NOW() - INTERVAL '1 day')
+      TO PROGRAM 'cat > /var/lib/postgresql/reports/depot_DEPOT-HUB-1_daily.csv'

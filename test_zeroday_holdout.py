@@ -10,6 +10,7 @@ Uses expectation_manifest.json to identify families, ensuring both halves
 of matched pairs (benign + malicious) are held out together.
 """
 
+import sys
 import json
 import csv
 from pathlib import Path
@@ -120,5 +121,6 @@ def create_zeroday_splits(data_dir: Path, holdout_scenario="sabotage"):
 
 
 if __name__ == '__main__':
-    data_dir = Path("datagen/generated/banking_1000")
-    create_zeroday_splits(data_dir, holdout_scenario="exfil")
+    data_dir = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("datagen/generated/multi_domain_large")
+    scenario = sys.argv[2] if len(sys.argv) > 2 else "exfil"
+    create_zeroday_splits(data_dir, holdout_scenario=scenario)

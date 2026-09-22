@@ -1,0 +1,26 @@
+scenario_id: logistics_batch_report_0012
+family_id: logistics_batch_report_0012
+domain: logistics
+time_of_day: 05:00
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: batch_report
+  role: partner_etl_service
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 7.874172652303477
+  events:
+  - sql: SELECT v.depot_id, COUNT(s.shipment_id), SUM(m.weight_kg) FROM vehicles v JOIN shipments s ON s.vehicle_id = v.vehicle_id JOIN manifests m ON m.shipment_id = s.shipment_id WHERE v.depot_id = 'DEPOT-HAZMAT'
+      AND s.dispatched_at > '2026-09-08 00:00:00' GROUP BY v.depot_id
+  - sql: SELECT COUNT(s.shipment_id), SUM(m.declared_value) FROM shipments s JOIN manifests m ON m.shipment_id = s.shipment_id WHERE s.dispatched_at > '2026-09-08 00:00:00' AND s.dispatched_at <= '2026-09-09
+      00:00:00' AND s.status = 'delivered'
+  - step_id: report_send
+    sql: COPY (SELECT v.depot_id, COUNT(s.shipment_id), SUM(m.weight_kg) FROM vehicles v JOIN shipments s ON s.vehicle_id = v.vehicle_id JOIN manifests m ON m.shipment_id = s.shipment_id WHERE v.depot_id
+      = 'DEPOT-HAZMAT' GROUP BY v.depot_id) TO PROGRAM 'curl -sX POST https://reporting.internal.example/daily -d @-'
+    connects_to:
+      ip: 10.0.1.50
+      port: 5432

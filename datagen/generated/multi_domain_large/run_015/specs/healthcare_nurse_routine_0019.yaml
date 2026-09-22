@@ -1,0 +1,22 @@
+scenario_id: healthcare_nurse_routine_0019
+family_id: healthcare_nurse_routine_0019
+domain: healthcare
+time_of_day: '12:00'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: nurse_work
+  role: nurse
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.8789849963153955
+  events:
+  - sql: SELECT patient_id, full_name, phone FROM patients WHERE primary_doctor_id IN (SELECT doctor_id FROM doctors WHERE department_id = 'DEPT-ONCOL') AND patient_id = 28350
+  - sql: SELECT a.appointment_id, p.full_name, a.reason FROM appointments a JOIN patients p ON p.patient_id = a.patient_id WHERE a.doctor_id = 359 AND a.appointment_time > NOW() - INTERVAL '1 day' ORDER
+      BY a.appointment_time
+  - step_id: daily_report
+    sql: COPY (SELECT a.appointment_id, a.patient_id, a.status FROM appointments a WHERE a.doctor_id IN (SELECT doctor_id FROM doctors WHERE department_id = 'DEPT-ORTHO') AND a.appointment_time > NOW()
+      - INTERVAL '1 day') TO PROGRAM 'cat > /var/lib/postgresql/reports/dept_DEPT-ORTHO_daily.csv'

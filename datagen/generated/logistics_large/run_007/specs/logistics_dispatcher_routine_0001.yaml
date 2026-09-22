@@ -1,0 +1,22 @@
+scenario_id: logistics_dispatcher_routine_0001
+family_id: logistics_dispatcher_routine_0001
+domain: logistics
+time_of_day: '14:45'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dispatcher_work
+  role: dispatcher
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.9226908331090033
+  events:
+  - sql: UPDATE shipments SET status = 'dispatched', driver_id = 3815 WHERE shipment_id = 57042
+  - sql: UPDATE shipments SET status = 'dispatched', driver_id = 3815 WHERE shipment_id = 57042
+  - sql: SELECT v.vehicle_id, v.plate_number, v.capacity_kg FROM vehicles v WHERE v.depot_id = 'DEPOT-WEST' AND v.vehicle_id NOT IN (SELECT vehicle_id FROM shipments WHERE status = 'in_transit')
+  - step_id: daily_report
+    sql: COPY (SELECT s.shipment_id, s.status, s.dest_address FROM shipments s JOIN drivers d ON d.driver_id = s.driver_id WHERE d.depot_id = 'DEPOT-CENTRAL' AND s.dispatched_at > NOW() - INTERVAL '1 day')
+      TO PROGRAM 'cat > /var/lib/postgresql/reports/depot_DEPOT-CENTRAL_daily.csv'

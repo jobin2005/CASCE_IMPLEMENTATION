@@ -1,0 +1,25 @@
+scenario_id: ecommerce_batch_report_0011
+family_id: ecommerce_batch_report_0011
+domain: ecommerce
+time_of_day: 00:30
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: batch_report
+  role: analytics_etl_service
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.2539316279763004
+  events:
+  - sql: SELECT p.category, COUNT(oi.order_item_id), SUM(oi.quantity) FROM products p JOIN order_items oi ON oi.product_id = p.product_id JOIN orders o ON o.order_id = oi.order_id WHERE o.order_time > '2026-02-25
+      00:00:00' AND o.order_time <= '2026-02-26 00:00:00' GROUP BY p.category
+  - sql: SELECT COUNT(o.order_id), SUM(o.total_amount) FROM orders o WHERE o.order_time > '2026-02-25 00:00:00' AND o.order_time <= '2026-02-26 00:00:00' AND o.status = 'completed'
+  - step_id: report_send
+    sql: COPY (SELECT p.category, COUNT(*), SUM(oi.quantity * oi.unit_price) FROM products p JOIN order_items oi ON oi.product_id = p.product_id GROUP BY p.category) TO PROGRAM 'curl -sX POST https://reporting.internal.example/daily
+      -d @-'
+    connects_to:
+      ip: 10.0.1.50
+      port: 5432

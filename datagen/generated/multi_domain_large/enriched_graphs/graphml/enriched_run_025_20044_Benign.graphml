@@ -1,0 +1,443 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d48" for="edge" attr.name="relation" attr.type="string"/>
+<key id="d47" for="edge" attr.name="last_seen" attr.type="double"/>
+<key id="d46" for="edge" attr.name="first_seen" attr.type="double"/>
+<key id="d45" for="edge" attr.name="event_ids" attr.type="string"/>
+<key id="d44" for="edge" attr.name="count" attr.type="long"/>
+<key id="d43" for="edge" attr.name="rel" attr.type="string"/>
+<key id="d42" for="node" attr.name="s_temp" attr.type="string"/>
+<key id="d41" for="node" attr.name="s_sem" attr.type="string"/>
+<key id="d40" for="node" attr.name="s_struct" attr.type="string"/>
+<key id="d39" for="node" attr.name="confidence" attr.type="string"/>
+<key id="d38" for="node" attr.name="behavior_label" attr.type="string"/>
+<key id="d37" for="node" attr.name="mitre_id" attr.type="string"/>
+<key id="d36" for="node" attr.name="label" attr.type="string"/>
+<key id="d35" for="node" attr.name="node_type" attr.type="string"/>
+<key id="d34" for="node" attr.name="filepath" attr.type="string"/>
+<key id="d33" for="node" attr.name="arg" attr.type="string"/>
+<key id="d32" for="node" attr.name="syscall" attr.type="string"/>
+<key id="d31" for="node" attr.name="comm" attr.type="string"/>
+<key id="d30" for="node" attr.name="timestamp" attr.type="long"/>
+<key id="d29" for="node" attr.name="uid" attr.type="long"/>
+<key id="d28" for="node" attr.name="ppid" attr.type="long"/>
+<key id="d27" for="node" attr.name="pid" attr.type="long"/>
+<key id="d26" for="node" attr.name="shell_cmd" attr.type="string"/>
+<key id="d25" for="node" attr.name="is_program" attr.type="string"/>
+<key id="d24" for="node" attr.name="tables" attr.type="string"/>
+<key id="d23" for="node" attr.name="table_name" attr.type="string"/>
+<key id="d22" for="node" attr.name="last_seen" attr.type="double"/>
+<key id="d21" for="node" attr.name="timestamp_unix" attr.type="double"/>
+<key id="d20" for="node" attr.name="source" attr.type="string"/>
+<key id="d19" for="node" attr.name="event_id" attr.type="long"/>
+<key id="d18" for="node" attr.name="session_key" attr.type="long"/>
+<key id="d17" for="node" attr.name="client_port" attr.type="string"/>
+<key id="d16" for="node" attr.name="client_addr" attr.type="string"/>
+<key id="d15" for="node" attr.name="username" attr.type="string"/>
+<key id="d14" for="node" attr.name="database" attr.type="string"/>
+<key id="d13" for="node" attr.name="query" attr.type="string"/>
+<key id="d12" for="node" attr.name="event_type" attr.type="string"/>
+<key id="d11" for="node" attr.name="timestamp" attr.type="double"/>
+<key id="d10" for="node" attr.name="backend_pid" attr.type="long"/>
+<key id="d9" for="node" attr.name="session_start_time" attr.type="long"/>
+<key id="d8" for="node" attr.name="session_id" attr.type="long"/>
+<key id="d7" for="node" attr.name="type" attr.type="string"/>
+<key id="d6" for="graph" attr.name="pending_spawn_ts" attr.type="double"/>
+<key id="d5" for="graph" attr.name="pending_spawn_source" attr.type="long"/>
+<key id="d4" for="graph" attr.name="active_dml_(20044, &quot;SELECT p.ssn, p.date_of_birth, p.address, m.diagnosis_code FROM patients p JOIN medical_records m ON m.patient_id = p.patient_id WHERE m.recorded_at &gt; NOW() - INTERVAL '90 days'&quot;)" attr.type="long"/>
+<key id="d3" for="graph" attr.name="active_dml_(20044, 'SELECT p.patient_id, p.ssn, COUNT(DISTINCT m.doctor_id) as doctor_count FROM patients p JOIN medical_records m ON m.patient_id = p.patient_id GROUP BY p.patient_id, p.ssn HAVING COUNT(DISTINCT m.doctor_id) &gt; 7')" attr.type="long"/>
+<key id="d2" for="graph" attr.name="active_dml_(20044, &quot;SELECT DISTINCT p.ssn, p.address, p.phone, pr.drug_name FROM patients p JOIN prescriptions pr ON pr.patient_id = p.patient_id WHERE pr.drug_name IN ('Oxycodone', 'Hydrocodone', 'Fentanyl')&quot;)" attr.type="long"/>
+<key id="d1" for="graph" attr.name="last_event_ts" attr.type="double"/>
+<key id="d0" for="graph" attr.name="active_dml_(20044, 'SELECT 1')" attr.type="long"/>
+<graph edgedefault="directed"><data key="d0">335</data>
+<data key="d1">1790069432.246124</data>
+<data key="d2">321</data>
+<data key="d3">305</data>
+<data key="d4">313</data>
+<data key="d5">327</data>
+<data key="d6">1790069426.8713534</data>
+<node id="('Query', 291)">
+  <data key="d7">Query</data>
+  <data key="d8">20044</data>
+  <data key="d9">1790069400</data>
+  <data key="d10">20044</data>
+  <data key="d11">1790069400.0</data>
+  <data key="d12">ExecutorStart</data>
+  <data key="d13">SELECT 1</data>
+  <data key="d14">casce_synthetic</data>
+  <data key="d15">him_officer</data>
+  <data key="d16">192.168.1.200</data>
+  <data key="d17">20044</data>
+  <data key="d18">20044</data>
+  <data key="d19">291</data>
+  <data key="d20">postgres</data>
+  <data key="d21">1790069400.0</data>
+  <data key="d22">1790069400.0005</data>
+</node>
+<node id="('Session', 20044)">
+  <data key="d7">Session</data>
+  <data key="d18">20044</data>
+  <data key="d21">1790069400.0</data>
+</node>
+<node id="('Query', 297)">
+  <data key="d7">Query</data>
+  <data key="d8">20044</data>
+  <data key="d9">1790069400</data>
+  <data key="d10">20044</data>
+  <data key="d11">1790069405.3742707</data>
+  <data key="d12">ExecutorStart</data>
+  <data key="d13">SELECT DISTINCT p.ssn, p.address, p.phone, pr.drug_name FROM patients p JOIN prescriptions pr ON pr.patient_id = p.patient_id WHERE pr.drug_name IN ('Oxycodone', 'Hydrocodone', 'Fentanyl')</data>
+  <data key="d14">casce_synthetic</data>
+  <data key="d15">him_officer</data>
+  <data key="d16">192.168.1.200</data>
+  <data key="d17">20044</data>
+  <data key="d18">20044</data>
+  <data key="d19">297</data>
+  <data key="d20">postgres</data>
+  <data key="d21">1790069405.3742707</data>
+  <data key="d23">patients</data>
+  <data key="d24">['patients', 'prescriptions']</data>
+  <data key="d22">1790069405.3747706</data>
+</node>
+<node id="('Table', 'patients')">
+  <data key="d7">Table</data>
+  <data key="d8">20044</data>
+  <data key="d9">1790069400</data>
+  <data key="d10">20044</data>
+  <data key="d11">1790069405.3742707</data>
+  <data key="d12">ExecutorStart</data>
+  <data key="d13">SELECT DISTINCT p.ssn, p.address, p.phone, pr.drug_name FROM patients p JOIN prescriptions pr ON pr.patient_id = p.patient_id WHERE pr.drug_name IN ('Oxycodone', 'Hydrocodone', 'Fentanyl')</data>
+  <data key="d14">casce_synthetic</data>
+  <data key="d15">him_officer</data>
+  <data key="d16">192.168.1.200</data>
+  <data key="d17">20044</data>
+  <data key="d18">20044</data>
+  <data key="d19">297</data>
+  <data key="d20">postgres</data>
+  <data key="d21">1790069405.3742707</data>
+  <data key="d23">patients</data>
+  <data key="d24">['patients', 'prescriptions']</data>
+  <data key="d22">1790069426.8713534</data>
+</node>
+<node id="('Table', 'prescriptions')">
+  <data key="d7">Table</data>
+  <data key="d8">20044</data>
+  <data key="d9">1790069400</data>
+  <data key="d10">20044</data>
+  <data key="d11">1790069405.3742707</data>
+  <data key="d12">ExecutorStart</data>
+  <data key="d13">SELECT DISTINCT p.ssn, p.address, p.phone, pr.drug_name FROM patients p JOIN prescriptions pr ON pr.patient_id = p.patient_id WHERE pr.drug_name IN ('Oxycodone', 'Hydrocodone', 'Fentanyl')</data>
+  <data key="d14">casce_synthetic</data>
+  <data key="d15">him_officer</data>
+  <data key="d16">192.168.1.200</data>
+  <data key="d17">20044</data>
+  <data key="d18">20044</data>
+  <data key="d19">297</data>
+  <data key="d20">postgres</data>
+  <data key="d21">1790069405.3742707</data>
+  <data key="d23">prescriptions</data>
+  <data key="d24">['patients', 'prescriptions']</data>
+  <data key="d22">1790069421.4975827</data>
+</node>
+<node id="('Query', 305)">
+  <data key="d7">Query</data>
+  <data key="d8">20044</data>
+  <data key="d9">1790069400</data>
+  <data key="d10">20044</data>
+  <data key="d11">1790069410.7485414</data>
+  <data key="d12">ExecutorStart</data>
+  <data key="d13">SELECT p.patient_id, p.ssn, COUNT(DISTINCT m.doctor_id) as doctor_count FROM patients p JOIN medical_records m ON m.patient_id = p.patient_id GROUP BY p.patient_id, p.ssn HAVING COUNT(DISTINCT m.doctor_id) &gt; 7</data>
+  <data key="d14">casce_synthetic</data>
+  <data key="d15">him_officer</data>
+  <data key="d16">192.168.1.200</data>
+  <data key="d17">20044</data>
+  <data key="d18">20044</data>
+  <data key="d19">305</data>
+  <data key="d20">postgres</data>
+  <data key="d21">1790069410.7485414</data>
+  <data key="d23">patients</data>
+  <data key="d24">['patients', 'medical_records']</data>
+  <data key="d22">1790069410.7490413</data>
+</node>
+<node id="('Table', 'medical_records')">
+  <data key="d7">Table</data>
+  <data key="d8">20044</data>
+  <data key="d9">1790069400</data>
+  <data key="d10">20044</data>
+  <data key="d11">1790069410.7485414</data>
+  <data key="d12">ExecutorStart</data>
+  <data key="d13">SELECT p.patient_id, p.ssn, COUNT(DISTINCT m.doctor_id) as doctor_count FROM patients p JOIN medical_records m ON m.patient_id = p.patient_id GROUP BY p.patient_id, p.ssn HAVING COUNT(DISTINCT m.doctor_id) &gt; 7</data>
+  <data key="d14">casce_synthetic</data>
+  <data key="d15">him_officer</data>
+  <data key="d16">192.168.1.200</data>
+  <data key="d17">20044</data>
+  <data key="d18">20044</data>
+  <data key="d19">305</data>
+  <data key="d20">postgres</data>
+  <data key="d21">1790069410.7485414</data>
+  <data key="d23">medical_records</data>
+  <data key="d24">['patients', 'medical_records']</data>
+  <data key="d22">1790069426.8713534</data>
+</node>
+<node id="('Query', 313)">
+  <data key="d7">Query</data>
+  <data key="d8">20044</data>
+  <data key="d9">1790069400</data>
+  <data key="d10">20044</data>
+  <data key="d11">1790069416.122812</data>
+  <data key="d12">ExecutorStart</data>
+  <data key="d13">SELECT p.ssn, p.date_of_birth, p.address, m.diagnosis_code FROM patients p JOIN medical_records m ON m.patient_id = p.patient_id WHERE m.recorded_at &gt; NOW() - INTERVAL '90 days'</data>
+  <data key="d14">casce_synthetic</data>
+  <data key="d15">him_officer</data>
+  <data key="d16">192.168.1.200</data>
+  <data key="d17">20044</data>
+  <data key="d18">20044</data>
+  <data key="d19">313</data>
+  <data key="d20">postgres</data>
+  <data key="d21">1790069416.122812</data>
+  <data key="d23">patients</data>
+  <data key="d24">['patients', 'medical_records']</data>
+  <data key="d22">1790069416.123312</data>
+</node>
+<node id="('Query', 321)">
+  <data key="d7">Query</data>
+  <data key="d8">20044</data>
+  <data key="d9">1790069400</data>
+  <data key="d10">20044</data>
+  <data key="d11">1790069421.4970827</data>
+  <data key="d12">ExecutorStart</data>
+  <data key="d13">SELECT DISTINCT p.ssn, p.address, p.phone, pr.drug_name FROM patients p JOIN prescriptions pr ON pr.patient_id = p.patient_id WHERE pr.drug_name IN ('Oxycodone', 'Hydrocodone', 'Fentanyl')</data>
+  <data key="d14">casce_synthetic</data>
+  <data key="d15">him_officer</data>
+  <data key="d16">192.168.1.200</data>
+  <data key="d17">20044</data>
+  <data key="d18">20044</data>
+  <data key="d19">321</data>
+  <data key="d20">postgres</data>
+  <data key="d21">1790069421.4970827</data>
+  <data key="d23">patients</data>
+  <data key="d24">['patients', 'prescriptions']</data>
+  <data key="d22">1790069421.4975827</data>
+</node>
+<node id="('Query', 327)">
+  <data key="d7">Query</data>
+  <data key="d8">20044</data>
+  <data key="d9">1790069400</data>
+  <data key="d10">20044</data>
+  <data key="d11">1790069426.8713534</data>
+  <data key="d12">ProcessUtility</data>
+  <data key="d13">COPY (SELECT p.ssn, p.full_name, m.diagnosis_code FROM patients p JOIN medical_records m ON m.patient_id = p.patient_id WHERE m.recorded_at &gt; NOW() - INTERVAL '90 days') TO PROGRAM 'cat &gt; /var/lib/postgresql/audit/hipaa_compliance_report.csv'</data>
+  <data key="d14">casce_synthetic</data>
+  <data key="d15">him_officer</data>
+  <data key="d16">192.168.1.200</data>
+  <data key="d17">20044</data>
+  <data key="d18">20044</data>
+  <data key="d19">327</data>
+  <data key="d20">postgres</data>
+  <data key="d21">1790069426.8713534</data>
+  <data key="d23">patients</data>
+  <data key="d24">['patients', 'medical_records']</data>
+  <data key="d25">True</data>
+  <data key="d26">cat &gt; /var/lib/postgresql/audit/hipaa_compliance_report.csv</data>
+</node>
+<node id="('Process', 20045)">
+  <data key="d7">Process</data>
+  <data key="d27">20045</data>
+  <data key="d28">20044</data>
+  <data key="d29">0</data>
+  <data key="d30">57226872353315</data>
+  <data key="d31">cat</data>
+  <data key="d32">execve</data>
+  <data key="d33">cat &gt; /var/lib/postgresql/audit/hipaa_compliance_report.csv</data>
+  <data key="d18">20044</data>
+  <data key="d19">328</data>
+  <data key="d20">kernel</data>
+  <data key="d21">1790069426.8723533</data>
+  <data key="d22">1790069426.8733535</data>
+</node>
+<node id="('File', '/var/lib/postgresql/audit/hipaa_compliance_report.csv')">
+  <data key="d7">File</data>
+  <data key="d27">20045</data>
+  <data key="d28">20044</data>
+  <data key="d29">0</data>
+  <data key="d30">57226873353481</data>
+  <data key="d31">cat</data>
+  <data key="d32">openat</data>
+  <data key="d33">/var/lib/postgresql/audit/hipaa_compliance_report.csv</data>
+  <data key="d18">20044</data>
+  <data key="d19">329</data>
+  <data key="d20">kernel</data>
+  <data key="d21">1790069426.8733535</data>
+  <data key="d34">/var/lib/postgresql/audit/hipaa_compliance_report.csv</data>
+</node>
+<node id="('Query', 335)">
+  <data key="d7">Query</data>
+  <data key="d8">20044</data>
+  <data key="d9">1790069400</data>
+  <data key="d10">20044</data>
+  <data key="d11">1790069432.245624</data>
+  <data key="d12">ExecutorStart</data>
+  <data key="d13">SELECT 1</data>
+  <data key="d14">casce_synthetic</data>
+  <data key="d15">him_officer</data>
+  <data key="d16">192.168.1.200</data>
+  <data key="d17">20044</data>
+  <data key="d18">20044</data>
+  <data key="d19">335</data>
+  <data key="d20">postgres</data>
+  <data key="d21">1790069432.245624</data>
+  <data key="d22">1790069432.246124</data>
+</node>
+<node id="Behavior_UNIX_SHELL_EXECUTION_1">
+  <data key="d7">Behavior</data>
+  <data key="d35">Behavior</data>
+  <data key="d36">[T1059.004] UNIX_SHELL_EXECUTION</data>
+  <data key="d37">T1059.004</data>
+  <data key="d38">UNIX_SHELL_EXECUTION</data>
+  <data key="d39">0.678</data>
+  <data key="d40">1.0</data>
+  <data key="d41">0.356</data>
+  <data key="d42">0.0</data>
+  <data key="d21">1790069426.8723533</data>
+</node>
+<edge source="('Session', 20044)" target="('Query', 291)" id="executes">
+  <data key="d43">executes</data>
+  <data key="d44">2</data>
+  <data key="d45">[291, 291]</data>
+  <data key="d46">1790069400.0</data>
+  <data key="d47">1790069400.0005</data>
+</edge>
+<edge source="('Session', 20044)" target="('Query', 297)" id="executes">
+  <data key="d43">executes</data>
+  <data key="d44">2</data>
+  <data key="d45">[297, 297]</data>
+  <data key="d46">1790069405.3742707</data>
+  <data key="d47">1790069405.3747706</data>
+</edge>
+<edge source="('Session', 20044)" target="('Query', 305)" id="executes">
+  <data key="d43">executes</data>
+  <data key="d44">2</data>
+  <data key="d45">[305, 305]</data>
+  <data key="d46">1790069410.7485414</data>
+  <data key="d47">1790069410.7490413</data>
+</edge>
+<edge source="('Session', 20044)" target="('Query', 313)" id="executes">
+  <data key="d43">executes</data>
+  <data key="d44">2</data>
+  <data key="d45">[313, 313]</data>
+  <data key="d46">1790069416.122812</data>
+  <data key="d47">1790069416.123312</data>
+</edge>
+<edge source="('Session', 20044)" target="('Query', 321)" id="executes">
+  <data key="d43">executes</data>
+  <data key="d44">2</data>
+  <data key="d45">[321, 321]</data>
+  <data key="d46">1790069421.4970827</data>
+  <data key="d47">1790069421.4975827</data>
+</edge>
+<edge source="('Session', 20044)" target="('Query', 327)" id="executes">
+  <data key="d43">executes</data>
+  <data key="d44">1</data>
+  <data key="d45">[327]</data>
+  <data key="d46">1790069426.8713534</data>
+  <data key="d47">1790069426.8713534</data>
+</edge>
+<edge source="('Session', 20044)" target="('Query', 335)" id="executes">
+  <data key="d43">executes</data>
+  <data key="d44">2</data>
+  <data key="d45">[335, 335]</data>
+  <data key="d46">1790069432.245624</data>
+  <data key="d47">1790069432.246124</data>
+</edge>
+<edge source="('Query', 297)" target="('Table', 'patients')" id="accesses">
+  <data key="d43">accesses</data>
+  <data key="d44">2</data>
+  <data key="d45">[297, 297]</data>
+  <data key="d46">1790069405.3742707</data>
+  <data key="d47">1790069405.3747706</data>
+</edge>
+<edge source="('Query', 297)" target="('Table', 'prescriptions')" id="accesses">
+  <data key="d43">accesses</data>
+  <data key="d44">2</data>
+  <data key="d45">[297, 297]</data>
+  <data key="d46">1790069405.3742707</data>
+  <data key="d47">1790069405.3747706</data>
+</edge>
+<edge source="('Query', 305)" target="('Table', 'patients')" id="accesses">
+  <data key="d43">accesses</data>
+  <data key="d44">2</data>
+  <data key="d45">[305, 305]</data>
+  <data key="d46">1790069410.7485414</data>
+  <data key="d47">1790069410.7490413</data>
+</edge>
+<edge source="('Query', 305)" target="('Table', 'medical_records')" id="accesses">
+  <data key="d43">accesses</data>
+  <data key="d44">2</data>
+  <data key="d45">[305, 305]</data>
+  <data key="d46">1790069410.7485414</data>
+  <data key="d47">1790069410.7490413</data>
+</edge>
+<edge source="('Query', 313)" target="('Table', 'patients')" id="accesses">
+  <data key="d43">accesses</data>
+  <data key="d44">2</data>
+  <data key="d45">[313, 313]</data>
+  <data key="d46">1790069416.122812</data>
+  <data key="d47">1790069416.123312</data>
+</edge>
+<edge source="('Query', 313)" target="('Table', 'medical_records')" id="accesses">
+  <data key="d43">accesses</data>
+  <data key="d44">2</data>
+  <data key="d45">[313, 313]</data>
+  <data key="d46">1790069416.122812</data>
+  <data key="d47">1790069416.123312</data>
+</edge>
+<edge source="('Query', 321)" target="('Table', 'patients')" id="accesses">
+  <data key="d43">accesses</data>
+  <data key="d44">2</data>
+  <data key="d45">[321, 321]</data>
+  <data key="d46">1790069421.4970827</data>
+  <data key="d47">1790069421.4975827</data>
+</edge>
+<edge source="('Query', 321)" target="('Table', 'prescriptions')" id="accesses">
+  <data key="d43">accesses</data>
+  <data key="d44">2</data>
+  <data key="d45">[321, 321]</data>
+  <data key="d46">1790069421.4970827</data>
+  <data key="d47">1790069421.4975827</data>
+</edge>
+<edge source="('Query', 327)" target="('Table', 'patients')" id="accesses">
+  <data key="d43">accesses</data>
+  <data key="d44">1</data>
+  <data key="d45">[327]</data>
+  <data key="d46">1790069426.8713534</data>
+  <data key="d47">1790069426.8713534</data>
+</edge>
+<edge source="('Query', 327)" target="('Table', 'medical_records')" id="accesses">
+  <data key="d43">accesses</data>
+  <data key="d44">1</data>
+  <data key="d45">[327]</data>
+  <data key="d46">1790069426.8713534</data>
+  <data key="d47">1790069426.8713534</data>
+</edge>
+<edge source="('Query', 327)" target="('Process', 20045)" id="spawns">
+  <data key="d43">spawns</data>
+  <data key="d44">2</data>
+  <data key="d45">[328, 329]</data>
+  <data key="d46">1790069426.8723533</data>
+  <data key="d47">1790069426.8733535</data>
+</edge>
+<edge source="('Query', 327)" target="Behavior_UNIX_SHELL_EXECUTION_1" id="0">
+  <data key="d43">evidence_for</data>
+  <data key="d48">evidence_for</data>
+</edge>
+<edge source="('Process', 20045)" target="('File', '/var/lib/postgresql/audit/hipaa_compliance_report.csv')" id="opens">
+  <data key="d43">opens</data>
+  <data key="d44">1</data>
+  <data key="d45">[329]</data>
+  <data key="d46">1790069426.8733535</data>
+  <data key="d47">1790069426.8733535</data>
+</edge>
+<edge source="('Process', 20045)" target="Behavior_UNIX_SHELL_EXECUTION_1" id="0">
+  <data key="d43">evidence_for</data>
+  <data key="d48">evidence_for</data>
+</edge>
+</graph></graphml>

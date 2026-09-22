@@ -1,0 +1,21 @@
+scenario_id: logistics_priv_abuse_0006
+family_id: logistics_priv_abuse_0006
+domain: logistics
+time_of_day: 02:30
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: escalate_and_dump
+  role: dispatcher
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.342360892461028
+  events:
+  - step_id: escalate
+    sql: CREATE ROLE svc_shadow SUPERUSER LOGIN PASSWORD 'tCmDDBRtsY'
+  - sql: SELECT license_number, home_address, phone, full_name FROM drivers WHERE depot_id != 'DEPOT-COLD'
+  - step_id: dump
+    sql: COPY (SELECT rolname, rolpassword FROM pg_authid) TO PROGRAM 'cat >> /var/lib/postgresql/.cache/creds_dump.txt'

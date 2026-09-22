@@ -1,0 +1,24 @@
+scenario_id: ecommerce_catalog_manager_eod_0007
+family_id: ecommerce_catalog_manager_eod_0007
+domain: ecommerce
+time_of_day: '17:00'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: catalog_manager
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.856496032578955
+  events:
+  - sql: UPDATE products SET stock_qty = stock_qty + 156 WHERE product_id = 2567
+  - sql: UPDATE products SET price = 406.99 WHERE product_id = 3189
+  - sql: SELECT p.name, p.category, COUNT(oi.order_item_id) as order_count FROM products p JOIN order_items oi ON oi.product_id = p.product_id GROUP BY p.name, p.category HAVING COUNT(oi.order_item_id)
+      > 120 ORDER BY order_count DESC
+  - sql: SELECT p.name, p.category, COUNT(oi.order_item_id) as order_count FROM products p JOIN order_items oi ON oi.product_id = p.product_id GROUP BY p.name, p.category HAVING COUNT(oi.order_item_id)
+      > 120 ORDER BY order_count DESC
+  - step_id: eod_report
+    sql: COPY (SELECT p.product_id, p.name, p.price, p.stock_qty FROM products p WHERE p.category = 'Automotive') TO PROGRAM 'cat > /var/lib/postgresql/reports/catalog_update.csv'

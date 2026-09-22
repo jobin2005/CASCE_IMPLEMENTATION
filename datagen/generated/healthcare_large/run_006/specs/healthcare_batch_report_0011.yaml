@@ -1,0 +1,26 @@
+scenario_id: healthcare_batch_report_0011
+family_id: healthcare_batch_report_0011
+domain: healthcare
+time_of_day: 06:00
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: batch_report
+  role: research_etl_service
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 7.359103295316008
+  events:
+  - sql: SELECT d.department_id, d.specialty, COUNT(a.appointment_id) FROM doctors d JOIN appointments a ON a.doctor_id = d.doctor_id WHERE d.department_id = 'DEPT-PEDS' AND a.appointment_time > '2026-11-09
+      00:00:00' GROUP BY d.department_id, d.specialty
+  - sql: SELECT COUNT(m.record_id), COUNT(DISTINCT m.patient_id) FROM medical_records m JOIN doctors d ON d.doctor_id = m.doctor_id WHERE d.department_id = 'DEPT-PEDS' AND m.recorded_at > '2026-11-09 00:00:00'
+      AND m.recorded_at <= '2026-11-10 00:00:00'
+  - step_id: report_send
+    sql: COPY (SELECT d.department_id, COUNT(a.appointment_id) FROM doctors d JOIN appointments a ON a.doctor_id = d.doctor_id WHERE d.department_id = 'DEPT-PEDS' GROUP BY d.department_id) TO PROGRAM 'curl
+      -sX POST https://reporting.internal.example/daily -d @-'
+    connects_to:
+      ip: 172.16.1.10
+      port: 443

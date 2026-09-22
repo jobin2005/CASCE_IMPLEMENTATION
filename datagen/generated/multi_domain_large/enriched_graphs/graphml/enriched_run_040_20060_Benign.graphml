@@ -1,0 +1,476 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d48" for="edge" attr.name="relation" attr.type="string"/>
+<key id="d47" for="edge" attr.name="last_seen" attr.type="double"/>
+<key id="d46" for="edge" attr.name="first_seen" attr.type="double"/>
+<key id="d45" for="edge" attr.name="event_ids" attr.type="string"/>
+<key id="d44" for="edge" attr.name="count" attr.type="long"/>
+<key id="d43" for="edge" attr.name="rel" attr.type="string"/>
+<key id="d42" for="node" attr.name="s_temp" attr.type="string"/>
+<key id="d41" for="node" attr.name="s_sem" attr.type="string"/>
+<key id="d40" for="node" attr.name="s_struct" attr.type="string"/>
+<key id="d39" for="node" attr.name="confidence" attr.type="string"/>
+<key id="d38" for="node" attr.name="behavior_label" attr.type="string"/>
+<key id="d37" for="node" attr.name="mitre_id" attr.type="string"/>
+<key id="d36" for="node" attr.name="label" attr.type="string"/>
+<key id="d35" for="node" attr.name="node_type" attr.type="string"/>
+<key id="d34" for="node" attr.name="filepath" attr.type="string"/>
+<key id="d33" for="node" attr.name="arg" attr.type="string"/>
+<key id="d32" for="node" attr.name="syscall" attr.type="string"/>
+<key id="d31" for="node" attr.name="comm" attr.type="string"/>
+<key id="d30" for="node" attr.name="timestamp" attr.type="long"/>
+<key id="d29" for="node" attr.name="uid" attr.type="long"/>
+<key id="d28" for="node" attr.name="ppid" attr.type="long"/>
+<key id="d27" for="node" attr.name="pid" attr.type="long"/>
+<key id="d26" for="node" attr.name="shell_cmd" attr.type="string"/>
+<key id="d25" for="node" attr.name="is_program" attr.type="string"/>
+<key id="d24" for="node" attr.name="tables" attr.type="string"/>
+<key id="d23" for="node" attr.name="table_name" attr.type="string"/>
+<key id="d22" for="node" attr.name="last_seen" attr.type="double"/>
+<key id="d21" for="node" attr.name="timestamp_unix" attr.type="double"/>
+<key id="d20" for="node" attr.name="source" attr.type="string"/>
+<key id="d19" for="node" attr.name="event_id" attr.type="long"/>
+<key id="d18" for="node" attr.name="session_key" attr.type="long"/>
+<key id="d17" for="node" attr.name="client_port" attr.type="string"/>
+<key id="d16" for="node" attr.name="client_addr" attr.type="string"/>
+<key id="d15" for="node" attr.name="username" attr.type="string"/>
+<key id="d14" for="node" attr.name="database" attr.type="string"/>
+<key id="d13" for="node" attr.name="query" attr.type="string"/>
+<key id="d12" for="node" attr.name="event_type" attr.type="string"/>
+<key id="d11" for="node" attr.name="timestamp" attr.type="double"/>
+<key id="d10" for="node" attr.name="backend_pid" attr.type="long"/>
+<key id="d9" for="node" attr.name="session_start_time" attr.type="long"/>
+<key id="d8" for="node" attr.name="session_id" attr.type="long"/>
+<key id="d7" for="node" attr.name="type" attr.type="string"/>
+<key id="d6" for="graph" attr.name="pending_spawn_ts" attr.type="double"/>
+<key id="d5" for="graph" attr.name="pending_spawn_source" attr.type="long"/>
+<key id="d4" for="graph" attr.name="active_dml_(20060, &quot;SELECT s.shipment_id, s.dispatched_at, v.plate_number FROM shipments s JOIN vehicles v ON v.vehicle_id = s.vehicle_id WHERE s.driver_id = 2298 AND s.status = 'in_transit'&quot;)" attr.type="long"/>
+<key id="d3" for="graph" attr.name="active_dml_(20060, &quot;UPDATE shipments SET status = 'delivered' WHERE shipment_id = 78902&quot;)" attr.type="long"/>
+<key id="d2" for="graph" attr.name="active_dml_(20060, &quot;SELECT d.driver_id, d.full_name, COUNT(s.shipment_id) as active_shipments FROM drivers d LEFT JOIN shipments s ON s.driver_id = d.driver_id AND s.status = 'in_transit' WHERE d.depot_id = 'DEPOT-COLD' GROUP BY d.driver_id, d.full_name&quot;)" attr.type="long"/>
+<key id="d1" for="graph" attr.name="last_event_ts" attr.type="double"/>
+<key id="d0" for="graph" attr.name="active_dml_(20060, 'SELECT 1')" attr.type="long"/>
+<graph edgedefault="directed"><data key="d0">242</data>
+<data key="d1">1790066718.4773698</data>
+<data key="d2">237</data>
+<data key="d3">231</data>
+<data key="d4">235</data>
+<data key="d5">239</data>
+<data key="d6">1790066715.837317</data>
+<node id="('Query', 227)">
+  <data key="d7">Query</data>
+  <data key="d8">20060</data>
+  <data key="d9">1790066700</data>
+  <data key="d10">20060</data>
+  <data key="d11">1790066700.0</data>
+  <data key="d12">ExecutorStart</data>
+  <data key="d13">SELECT 1</data>
+  <data key="d14">casce_synthetic</data>
+  <data key="d15">dispatcher</data>
+  <data key="d16">192.168.1.200</data>
+  <data key="d17">20060</data>
+  <data key="d18">20060</data>
+  <data key="d19">227</data>
+  <data key="d20">postgres</data>
+  <data key="d21">1790066700.0</data>
+  <data key="d22">1790066700.0005</data>
+</node>
+<node id="('Session', 20060)">
+  <data key="d7">Session</data>
+  <data key="d18">20060</data>
+  <data key="d21">1790066700.0</data>
+</node>
+<node id="('Query', 229)">
+  <data key="d7">Query</data>
+  <data key="d8">20060</data>
+  <data key="d9">1790066700</data>
+  <data key="d10">20060</data>
+  <data key="d11">1790066702.6395528</data>
+  <data key="d12">ExecutorStart</data>
+  <data key="d13">SELECT d.driver_id, d.full_name, COUNT(s.shipment_id) as active_shipments FROM drivers d LEFT JOIN shipments s ON s.driver_id = d.driver_id AND s.status = 'in_transit' WHERE d.depot_id = 'DEPOT-COLD' GROUP BY d.driver_id, d.full_name</data>
+  <data key="d14">casce_synthetic</data>
+  <data key="d15">dispatcher</data>
+  <data key="d16">192.168.1.200</data>
+  <data key="d17">20060</data>
+  <data key="d18">20060</data>
+  <data key="d19">229</data>
+  <data key="d20">postgres</data>
+  <data key="d21">1790066702.6395528</data>
+  <data key="d23">drivers</data>
+  <data key="d24">['drivers', 'shipments']</data>
+  <data key="d22">1790066702.6400528</data>
+</node>
+<node id="('Table', 'drivers')">
+  <data key="d7">Table</data>
+  <data key="d8">20060</data>
+  <data key="d9">1790066700</data>
+  <data key="d10">20060</data>
+  <data key="d11">1790066702.6395528</data>
+  <data key="d12">ExecutorStart</data>
+  <data key="d13">SELECT d.driver_id, d.full_name, COUNT(s.shipment_id) as active_shipments FROM drivers d LEFT JOIN shipments s ON s.driver_id = d.driver_id AND s.status = 'in_transit' WHERE d.depot_id = 'DEPOT-COLD' GROUP BY d.driver_id, d.full_name</data>
+  <data key="d14">casce_synthetic</data>
+  <data key="d15">dispatcher</data>
+  <data key="d16">192.168.1.200</data>
+  <data key="d17">20060</data>
+  <data key="d18">20060</data>
+  <data key="d19">229</data>
+  <data key="d20">postgres</data>
+  <data key="d21">1790066702.6395528</data>
+  <data key="d23">drivers</data>
+  <data key="d24">['drivers', 'shipments']</data>
+  <data key="d22">1790066715.837317</data>
+</node>
+<node id="('Table', 'shipments')">
+  <data key="d7">Table</data>
+  <data key="d8">20060</data>
+  <data key="d9">1790066700</data>
+  <data key="d10">20060</data>
+  <data key="d11">1790066702.6395528</data>
+  <data key="d12">ExecutorStart</data>
+  <data key="d13">SELECT d.driver_id, d.full_name, COUNT(s.shipment_id) as active_shipments FROM drivers d LEFT JOIN shipments s ON s.driver_id = d.driver_id AND s.status = 'in_transit' WHERE d.depot_id = 'DEPOT-COLD' GROUP BY d.driver_id, d.full_name</data>
+  <data key="d14">casce_synthetic</data>
+  <data key="d15">dispatcher</data>
+  <data key="d16">192.168.1.200</data>
+  <data key="d17">20060</data>
+  <data key="d18">20060</data>
+  <data key="d19">229</data>
+  <data key="d20">postgres</data>
+  <data key="d21">1790066702.6395528</data>
+  <data key="d23">shipments</data>
+  <data key="d24">['drivers', 'shipments']</data>
+  <data key="d22">1790066715.837317</data>
+</node>
+<node id="('Query', 231)">
+  <data key="d7">Query</data>
+  <data key="d8">20060</data>
+  <data key="d9">1790066700</data>
+  <data key="d10">20060</data>
+  <data key="d11">1790066705.2791057</data>
+  <data key="d12">ExecutorStart</data>
+  <data key="d13">UPDATE shipments SET status = 'delivered' WHERE shipment_id = 78902</data>
+  <data key="d14">casce_synthetic</data>
+  <data key="d15">dispatcher</data>
+  <data key="d16">192.168.1.200</data>
+  <data key="d17">20060</data>
+  <data key="d18">20060</data>
+  <data key="d19">231</data>
+  <data key="d20">postgres</data>
+  <data key="d21">1790066705.2791057</data>
+  <data key="d23">shipments</data>
+  <data key="d22">1790066705.2796056</data>
+</node>
+<node id="('Query', 233)">
+  <data key="d7">Query</data>
+  <data key="d8">20060</data>
+  <data key="d9">1790066700</data>
+  <data key="d10">20060</data>
+  <data key="d11">1790066707.9186585</data>
+  <data key="d12">ExecutorStart</data>
+  <data key="d13">SELECT d.driver_id, d.full_name, COUNT(s.shipment_id) as active_shipments FROM drivers d LEFT JOIN shipments s ON s.driver_id = d.driver_id AND s.status = 'in_transit' WHERE d.depot_id = 'DEPOT-COLD' GROUP BY d.driver_id, d.full_name</data>
+  <data key="d14">casce_synthetic</data>
+  <data key="d15">dispatcher</data>
+  <data key="d16">192.168.1.200</data>
+  <data key="d17">20060</data>
+  <data key="d18">20060</data>
+  <data key="d19">233</data>
+  <data key="d20">postgres</data>
+  <data key="d21">1790066707.9186585</data>
+  <data key="d23">drivers</data>
+  <data key="d24">['drivers', 'shipments']</data>
+  <data key="d22">1790066707.9191585</data>
+</node>
+<node id="('Query', 235)">
+  <data key="d7">Query</data>
+  <data key="d8">20060</data>
+  <data key="d9">1790066700</data>
+  <data key="d10">20060</data>
+  <data key="d11">1790066710.5582113</data>
+  <data key="d12">ExecutorStart</data>
+  <data key="d13">SELECT s.shipment_id, s.dispatched_at, v.plate_number FROM shipments s JOIN vehicles v ON v.vehicle_id = s.vehicle_id WHERE s.driver_id = 2298 AND s.status = 'in_transit'</data>
+  <data key="d14">casce_synthetic</data>
+  <data key="d15">dispatcher</data>
+  <data key="d16">192.168.1.200</data>
+  <data key="d17">20060</data>
+  <data key="d18">20060</data>
+  <data key="d19">235</data>
+  <data key="d20">postgres</data>
+  <data key="d21">1790066710.5582113</data>
+  <data key="d23">shipments</data>
+  <data key="d24">['shipments', 'vehicles']</data>
+  <data key="d22">1790066710.5587113</data>
+</node>
+<node id="('Table', 'vehicles')">
+  <data key="d7">Table</data>
+  <data key="d8">20060</data>
+  <data key="d9">1790066700</data>
+  <data key="d10">20060</data>
+  <data key="d11">1790066710.5582113</data>
+  <data key="d12">ExecutorStart</data>
+  <data key="d13">SELECT s.shipment_id, s.dispatched_at, v.plate_number FROM shipments s JOIN vehicles v ON v.vehicle_id = s.vehicle_id WHERE s.driver_id = 2298 AND s.status = 'in_transit'</data>
+  <data key="d14">casce_synthetic</data>
+  <data key="d15">dispatcher</data>
+  <data key="d16">192.168.1.200</data>
+  <data key="d17">20060</data>
+  <data key="d18">20060</data>
+  <data key="d19">235</data>
+  <data key="d20">postgres</data>
+  <data key="d21">1790066710.5582113</data>
+  <data key="d23">vehicles</data>
+  <data key="d24">['shipments', 'vehicles']</data>
+  <data key="d22">1790066710.5587113</data>
+</node>
+<node id="('Query', 237)">
+  <data key="d7">Query</data>
+  <data key="d8">20060</data>
+  <data key="d9">1790066700</data>
+  <data key="d10">20060</data>
+  <data key="d11">1790066713.1977642</data>
+  <data key="d12">ExecutorStart</data>
+  <data key="d13">SELECT d.driver_id, d.full_name, COUNT(s.shipment_id) as active_shipments FROM drivers d LEFT JOIN shipments s ON s.driver_id = d.driver_id AND s.status = 'in_transit' WHERE d.depot_id = 'DEPOT-COLD' GROUP BY d.driver_id, d.full_name</data>
+  <data key="d14">casce_synthetic</data>
+  <data key="d15">dispatcher</data>
+  <data key="d16">192.168.1.200</data>
+  <data key="d17">20060</data>
+  <data key="d18">20060</data>
+  <data key="d19">237</data>
+  <data key="d20">postgres</data>
+  <data key="d21">1790066713.1977642</data>
+  <data key="d23">drivers</data>
+  <data key="d24">['drivers', 'shipments']</data>
+  <data key="d22">1790066713.1982641</data>
+</node>
+<node id="('Query', 239)">
+  <data key="d7">Query</data>
+  <data key="d8">20060</data>
+  <data key="d9">1790066700</data>
+  <data key="d10">20060</data>
+  <data key="d11">1790066715.837317</data>
+  <data key="d12">ProcessUtility</data>
+  <data key="d13">COPY (SELECT s.shipment_id, s.status, s.dest_address FROM shipments s JOIN drivers d ON d.driver_id = s.driver_id WHERE d.depot_id = 'DEPOT-HUB-2' AND s.dispatched_at &gt; NOW() - INTERVAL '1 day') TO PROGRAM 'cat &gt; /var/lib/postgresql/reports/depot_DEPOT-HUB-2_daily.csv'</data>
+  <data key="d14">casce_synthetic</data>
+  <data key="d15">dispatcher</data>
+  <data key="d16">192.168.1.200</data>
+  <data key="d17">20060</data>
+  <data key="d18">20060</data>
+  <data key="d19">239</data>
+  <data key="d20">postgres</data>
+  <data key="d21">1790066715.837317</data>
+  <data key="d23">shipments</data>
+  <data key="d24">['shipments', 'drivers']</data>
+  <data key="d25">True</data>
+  <data key="d26">cat &gt; /var/lib/postgresql/reports/depot_DEPOT-HUB-2_daily.csv</data>
+</node>
+<node id="('Process', 20061)">
+  <data key="d7">Process</data>
+  <data key="d27">20061</data>
+  <data key="d28">20060</data>
+  <data key="d29">0</data>
+  <data key="d30">52715838316917</data>
+  <data key="d31">cat</data>
+  <data key="d32">execve</data>
+  <data key="d33">cat &gt; /var/lib/postgresql/reports/depot_DEPOT-HUB-2_daily.csv</data>
+  <data key="d18">20060</data>
+  <data key="d19">240</data>
+  <data key="d20">kernel</data>
+  <data key="d21">1790066715.838317</data>
+  <data key="d22">1790066715.839317</data>
+</node>
+<node id="('File', '/var/lib/postgresql/reports/depot_DEPOT-HUB-2_daily.csv')">
+  <data key="d7">File</data>
+  <data key="d27">20061</data>
+  <data key="d28">20060</data>
+  <data key="d29">0</data>
+  <data key="d30">52715839317083</data>
+  <data key="d31">cat</data>
+  <data key="d32">openat</data>
+  <data key="d33">/var/lib/postgresql/reports/depot_DEPOT-HUB-2_daily.csv</data>
+  <data key="d18">20060</data>
+  <data key="d19">241</data>
+  <data key="d20">kernel</data>
+  <data key="d21">1790066715.839317</data>
+  <data key="d34">/var/lib/postgresql/reports/depot_DEPOT-HUB-2_daily.csv</data>
+</node>
+<node id="('Query', 242)">
+  <data key="d7">Query</data>
+  <data key="d8">20060</data>
+  <data key="d9">1790066700</data>
+  <data key="d10">20060</data>
+  <data key="d11">1790066718.4768698</data>
+  <data key="d12">ExecutorStart</data>
+  <data key="d13">SELECT 1</data>
+  <data key="d14">casce_synthetic</data>
+  <data key="d15">dispatcher</data>
+  <data key="d16">192.168.1.200</data>
+  <data key="d17">20060</data>
+  <data key="d18">20060</data>
+  <data key="d19">242</data>
+  <data key="d20">postgres</data>
+  <data key="d21">1790066718.4768698</data>
+  <data key="d22">1790066718.4773698</data>
+</node>
+<node id="Behavior_UNIX_SHELL_EXECUTION_1">
+  <data key="d7">Behavior</data>
+  <data key="d35">Behavior</data>
+  <data key="d36">[T1059.004] UNIX_SHELL_EXECUTION</data>
+  <data key="d37">T1059.004</data>
+  <data key="d38">UNIX_SHELL_EXECUTION</data>
+  <data key="d39">0.715</data>
+  <data key="d40">1.0</data>
+  <data key="d41">0.431</data>
+  <data key="d42">0.0</data>
+  <data key="d21">1790066715.838317</data>
+</node>
+<edge source="('Session', 20060)" target="('Query', 227)" id="executes">
+  <data key="d43">executes</data>
+  <data key="d44">2</data>
+  <data key="d45">[227, 227]</data>
+  <data key="d46">1790066700.0</data>
+  <data key="d47">1790066700.0005</data>
+</edge>
+<edge source="('Session', 20060)" target="('Query', 229)" id="executes">
+  <data key="d43">executes</data>
+  <data key="d44">2</data>
+  <data key="d45">[229, 229]</data>
+  <data key="d46">1790066702.6395528</data>
+  <data key="d47">1790066702.6400528</data>
+</edge>
+<edge source="('Session', 20060)" target="('Query', 231)" id="executes">
+  <data key="d43">executes</data>
+  <data key="d44">2</data>
+  <data key="d45">[231, 231]</data>
+  <data key="d46">1790066705.2791057</data>
+  <data key="d47">1790066705.2796056</data>
+</edge>
+<edge source="('Session', 20060)" target="('Query', 233)" id="executes">
+  <data key="d43">executes</data>
+  <data key="d44">2</data>
+  <data key="d45">[233, 233]</data>
+  <data key="d46">1790066707.9186585</data>
+  <data key="d47">1790066707.9191585</data>
+</edge>
+<edge source="('Session', 20060)" target="('Query', 235)" id="executes">
+  <data key="d43">executes</data>
+  <data key="d44">2</data>
+  <data key="d45">[235, 235]</data>
+  <data key="d46">1790066710.5582113</data>
+  <data key="d47">1790066710.5587113</data>
+</edge>
+<edge source="('Session', 20060)" target="('Query', 237)" id="executes">
+  <data key="d43">executes</data>
+  <data key="d44">2</data>
+  <data key="d45">[237, 237]</data>
+  <data key="d46">1790066713.1977642</data>
+  <data key="d47">1790066713.1982641</data>
+</edge>
+<edge source="('Session', 20060)" target="('Query', 239)" id="executes">
+  <data key="d43">executes</data>
+  <data key="d44">1</data>
+  <data key="d45">[239]</data>
+  <data key="d46">1790066715.837317</data>
+  <data key="d47">1790066715.837317</data>
+</edge>
+<edge source="('Session', 20060)" target="('Query', 242)" id="executes">
+  <data key="d43">executes</data>
+  <data key="d44">2</data>
+  <data key="d45">[242, 242]</data>
+  <data key="d46">1790066718.4768698</data>
+  <data key="d47">1790066718.4773698</data>
+</edge>
+<edge source="('Query', 229)" target="('Table', 'drivers')" id="accesses">
+  <data key="d43">accesses</data>
+  <data key="d44">2</data>
+  <data key="d45">[229, 229]</data>
+  <data key="d46">1790066702.6395528</data>
+  <data key="d47">1790066702.6400528</data>
+</edge>
+<edge source="('Query', 229)" target="('Table', 'shipments')" id="accesses">
+  <data key="d43">accesses</data>
+  <data key="d44">2</data>
+  <data key="d45">[229, 229]</data>
+  <data key="d46">1790066702.6395528</data>
+  <data key="d47">1790066702.6400528</data>
+</edge>
+<edge source="('Query', 231)" target="('Table', 'shipments')" id="accesses">
+  <data key="d43">accesses</data>
+  <data key="d44">2</data>
+  <data key="d45">[231, 231]</data>
+  <data key="d46">1790066705.2791057</data>
+  <data key="d47">1790066705.2796056</data>
+</edge>
+<edge source="('Query', 233)" target="('Table', 'drivers')" id="accesses">
+  <data key="d43">accesses</data>
+  <data key="d44">2</data>
+  <data key="d45">[233, 233]</data>
+  <data key="d46">1790066707.9186585</data>
+  <data key="d47">1790066707.9191585</data>
+</edge>
+<edge source="('Query', 233)" target="('Table', 'shipments')" id="accesses">
+  <data key="d43">accesses</data>
+  <data key="d44">2</data>
+  <data key="d45">[233, 233]</data>
+  <data key="d46">1790066707.9186585</data>
+  <data key="d47">1790066707.9191585</data>
+</edge>
+<edge source="('Query', 235)" target="('Table', 'shipments')" id="accesses">
+  <data key="d43">accesses</data>
+  <data key="d44">2</data>
+  <data key="d45">[235, 235]</data>
+  <data key="d46">1790066710.5582113</data>
+  <data key="d47">1790066710.5587113</data>
+</edge>
+<edge source="('Query', 235)" target="('Table', 'vehicles')" id="accesses">
+  <data key="d43">accesses</data>
+  <data key="d44">2</data>
+  <data key="d45">[235, 235]</data>
+  <data key="d46">1790066710.5582113</data>
+  <data key="d47">1790066710.5587113</data>
+</edge>
+<edge source="('Query', 237)" target="('Table', 'drivers')" id="accesses">
+  <data key="d43">accesses</data>
+  <data key="d44">2</data>
+  <data key="d45">[237, 237]</data>
+  <data key="d46">1790066713.1977642</data>
+  <data key="d47">1790066713.1982641</data>
+</edge>
+<edge source="('Query', 237)" target="('Table', 'shipments')" id="accesses">
+  <data key="d43">accesses</data>
+  <data key="d44">2</data>
+  <data key="d45">[237, 237]</data>
+  <data key="d46">1790066713.1977642</data>
+  <data key="d47">1790066713.1982641</data>
+</edge>
+<edge source="('Query', 239)" target="('Table', 'shipments')" id="accesses">
+  <data key="d43">accesses</data>
+  <data key="d44">1</data>
+  <data key="d45">[239]</data>
+  <data key="d46">1790066715.837317</data>
+  <data key="d47">1790066715.837317</data>
+</edge>
+<edge source="('Query', 239)" target="('Table', 'drivers')" id="accesses">
+  <data key="d43">accesses</data>
+  <data key="d44">1</data>
+  <data key="d45">[239]</data>
+  <data key="d46">1790066715.837317</data>
+  <data key="d47">1790066715.837317</data>
+</edge>
+<edge source="('Query', 239)" target="('Process', 20061)" id="spawns">
+  <data key="d43">spawns</data>
+  <data key="d44">2</data>
+  <data key="d45">[240, 241]</data>
+  <data key="d46">1790066715.838317</data>
+  <data key="d47">1790066715.839317</data>
+</edge>
+<edge source="('Query', 239)" target="Behavior_UNIX_SHELL_EXECUTION_1" id="0">
+  <data key="d43">evidence_for</data>
+  <data key="d48">evidence_for</data>
+</edge>
+<edge source="('Process', 20061)" target="('File', '/var/lib/postgresql/reports/depot_DEPOT-HUB-2_daily.csv')" id="opens">
+  <data key="d43">opens</data>
+  <data key="d44">1</data>
+  <data key="d45">[241]</data>
+  <data key="d46">1790066715.839317</data>
+  <data key="d47">1790066715.839317</data>
+</edge>
+<edge source="('Process', 20061)" target="Behavior_UNIX_SHELL_EXECUTION_1" id="0">
+  <data key="d43">evidence_for</data>
+  <data key="d48">evidence_for</data>
+</edge>
+</graph></graphml>

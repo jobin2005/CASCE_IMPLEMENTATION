@@ -1,0 +1,21 @@
+scenario_id: logistics_dispatcher_routine_0006
+family_id: logistics_dispatcher_routine_0006
+domain: logistics
+time_of_day: '11:30'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dispatcher_work
+  role: dispatcher
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.1701951116577387
+  events:
+  - sql: UPDATE shipments SET status = 'dispatched', driver_id = 1313 WHERE shipment_id = 50825
+  - sql: UPDATE shipments SET status = 'dispatched', driver_id = 1313 WHERE shipment_id = 50825
+  - step_id: daily_report
+    sql: COPY (SELECT s.shipment_id, s.status, s.dest_address FROM shipments s JOIN drivers d ON d.driver_id = s.driver_id WHERE d.depot_id = 'DEPOT-HUB-2' AND s.dispatched_at > NOW() - INTERVAL '1 day')
+      TO PROGRAM 'cat > /var/lib/postgresql/reports/depot_DEPOT-HUB-2_daily.csv'

@@ -1,0 +1,25 @@
+scenario_id: logistics_dispatcher_routine_1008
+family_id: logistics_dispatcher_routine_1008
+domain: logistics
+time_of_day: 09:45
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dispatcher_work
+  role: dispatcher
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.216117866409305
+  events:
+  - sql: UPDATE shipments SET status = 'delivered' WHERE shipment_id = 69144
+  - sql: SELECT COUNT(*) FROM shipments WHERE origin_warehouse_id IN (SELECT warehouse_id FROM warehouses WHERE manager_id IN (SELECT driver_id FROM drivers WHERE depot_id = 'DEPOT-PORT')) AND status =
+      'pending'
+  - sql: UPDATE shipments SET status = 'delivered' WHERE shipment_id = 69144
+  - sql: UPDATE shipments SET status = 'delivered' WHERE shipment_id = 69144
+  - sql: SELECT d.full_name, d.phone FROM drivers d WHERE d.depot_id = 'DEPOT-PORT' AND d.driver_id = 1378
+  - step_id: daily_report
+    sql: COPY (SELECT s.shipment_id, s.status, s.dest_address FROM shipments s JOIN drivers d ON d.driver_id = s.driver_id WHERE d.depot_id = 'DEPOT-COLD' AND s.dispatched_at > NOW() - INTERVAL '1 day')
+      TO PROGRAM 'cat > /var/lib/postgresql/reports/depot_DEPOT-COLD_daily.csv'

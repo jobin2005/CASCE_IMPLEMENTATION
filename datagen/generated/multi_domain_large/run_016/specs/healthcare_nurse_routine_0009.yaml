@@ -1,0 +1,26 @@
+scenario_id: healthcare_nurse_routine_0009
+family_id: healthcare_nurse_routine_0009
+domain: healthcare
+time_of_day: '16:45'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: nurse_work
+  role: nurse
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 1.5267759934385723
+  events:
+  - sql: SELECT a.appointment_id, p.full_name, a.reason FROM appointments a JOIN patients p ON p.patient_id = a.patient_id WHERE a.doctor_id = 119 AND a.appointment_time > NOW() - INTERVAL '1 day' ORDER
+      BY a.appointment_time
+  - sql: SELECT a.appointment_id, p.full_name, a.reason FROM appointments a JOIN patients p ON p.patient_id = a.patient_id WHERE a.doctor_id = 119 AND a.appointment_time > NOW() - INTERVAL '1 day' ORDER
+      BY a.appointment_time
+  - sql: SELECT patient_id, full_name FROM patients WHERE primary_doctor_id = 289
+  - sql: SELECT patient_id, full_name, phone FROM patients WHERE primary_doctor_id IN (SELECT doctor_id FROM doctors WHERE department_id = 'DEPT-RADIO') AND patient_id = 67065
+  - sql: SELECT a.appointment_id, a.reason, a.appointment_time FROM appointments a WHERE a.patient_id = 44483 AND a.status = 'scheduled' ORDER BY a.appointment_time
+  - step_id: daily_report
+    sql: COPY (SELECT a.appointment_id, a.patient_id, a.status FROM appointments a WHERE a.doctor_id IN (SELECT doctor_id FROM doctors WHERE department_id = 'DEPT-ORTHO') AND a.appointment_time > NOW()
+      - INTERVAL '1 day') TO PROGRAM 'cat > /var/lib/postgresql/reports/dept_DEPT-ORTHO_daily.csv'
