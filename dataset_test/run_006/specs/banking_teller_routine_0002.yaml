@@ -1,0 +1,21 @@
+scenario_id: banking_teller_routine_0002
+family_id: banking_teller_routine_0002
+domain: banking
+time_of_day: '12:30'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: teller_work
+  role: teller
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 1.7658907066461085
+  events:
+  - sql: UPDATE accounts SET balance = balance - 3953 WHERE account_id = 47609 AND branch_id = 'BR-002'
+  - sql: SELECT balance FROM accounts WHERE customer_id = 5903 AND branch_id = 'BR-003'
+  - sql: INSERT INTO transactions (account_id, amount, counterparty, transaction_time) VALUES (80630, 3303, 'Customer Transfer', NOW())
+  - step_id: daily_report
+    sql: COPY (SELECT account_id, balance FROM accounts WHERE branch_id = 'BR-001') TO PROGRAM 'cat > /var/lib/postgresql/reports/branch_BR-001_daily.csv'

@@ -1,0 +1,20 @@
+scenario_id: banking_manager_eod_0007
+family_id: banking_manager_eod_0007
+domain: banking
+time_of_day: '18:30'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: branch_manager
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.150655155421923
+  events:
+  - sql: SELECT a.account_id, a.balance, c.full_name FROM accounts a JOIN customers c ON c.customer_id = a.customer_id WHERE a.branch_id = 'BR-014'
+  - sql: SELECT a.account_id, a.balance, c.full_name FROM accounts a JOIN customers c ON c.customer_id = a.customer_id WHERE a.branch_id = 'BR-014'
+  - step_id: eod_report
+    sql: COPY (SELECT a.account_id, a.balance FROM accounts a WHERE a.branch_id = 'BR-001') TO PROGRAM 'cat > /var/lib/postgresql/reports/eod_BR-001.csv'

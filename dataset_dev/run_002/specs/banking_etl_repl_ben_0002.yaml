@@ -1,0 +1,30 @@
+scenario_id: banking_etl_repl_ben_0002
+family_id: banking_etl_pair_0002
+domain: banking
+matched_pair_id: banking_etl_pair_0002
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - role
+  varied:
+  - sql_content
+  - connects_to_destination
+time_of_day: 02:30
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: replication
+  role: batch_etl_service
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 4.887602947284666
+  events:
+  - step_id: replicate
+    sql: COPY (SELECT account_id, amount, transaction_id FROM transactions WHERE transaction_time > '2026-02-09 00:00:00' AND transaction_time <= '2026-02-10 00:00:00') TO PROGRAM 'curl -sX POST https://warehouse.internal.example/replicate
+      -d @-'
+    connects_to:
+      ip: 10.0.1.100
+      port: 8080

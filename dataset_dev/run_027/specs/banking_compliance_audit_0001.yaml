@@ -1,0 +1,23 @@
+scenario_id: banking_compliance_audit_0001
+family_id: banking_compliance_audit_0001
+domain: banking
+time_of_day: 09:00
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: audit
+  role: compliance_officer
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 7.621066034517137
+  events:
+  - sql: SELECT c.full_name, c.national_id, COUNT(t.transaction_id) FROM customers c JOIN accounts a ON a.customer_id = c.customer_id JOIN transactions t ON t.account_id = a.account_id GROUP BY c.customer_id,
+      c.full_name, c.national_id HAVING COUNT(t.transaction_id) > 100
+  - sql: SELECT c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE a.balance > 100000
+  - sql: SELECT c.customer_id, c.national_id, t.amount, t.counterparty FROM customers c JOIN accounts a ON a.customer_id = c.customer_id JOIN transactions t ON t.account_id = a.account_id WHERE t.amount
+      > 50000
+  - step_id: audit_export
+    sql: COPY (SELECT c.national_id, c.full_name, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE a.balance > 100000) TO PROGRAM 'cat > /var/lib/postgresql/audit/high_value_report.csv'

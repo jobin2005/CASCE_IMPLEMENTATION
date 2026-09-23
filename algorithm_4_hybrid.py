@@ -828,8 +828,7 @@ def evaluate_model(args):
         raise RuntimeError("No evaluation data found.")
 
     # Binary predictions at current threshold
-    y_pred = [1 if s >= THETA_A else 0 for s in y_scores]
-
+    y_pred = [1 if s >= args.theta_a else 0 for s in y_scores]
     # Compute metrics
     tp = sum(1 for t, p in zip(y_true, y_pred) if t == 1 and p == 1)
     fp = sum(1 for t, p in zip(y_true, y_pred) if t == 0 and p == 1)
@@ -842,7 +841,7 @@ def evaluate_model(args):
     accuracy = (tp + tn) / max(1, len(y_true))
 
     results = {
-        'threshold': THETA_A,
+        'threshold': args.theta_a,
         'total_samples': len(y_true),
         'true_positives': tp, 'false_positives': fp,
         'false_negatives': fn, 'true_negatives': tn,
@@ -854,7 +853,7 @@ def evaluate_model(args):
     }
 
     print(f"\n{'='*60}")
-    print(f"  EVALUATION RESULTS (θ_A = {THETA_A})")
+    print(f"  EVALUATION RESULTS (θ_A = {args.theta_a})")
     print(f"{'='*60}")
     print(f"  Samples:   {len(y_true)} ({sum(y_true)} malicious, {len(y_true)-sum(y_true)} normal)")
     print(f"  Accuracy:  {accuracy:.4f}")
