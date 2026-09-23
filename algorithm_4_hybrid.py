@@ -94,6 +94,7 @@ FORWARD_EDGE_TYPES = [
     ("Query",   "reads_from",  "Table"),
     ("Query",   "modifies",    "Table"),
     ("Query",   "modifies",    "Role"),
+    ("Query",   "accesses",    "Role"),        # what Algorithm 2 emits for CREATE/ALTER ROLE
     ("Query",   "modifies",    "Configuration"),
     ("Process", "executes",    "File"),
     ("Process", "reads_from",  "File"),
@@ -172,16 +173,32 @@ CHAIN_RULES = [
      "sequence": ["EXTERNAL_TRANSFER"], "match_type": "co_occurrence", "severity": 0.45},
 ]
 
-THETA_A = 0.5   # alert threshold
+THETA_A = 0.5   # alert threshold (re-tune on VALIDATION data only, see --mode tune)
 THETA_R = 0.8   # response threshold
-W_RULE = 0.85
-W_GAT = 0.75
+# Fusion weights. With W_GAT = 0.75 the fused score was capped at 0.75 whenever
+# no rule fired (rule = 0), which is below THETA_R, so the response tier was
+# unreachable for any GAT-only detection. Weights of 1.0 make the noisy-OR a
+# plain probabilistic OR: neither path is discounted, and a confident GAT alone
+# can reach the response tier.
+W_RULE = 1.0
+W_GAT = 1.0
 
 FEATURE_HASH_DIM = 16
 NUM_NODE_FEATS = FEATURE_HASH_DIM + 8
-HIDDEN_DIM = 32
-HEADS = 4
+# Model / training defaults. Size was cut from hidden 32 x 4 heads (~1.4M weights
+# for ~7k tiny graphs, enough to memorise the corpus) to 16 x 2; run_experiments.py
+# sweeps size explicitly. AdamW weight decay, dropout 0.3, batching and a fixed
+# seed replace plain Adam / dropout 0.2 / batch 1 / unseeded.
+HIDDEN_DIM = 16
+HEADS = 2
 NUM_LAYERS = 2
+DROPOUT = 0.3
+LEARNING_RATE = 1e-3
+WEIGHT_DECAY = 1e-3
+BATCH_SIZE = 64
+EPOCHS = 60
+PATIENCE = 8
+SEED = 0
 
 
 # ============================================================================
@@ -352,13 +369,53 @@ def render_alert_text(session_id, risk, scenario, facts):
 # 3. GAT PATH  — GAT(G'_s)
 # ============================================================================
 
+_LITERAL_RE = re.compile(r"'(?:[^']|'')*'|\b0x[0-9a-f]+\b|\b\d+(?:\.\d+)?\b")
+_ID_RE = re.compile(r"[0-9a-f]{6,}|\d+")
+_TOKEN_RE = re.compile(r"[a-z0-9_#?]+")
+_PRIVATE_IP_RE = re.compile(r"^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|127\.)")
+
+
+def normalize_sql(query):
+    """Replace string/numeric literals with '?' so the hashed feature keys on
+    the statement's shape, not on a specific account number, host or value
+    (an exact-text hash is a direct memorisation channel)."""
+    return " ".join(_LITERAL_RE.sub("?", str(query).lower()).split())
+
+
+def node_semantic_text(data):
+    """Text hashed into a node's feature vector. Deliberately excludes
+    anything that is an identifier of a *run* rather than of behaviour: pids
+    (the old fallback hashed str(node_id), i.e. "('Process', 20001)"), raw IPs
+    and hostnames, and literal SQL values."""
+    t = data.get("type")
+    if t == "Query":
+        return normalize_sql(data.get("query", ""))
+    if t == "Table":
+        return str(data.get("table_name", ""))
+    if t == "Role":
+        return str(data.get("role_name", ""))
+    if t == "Process":
+        return str(data.get("comm", ""))
+    if t == "File":
+        return _ID_RE.sub("#", str(data.get("filepath", data.get("arg", ""))).lower())
+    if t == "Endpoint":
+        ip = str(data.get("dest_ip", ""))
+        scope = "internal" if _PRIVATE_IP_RE.match(ip) else "external"
+        return f"port_{data.get('dest_port', '')} {scope}"
+    if t == "Behavior":
+        return str(data.get("behavior_label", data.get("label", "")))
+    if t == "Configuration":
+        return str(data.get("setting_name", ""))
+    return str(t or "")
+
+
 def _stable_hash_bucket(text, dim=FEATURE_HASH_DIM):
     """Deterministic feature hashing (md5, not hash()) so train-time and
     inference-time features never silently disagree across processes."""
     vec = np.zeros(dim, dtype=np.float32)
     if not text:
         return vec
-    for tok in re.findall(r"[a-zA-Z0-9_./:-]+", str(text).lower()):
+    for tok in _TOKEN_RE.findall(str(text).lower()):
         h = int(hashlib.md5(tok.encode("utf-8")).hexdigest(), 16)
         vec[h % dim] += 1.0
     norm = np.linalg.norm(vec)
@@ -367,51 +424,48 @@ def _stable_hash_bucket(text, dim=FEATURE_HASH_DIM):
     return vec
 
 
-def featurize_node(G, n, max_ts):
+def _node_ts(data):
+    ts = data.get("timestamp_unix", data.get("timestamp"))
+    return None if ts in (None, "") else _safe_float(ts, None)
+
+
+def featurize_node(G, n, t_min, t_span):
     data = G.nodes[n]
-    # Use label, query text, or node id as hash input for semantic features
-    hash_text = data.get("label", data.get("query", str(n)))
-    hash_feat = _stable_hash_bucket(hash_text)
-    confidence = _safe_float(data.get("confidence"))
-    s_struct = _safe_float(data.get("s_struct"))
-    s_sem = _safe_float(data.get("s_sem"))
-    s_temp = _safe_float(data.get("s_temp"))
-    # Accept both "timestamp" and "timestamp_unix" (jobs branch uses timestamp_unix)
-    ts_raw = data.get("timestamp", data.get("timestamp_unix", None))
-    has_ts = 1.0 if ts_raw is not None else 0.0
-    recency = (_safe_float(ts_raw) / max_ts) if max_ts > 0 else 0.0
+    hash_feat = _stable_hash_bucket(node_semantic_text(data))
+    ts = _node_ts(data)
+    # Position inside the session (0..1), not ts/max_ts: unix timestamps are
+    # ~1.79e9 everywhere so the old "recency" was a constant.
+    rel_time = ((ts - t_min) / t_span) if (ts is not None and t_span > 0) else 0.0
     in_deg = G.in_degree(n) if G.is_directed() else G.degree(n)
     out_deg = G.out_degree(n) if G.is_directed() else 0
-    numeric_feat = np.array([confidence, s_struct, s_sem, s_temp, has_ts, recency,
-                              math.tanh(in_deg / 5.0), math.tanh(out_deg / 5.0)], dtype=np.float32)
+    numeric_feat = np.array([
+        _safe_float(data.get("confidence")), _safe_float(data.get("s_struct")),
+        _safe_float(data.get("s_sem")), _safe_float(data.get("s_temp")),
+        1.0 if ts is not None else 0.0, rel_time,
+        math.tanh(in_deg / 5.0), math.tanh(out_deg / 5.0)], dtype=np.float32)
     return np.concatenate([hash_feat, numeric_feat])
 
 
 if TORCH_AVAILABLE:
+    from torch_geometric.data import Batch
+    from torch_geometric.loader import DataLoader
+    from torch_geometric.nn import global_mean_pool
 
-    def build_hetero_data(G):
+    def build_hetero_data(G, label=None):
         data = HeteroData()
         node_index = {nt: {} for nt in ALL_NODE_TYPES}
         node_feats = {nt: [] for nt in ALL_NODE_TYPES}
 
-        # Accept both "timestamp" and "timestamp_unix" for recency features
-        timestamps = []
-        for _, d in G.nodes(data=True):
-            ts = d.get("timestamp", d.get("timestamp_unix"))
-            if ts is not None:
-                timestamps.append(_safe_float(ts))
-        max_ts = max(timestamps) if timestamps else 1.0
+        stamps = [t for t in (_node_ts(d) for _, d in G.nodes(data=True)) if t is not None]
+        t_min = min(stamps) if stamps else 0.0
+        t_span = (max(stamps) - t_min) if stamps else 0.0
 
-        unknown_types = set()
         for n, d in G.nodes(data=True):
             ntype = d.get("type")
             if ntype not in node_index:
-                unknown_types.add(ntype)
-                continue
+                continue  # unknown node types are skipped
             node_index[ntype][n] = len(node_index[ntype])
-            node_feats[ntype].append(featurize_node(G, n, max_ts))
-        if unknown_types:
-            pass  # Silently skip unknown types — they are expected for new node types
+            node_feats[ntype].append(featurize_node(G, n, t_min, t_span))
 
         for nt in ALL_NODE_TYPES:
             if node_feats[nt]:
@@ -420,71 +474,60 @@ if TORCH_AVAILABLE:
                 data[nt].x = torch.zeros((0, NUM_NODE_FEATS), dtype=torch.float32)
 
         edge_buckets = {et: ([], []) for et in EDGE_TYPES}
-        unknown_edges = set()
-        # Handle both DiGraph (u, v, data) and MultiDiGraph (u, v, key, data).
-        # Rather than pulling a single mixed-arity tuple out of a generically
-        # typed iterator and unpacking it differently per branch (which static
-        # checkers like pyrefly can't narrow, since both branches share one
-        # inferred type for edge_tuple), normalize each case to a plain
-        # (u, v, ed) 3-tuple up front. This keeps runtime behavior identical
-        # while making the unpack shape unambiguous everywhere it's used.
         if isinstance(G, nx.MultiDiGraph):
-            edge_iter = ((u, v, ed) for u, v, _ekey, ed in G.edges(data=True, keys=True))
+            edge_iter = ((u, v, ed) for u, v, _k, ed in G.edges(data=True, keys=True))
         else:
             edge_iter = G.edges(data=True)
         for u, v, ed in edge_iter:
-            # Accept both "relation" (old format) and "rel" (jobs branch format)
             rel = ed.get("relation", ed.get("rel"))
             if rel is None:
                 continue
-            ut = G.nodes[u].get("type")
-            vt = G.nodes[v].get("type")
+            ut, vt = G.nodes[u].get("type"), G.nodes[v].get("type")
             key = (ut, rel, vt)
             if key not in edge_buckets:
-                unknown_edges.add(key)
                 continue
             if u not in node_index.get(ut, {}) or v not in node_index.get(vt, {}):
                 continue
             src, dst = edge_buckets[key]
             src.append(node_index[ut][u]); dst.append(node_index[vt][v])
-            # BUG 2 fix companion: also populate the auto-added reverse relation
             rev_key = (vt, f"rev_{rel}", ut)
             if rev_key in edge_buckets:
                 rsrc, rdst = edge_buckets[rev_key]
                 rsrc.append(node_index[vt][v]); rdst.append(node_index[ut][u])
-        # Only warn once about truly unexpected edges (suppress known noise)
-        if unknown_edges:
-            filtered = {e for e in unknown_edges if e[1] is not None and e[0] is not None}
-            if filtered:
-                pass  # Silently skip — varied graph schemas are expected
 
         for et, (src, dst) in edge_buckets.items():
             data[et].edge_index = (torch.tensor([src, dst], dtype=torch.long) if src
                                     else torch.empty((2, 0), dtype=torch.long))
+        if label is not None:
+            data.y = torch.tensor([float(label)])
         return data
 
     class CasceHeteroGAT(nn.Module):
         """
         Heterogeneous GATv2 over CASCE's node/edge schema. Node type is
-        encoded structurally (separate weight matrices per HeteroConv
-        relation), not via one-hot features, which is the whole point of
-        using a heterogeneous GNN instead of a flattened homogeneous graph.
+        encoded structurally (separate weights per HeteroConv relation).
 
-        BUG 1 fix: every GATv2Conv here gets an EXPLICIT integer in_channels
-        (no lazy (-1,-1) shapes), so `model.parameters()` is fully populated
-        the instant the model is constructed -- safe to build an optimizer
-        before any forward pass, which the training loop does.
-        BUG 2 fix: EDGE_TYPES already includes the auto-generated reverse
-        relations, so every node type is a destination somewhere and keeps
-        being updated across layers instead of vanishing from x_dict.
+        Capacity: the original (hidden 32 x 4 heads, 68 relation convs) had
+        ~1.4M weights for ~7k graphs of 5-15 nodes, which is enough to store
+        the corpus. Defaults are now hidden 16 x 2 heads; `hidden_dim`, `heads`,
+        `num_layers` stay configurable so the size sweep in run_experiments.py
+        can show the effect rather than assume it.
+
+        Forward accepts a batched HeteroData (torch_geometric Batch); graph
+        readout is a per-node-type mean pool, concatenated, then an MLP.
+        Explicit in_channels everywhere (no lazy shapes) and an auto-added
+        reverse relation per edge type keep every node type updating -- the
+        two earlier bug fixes are unchanged.
         """
         def __init__(self, node_types=ALL_NODE_TYPES, edge_types=EDGE_TYPES,
                      in_dim=NUM_NODE_FEATS, hidden_dim=HIDDEN_DIM, heads=HEADS,
-                     num_layers=NUM_LAYERS, dropout=0.2):
+                     num_layers=NUM_LAYERS, dropout=DROPOUT):
             super().__init__()
             self.node_types = node_types
             self.hidden_dim = hidden_dim
             self.heads = heads
+            self.config = dict(hidden_dim=hidden_dim, heads=heads,
+                               num_layers=num_layers, dropout=dropout)
 
             self.convs = nn.ModuleList()
             layer_in_dim = in_dim
@@ -495,7 +538,7 @@ if TORCH_AVAILABLE:
                     for et in edge_types
                 }
                 self.convs.append(HeteroConv(conv_dict, aggr="sum"))
-                layer_in_dim = hidden_dim * heads  # output dim of every layer after the first
+                layer_in_dim = hidden_dim * heads
 
             pooled_dim = hidden_dim * heads * len(node_types)
             self.classifier = nn.Sequential(
@@ -507,32 +550,41 @@ if TORCH_AVAILABLE:
             x_dict = data.x_dict
             edge_index_dict = data.edge_index_dict
             out_dim = self.hidden_dim * self.heads
+            num_graphs = int(data.num_graphs) if hasattr(data, "num_graphs") else 1
+            device = next(self.parameters()).device
 
             for conv in self.convs:
-                # Ensure every node type has an entry going in (zeros of the
-                # right width if empty) so HeteroConv never chokes and so a
-                # node type absent this layer still has *something* next layer.
                 x_dict = conv(x_dict, edge_index_dict)
                 x_dict = {k: F.elu(v) for k, v in x_dict.items()}
                 for nt in self.node_types:
                     if nt not in x_dict:
-                        x_dict[nt] = torch.zeros((0, out_dim))
+                        x_dict[nt] = torch.zeros((0, out_dim), device=device)
 
-            pooled_parts = []
+            pooled = []
             for nt in self.node_types:
-                x = x_dict.get(nt)
-                if x is not None and x.size(0) > 0:
-                    pooled_parts.append(x.mean(dim=0))
+                x = x_dict[nt]
+                if x.size(0) > 0:
+                    batch = data[nt].batch if hasattr(data[nt], "batch") and data[nt].batch is not None \
+                        else torch.zeros(x.size(0), dtype=torch.long, device=device)
+                    pooled.append(global_mean_pool(x, batch, size=num_graphs))
                 else:
-                    pooled_parts.append(torch.zeros(out_dim))
-            graph_repr = torch.cat(pooled_parts, dim=0)
-            return self.classifier(graph_repr).squeeze(-1)
+                    pooled.append(torch.zeros((num_graphs, out_dim), device=device))
+            return self.classifier(torch.cat(pooled, dim=1)).squeeze(-1)
+
+    def count_parameters(model):
+        return sum(p.numel() for p in model.parameters())
+
+    def predict_probs(model, data_list, batch_size=256):
+        """P(malicious) for a list of HeteroData, in order."""
+        model.eval()
+        out = []
+        with torch.no_grad():
+            for batch in DataLoader(data_list, batch_size=batch_size, shuffle=False):
+                out.extend(torch.sigmoid(model(batch)).tolist())
+        return out
 
     def gat_score(G, model):
-        data = build_hetero_data(G)
-        model.eval()
-        with torch.no_grad():
-            return torch.sigmoid(model(data)).item()
+        return predict_probs(model, [build_hetero_data(G)])[0]
 
 else:
 
@@ -544,7 +596,6 @@ else:
         if not behaviors:
             return 0.0
         avg_conf = float(np.mean([b["confidence"] for b in behaviors]))
-        # Count precedes edges; handle both MultiDiGraph and DiGraph, and both attr names
         precedes_edges = 0
         if isinstance(G, nx.MultiDiGraph):
             for _, _, _k, d in G.edges(data=True, keys=True):
@@ -644,12 +695,7 @@ def detect(G, model, session_id="unknown", theta_a=THETA_A, theta_r=THETA_R):
 def _load_dataset_from_dirs(dir_str, label_str):
     """Load graphs and labels from comma-separated directory/label paths.
 
-    Args:
-        dir_str: Comma-separated enriched graph directories
-        label_str: Comma-separated label JSON file paths
-
-    Returns:
-        List of (HeteroData, float_label) tuples
+    Returns a list of HeteroData, each carrying its label in `.y`.
     """
     if not TORCH_AVAILABLE:
         raise SystemExit("torch + torch_geometric are required for this mode.")
@@ -666,27 +712,47 @@ def _load_dataset_from_dirs(dir_str, label_str):
             if not os.path.exists(path):
                 print(f"[data] WARNING: {filename} not found in {d} — skipping.")
                 continue
-            G = nx.read_graphml(path)
-            dataset.append((build_hetero_data(G), float(label)))
-
+            dataset.append(build_hetero_data(nx.read_graphml(path), label=label))
     return dataset
+
+
+def set_seed(seed):
+    import random
+    random.seed(seed)
+    np.random.seed(seed)
+    if TORCH_AVAILABLE:
+        torch.manual_seed(seed)
+
+
+DEFAULT_TRAIN_CFG = dict(hidden_dim=HIDDEN_DIM, heads=HEADS, num_layers=NUM_LAYERS,
+                         dropout=DROPOUT, lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY,
+                         batch_size=BATCH_SIZE, epochs=EPOCHS, patience=PATIENCE, seed=SEED)
 
 
 def load_model(model_path):
     if not TORCH_AVAILABLE:
         return None
-    model = CasceHeteroGAT()
     if model_path and os.path.exists(model_path):
-        state = torch.load(model_path, map_location="cpu", weights_only=False)
-        try:
-            model.load_state_dict(state, strict=False)
-            print(f"[algo4] Loaded trained GAT weights from {model_path}")
-        except Exception as e:
-            print(f"[algo4] WARNING: could not load weights ({e}); using untrained model.")
-    else:
-        warnings.warn("No trained GAT checkpoint found — gat_score will be near-random "
-                       "until train mode is run. The rule path is unaffected.", RuntimeWarning)
-    return model
+        ckpt = torch.load(model_path, map_location="cpu", weights_only=False)
+        if isinstance(ckpt, dict) and "state_dict" in ckpt:
+            model = CasceHeteroGAT(**ckpt["config"])
+            model.load_state_dict(ckpt["state_dict"])
+        else:  # legacy bare state_dict: default architecture
+            model = CasceHeteroGAT()
+            try:
+                model.load_state_dict(ckpt)
+            except Exception as e:
+                print(f"[algo4] WARNING: could not load legacy weights ({e}); using untrained model.")
+                return model
+        print(f"[algo4] Loaded trained GAT weights from {model_path}")
+        return model
+    warnings.warn("No trained GAT checkpoint found — gat_score will be near-random "
+                  "until train mode is run. The rule path is unaffected.", RuntimeWarning)
+    return CasceHeteroGAT()
+
+
+def save_model(model, path):
+    torch.save({"config": model.config, "state_dict": model.state_dict()}, path)
 
 
 def run_detection(input_dirs, outdir, model_path, theta_a, theta_r):
@@ -714,110 +780,91 @@ def run_detection(input_dirs, outdir, model_path, theta_a, theta_r):
     print(f"\nProcessed {len(results)} session graphs. Summary: {os.path.join(outdir, '_summary.json')}")
 
 
-def _compute_epoch_loss(model, dataset, loss_fn):
-    """Compute average loss over a dataset without gradient updates."""
-    model.eval()
-    total = 0.0
-    with torch.no_grad():
-        for data, y in dataset:
-            logit = model(data)
-            loss = loss_fn(logit.unsqueeze(0), torch.tensor([y]))
-            total += loss.item()
-    return total / max(1, len(dataset))
+def train_model(train_data, val_data=None, cfg=None, log=print):
+    """Train a CasceHeteroGAT on a list of labelled HeteroData.
+
+    AdamW (decoupled weight decay), mini-batches, fixed seed, early stopping on
+    validation loss. Returns (model, history); the model is restored to its
+    best-validation weights. `val_data` only steers early stopping -- it is
+    never trained on, and thresholds must not be tuned on the test split.
+    """
+    if not TORCH_AVAILABLE:
+        raise SystemExit("torch + torch_geometric are required for training.")
+    c = {**DEFAULT_TRAIN_CFG, **(cfg or {})}
+    set_seed(c["seed"])
+
+    model = CasceHeteroGAT(hidden_dim=c["hidden_dim"], heads=c["heads"],
+                           num_layers=c["num_layers"], dropout=c["dropout"])
+    opt = torch.optim.AdamW(model.parameters(), lr=c["lr"], weight_decay=c["weight_decay"])
+
+    n_pos = int(sum(float(d.y.item()) == 1.0 for d in train_data))
+    n_neg = len(train_data) - n_pos
+    pos_weight = torch.tensor([n_neg / max(1, n_pos)]) if n_pos else torch.tensor([1.0])
+    loss_fn = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
+    log(f"[train] {len(train_data)} graphs ({n_neg} benign, {n_pos} malicious), "
+        f"{count_parameters(model):,} params, cfg={ {k: c[k] for k in ('hidden_dim','heads','dropout','weight_decay','batch_size')} }")
+
+    gen = torch.Generator().manual_seed(c["seed"])
+    train_loader = DataLoader(train_data, batch_size=c["batch_size"], shuffle=True, generator=gen)
+    val_loader = DataLoader(val_data, batch_size=256) if val_data else None
+
+    best_val, best_state, bad = float("inf"), None, 0
+    history = []
+    for epoch in range(1, c["epochs"] + 1):
+        model.train()
+        tot, cnt = 0.0, 0
+        for batch in train_loader:
+            opt.zero_grad()
+            loss = loss_fn(model(batch), batch.y)
+            loss.backward()
+            opt.step()
+            tot += loss.item() * batch.num_graphs
+            cnt += batch.num_graphs
+        rec = {"epoch": epoch, "train_loss": tot / cnt}
+        if val_loader is not None:
+            model.eval()
+            vt, vc = 0.0, 0
+            with torch.no_grad():
+                for batch in val_loader:
+                    vt += loss_fn(model(batch), batch.y).item() * batch.num_graphs
+                    vc += batch.num_graphs
+            rec["val_loss"] = vt / vc
+            if rec["val_loss"] < best_val - 1e-4:
+                best_val, bad = rec["val_loss"], 0
+                best_state = {k: v.clone() for k, v in model.state_dict().items()}
+            else:
+                bad += 1
+        history.append(rec)
+        log(f"[train] epoch {epoch}/{c['epochs']}  " +
+            "  ".join(f"{k}={v:.4f}" for k, v in rec.items() if k != "epoch"))
+        if val_loader is not None and bad >= c["patience"]:
+            log(f"[train] early stop at epoch {epoch} (best val_loss={best_val:.4f})")
+            break
+    if best_state is not None:
+        model.load_state_dict(best_state)
+    return model, history
 
 
 def train_gat(args):
-    """Train with proper train/validation split and early stopping."""
-    if not TORCH_AVAILABLE:
-        raise SystemExit("torch + torch_geometric are required for --mode train.")
-
-    # Load training data
     train_data = _load_dataset_from_dirs(args.train_dir, args.train_labels)
     if not train_data:
         raise RuntimeError("No training graphs found — check --train-dir and --train-labels.")
-
-    # Load validation data (optional but recommended)
     val_data = []
     if args.val_dir and args.val_labels:
         val_data = _load_dataset_from_dirs(args.val_dir, args.val_labels)
-
-    n_pos = sum(1 for _, y in train_data if y == 1.0)
-    n_neg = len(train_data) - n_pos
-    print(f"[train] Training set: {len(train_data)} graphs ({n_neg} normal, {n_pos} malicious)")
-    if val_data:
-        v_pos = sum(1 for _, y in val_data if y == 1.0)
-        v_neg = len(val_data) - v_pos
-        print(f"[train] Validation set: {len(val_data)} graphs ({v_neg} normal, {v_pos} malicious)")
-
-    model = CasceHeteroGAT()
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
-
-    pos_weight = torch.tensor([n_neg / max(1, n_pos)]) if n_pos > 0 else torch.tensor([1.0])
-    loss_fn = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
-
-    # Early stopping state
-    best_val_loss = float('inf')
-    patience = 5
-    patience_counter = 0
-    best_state = None
-
-    for epoch in range(1, args.epochs + 1):
-        # --- Training ---
-        model.train()
-        total_loss = 0.0
-        for data, y in train_data:
-            optimizer.zero_grad()
-            logit = model(data)
-            loss = loss_fn(logit.unsqueeze(0), torch.tensor([y]))
-            loss.backward()
-            optimizer.step()
-            total_loss += loss.item()
-        train_loss = total_loss / len(train_data)
-
-        # --- Validation ---
-        if val_data:
-            val_loss = _compute_epoch_loss(model, val_data, loss_fn)
-            print(f"[train] epoch {epoch}/{args.epochs}  train_loss={train_loss:.4f}  val_loss={val_loss:.4f}")
-
-            # Early stopping check
-            if val_loss < best_val_loss:
-                best_val_loss = val_loss
-                patience_counter = 0
-                best_state = {k: v.clone() for k, v in model.state_dict().items()}
-            else:
-                patience_counter += 1
-                if patience_counter >= patience:
-                    print(f"[train] Early stopping at epoch {epoch} (val_loss not improving for {patience} epochs)")
-                    break
-        else:
-            print(f"[train] epoch {epoch}/{args.epochs}  train_loss={train_loss:.4f}")
-
-    # Restore best model if we did early stopping
-    if best_state is not None:
-        model.load_state_dict(best_state)
-        print(f"[train] Restored best model (val_loss={best_val_loss:.4f})")
-
-    torch.save(model.state_dict(), args.model_path)
+    cfg = dict(epochs=args.epochs, lr=args.lr, weight_decay=args.weight_decay,
+               dropout=args.dropout, hidden_dim=args.hidden_dim, heads=args.heads,
+               batch_size=args.batch_size, seed=args.seed)
+    model, _ = train_model(train_data, val_data, cfg)
+    save_model(model, args.model_path)
     print(f"[train] Saved trained GAT weights to {args.model_path}")
 
 
-def evaluate_model(args):
-    """Evaluate the trained model on a labeled dataset and report metrics.
-
-    Reports ablation metrics (rule-only, GAT-only, fused) separately,
-    warns if the eval set is single-class, and optionally fits a
-    shallow DecisionTree baseline as a memorization diagnostic.
-    """
-    if not TORCH_AVAILABLE:
-        raise SystemExit("torch + torch_geometric are required for --mode evaluate. "
-                         "Heuristic fallback cannot be used for scientific evaluation.")
-
-    model = load_model(args.model_path)
-
-    dirs = [d.strip() for d in args.input_dir.split(',') if d.strip()]
-    label_files = [f.strip() for f in args.labels.split(',') if f.strip()]
-
-    y_true, y_scores, y_rule, y_gat = [], [], [], []
+def _score_dirs(model, dir_str, label_str):
+    """Run detect() over labelled graphs; returns y, fused, rule, gat arrays."""
+    dirs = [d.strip() for d in dir_str.split(',') if d.strip()]
+    label_files = [f.strip() for f in label_str.split(',') if f.strip()]
+    y, fused, rule, gat = [], [], [], []
     for d, lf in zip(dirs, label_files):
         with open(lf) as f:
             labels = json.load(f)
@@ -825,180 +872,89 @@ def evaluate_model(args):
             path = os.path.join(d, filename)
             if not os.path.exists(path):
                 continue
-            G = nx.read_graphml(path)
-            assessment = detect(G, model, session_id=filename)
-            y_true.append(int(label))
-            y_scores.append(assessment['risk'])
-            y_rule.append(assessment['rule_score'])
-            y_gat.append(assessment['gat_score'])
-
-    if not y_true:
+            a = detect(nx.read_graphml(path), model, session_id=filename)
+            y.append(int(label)); fused.append(a["risk"])
+            rule.append(a["rule_score"]); gat.append(a["gat_score"])
+    if not y:
         raise RuntimeError("No evaluation data found.")
+    return y, fused, rule, gat
 
-    # Class distribution diagnostic
-    n_mal = sum(y_true)
-    n_ben = len(y_true) - n_mal
-    single_class = (n_mal == 0 or n_ben == 0)
 
-    if single_class:
-        print(f"\n  ⚠ WARNING: Evaluation set is 100% {'malicious' if n_mal > 0 else 'benign'}!")
-        print(f"    FPR is unmeasurable. Any 'predict-all' strategy scores 100%.")
-        print(f"    This evaluation CANNOT FAIL.\n")
+def evaluate_model(args):
+    """Report rule-only, GAT-only and fused metrics on a labelled set.
 
-    def _metrics(y_t, y_s, threshold):
-        y_p = [1 if s >= threshold else 0 for s in y_s]
-        tp = sum(1 for t, p in zip(y_t, y_p) if t == 1 and p == 1)
-        fp = sum(1 for t, p in zip(y_t, y_p) if t == 0 and p == 1)
-        fn = sum(1 for t, p in zip(y_t, y_p) if t == 1 and p == 0)
-        tn = sum(1 for t, p in zip(y_t, y_p) if t == 0 and p == 0)
-        prec = tp / max(1, tp + fp)
-        rec = tp / max(1, tp + fn)
-        f1 = 2 * prec * rec / max(1e-9, prec + rec)
-        acc = (tp + tn) / max(1, len(y_t))
-        return {'tp': tp, 'fp': fp, 'fn': fn, 'tn': tn,
-                'precision': round(prec, 4), 'recall': round(rec, 4),
-                'f1': round(f1, 4), 'accuracy': round(acc, 4)}
+    Thresholds: --theta-a for fused/GAT-only/rule-only unless overridden. Pick
+    them with --mode tune on VALIDATION labels, then evaluate once on test.
+    """
+    if not TORCH_AVAILABLE:
+        raise SystemExit("torch + torch_geometric are required for --mode evaluate.")
+    from casce_metrics import binary_report
 
-    # Ablation: compute metrics for each scoring path
-    fused = _metrics(y_true, y_scores, THETA_A)
-    rule_only = _metrics(y_true, y_rule, THETA_R)
-    gat_only = _metrics(y_true, y_gat, 0.5)
+    model = load_model(args.model_path)
+    y, fused, rule, gat = _score_dirs(model, args.input_dir, args.labels)
+    n_mal = sum(y)
+    if n_mal in (0, len(y)):
+        print(f"\n  ⚠ WARNING: evaluation set is 100% {'malicious' if n_mal else 'benign'} — "
+              f"FPR/AUC unmeasurable; this evaluation cannot fail.\n")
 
-    results = {
-        'threshold': THETA_A,
-        'total_samples': len(y_true),
-        'class_distribution': {'malicious': n_mal, 'benign': n_ben},
-        'single_class_warning': single_class,
-        'fused': fused,
-        'rule_only': rule_only,
-        'gat_only': gat_only,
-        'confusion_matrix': [[fused['tn'], fused['fp']], [fused['fn'], fused['tp']]],
-    }
-
-    print(f"\n{'='*60}")
-    print(f"  EVALUATION RESULTS (θ_A = {THETA_A})")
-    print(f"{'='*60}")
-    print(f"  Samples:   {len(y_true)} ({n_mal} malicious, {n_ben} benign)")
-
-    print(f"\n  {'Scorer':<12} {'Acc':>6} {'Prec':>6} {'Recall':>6} {'F1':>6}")
-    print(f"  {'-'*38}")
-    for name, m in [('Fused', fused), ('Rule-only', rule_only), ('GAT-only', gat_only)]:
-        print(f"  {name:<12} {m['accuracy']:6.4f} {m['precision']:6.4f} {m['recall']:6.4f} {m['f1']:6.4f}")
-
-    print(f"\n  Confusion Matrix (Fused):")
-    print(f"              Pred Normal  Pred Malicious")
-    print(f"  True Normal     {fused['tn']:5d}       {fused['fp']:5d}")
-    print(f"  True Malicious  {fused['fn']:5d}       {fused['tp']:5d}")
-
-    # GAT adds value?
-    gat_lift = fused['f1'] - rule_only['f1']
-    if gat_lift <= 0:
-        print(f"\n  ⚠ GAT adds no F1 lift over rule-only ({gat_lift:+.4f}).")
-        print(f"    The GNN may be memorizing or redundant.")
-    else:
-        print(f"\n  ✓ GAT F1 lift over rule-only: {gat_lift:+.4f}")
-
-    print(f"{'='*60}")
-
-    # Save results
-    out_path = os.path.join(args.outdir, "evaluation_results.json")
+    reports = {"fused": binary_report(y, fused, args.theta_a),
+               "rule_only": binary_report(y, rule, 0.5),
+               "gat_only": binary_report(y, gat, 0.5)}
+    print(f"\n{'='*72}\n  EVALUATION  n={len(y)} ({n_mal} malicious, {len(y)-n_mal} benign)\n{'='*72}")
+    print(f"  {'Scorer':<10}{'thr':>5}{'Acc':>7}{'Prec':>7}{'Rec':>7}{'F1':>7}{'FPR':>7}{'ROC':>7}{'PR':>7}{'Brier':>7}{'ECE':>7}")
+    f = lambda v: "  n/a" if v is None else f"{v:7.3f}"
+    for name, r in reports.items():
+        print(f"  {name:<10}{r['threshold']:5.2f}{r['accuracy']:7.3f}{r['precision']:7.3f}{r['recall']:7.3f}"
+              f"{r['f1']:7.3f}{r['fpr']:7.3f}{f(r['roc_auc'])}{f(r['pr_auc'])}{r['brier']:7.3f}{r['ece']:7.3f}")
     os.makedirs(args.outdir, exist_ok=True)
-    with open(out_path, 'w') as f:
-        json.dump(results, f, indent=2)
-    print(f"\n  Results saved to {out_path}")
-
-    return results
+    out = os.path.join(args.outdir, "evaluation_results.json")
+    with open(out, "w") as fh:
+        json.dump(reports, fh, indent=2)
+    print(f"\n  Results saved to {out}")
+    return reports
 
 
 def tune_thresholds(args):
-    """Sweep θ_A to find the threshold maximizing F1 on validation data."""
+    """Sweep theta on VALIDATION data to maximise F1. Refuses test label files."""
     if not TORCH_AVAILABLE:
         raise SystemExit("torch + torch_geometric are required for --mode tune.")
+    from casce_metrics import best_f1_threshold, binary_report
 
+    if any("test" in os.path.basename(p).lower() for p in args.labels.split(",")):
+        raise SystemExit("Refusing to tune thresholds on a label file named *test*: "
+                         "tuning on the evaluation split leaks it. Pass validation labels.")
     model = load_model(args.model_path)
-
-    dirs = [d.strip() for d in args.input_dir.split(',') if d.strip()]
-    label_files = [f.strip() for f in args.labels.split(',') if f.strip()]
-
-    y_true, y_scores = [], []
-    for d, lf in zip(dirs, label_files):
-        with open(lf) as f:
-            labels = json.load(f)
-        for filename, label in labels.items():
-            path = os.path.join(d, filename)
-            if not os.path.exists(path):
-                continue
-            G = nx.read_graphml(path)
-            assessment = detect(G, model, session_id=filename)
-            y_true.append(int(label))
-            y_scores.append(assessment['risk'])
-
-    if not y_true:
-        raise RuntimeError("No data for threshold tuning.")
-
-    print(f"\n{'='*60}")
-    print(f"  THRESHOLD TUNING (sweeping θ_A)")
-    print(f"{'='*60}")
-    print(f"  {'θ_A':>6}  {'Prec':>6}  {'Recall':>6}  {'F1':>6}  {'Acc':>6}")
-    print(f"  {'-'*36}")
-
-    best_f1, best_theta = 0, THETA_A
-    sweep_results = []
-
-    for theta_int in range(10, 91, 5):
-        theta = theta_int / 100.0
-        y_pred = [1 if s >= theta else 0 for s in y_scores]
-        tp = sum(1 for t, p in zip(y_true, y_pred) if t == 1 and p == 1)
-        fp = sum(1 for t, p in zip(y_true, y_pred) if t == 0 and p == 1)
-        fn = sum(1 for t, p in zip(y_true, y_pred) if t == 1 and p == 0)
-        tn = sum(1 for t, p in zip(y_true, y_pred) if t == 0 and p == 0)
-        prec = tp / max(1, tp + fp)
-        rec = tp / max(1, tp + fn)
-        f1 = 2 * prec * rec / max(1e-9, prec + rec)
-        acc = (tp + tn) / max(1, len(y_true))
-
-        sweep_results.append({'theta': theta, 'precision': prec, 'recall': rec, 'f1': f1, 'accuracy': acc})
-        print(f"  {theta:6.2f}  {prec:6.3f}  {rec:6.3f}  {f1:6.3f}  {acc:6.3f}")
-
-        if f1 > best_f1:
-            best_f1 = f1
-            best_theta = theta
-
-    print(f"\n  ★ Best F1 = {best_f1:.4f} at θ_A = {best_theta:.2f}")
-    print(f"    Recommended: update THETA_A = {best_theta}")
-
-    out_path = os.path.join(args.outdir, "threshold_sweep.json")
+    y, fused, _rule, _gat = _score_dirs(model, args.input_dir, args.labels)
+    best = best_f1_threshold(y, fused)
+    rep = binary_report(y, fused, best)
+    print(f"\n  Best fused F1 on validation = {rep['f1']:.4f} at theta_A = {best:.2f} "
+          f"(ROC-AUC {rep['roc_auc']}, PR-AUC {rep['pr_auc']})")
     os.makedirs(args.outdir, exist_ok=True)
-    with open(out_path, 'w') as f:
-        json.dump({'best_theta': best_theta, 'best_f1': best_f1, 'sweep': sweep_results}, f, indent=2)
-    print(f"    Sweep results saved to {out_path}")
+    with open(os.path.join(args.outdir, "threshold_sweep.json"), "w") as fh:
+        json.dump({"best_theta": best, "validation_report": rep}, fh, indent=2)
 
 
 def parse_args():
     p = argparse.ArgumentParser(description="CASCE Algorithm 4 — Hybrid Cross-Layer Threat Detection")
     p.add_argument("--mode", choices=["detect", "train", "evaluate", "tune"], default="detect")
-
-    # Shared
-    p.add_argument("--input-dir", default=None,
-                   help="Comma-separated enriched graph dirs (detect/evaluate/tune)")
+    p.add_argument("--input-dir", default=None, help="Comma-separated enriched graph dirs (detect/evaluate/tune)")
     p.add_argument("--outdir", default="./alg4_out")
     p.add_argument("--model-path", default="./casce_gat.pt")
-    p.add_argument("--labels", default=None,
-                   help="Comma-separated label JSON files (evaluate/tune)")
+    p.add_argument("--labels", default=None, help="Comma-separated label JSON files (evaluate/tune)")
     p.add_argument("--theta-a", type=float, default=THETA_A)
     p.add_argument("--theta-r", type=float, default=THETA_R)
-
-    # Train-specific
-    p.add_argument("--train-dir", default=None,
-                   help="Comma-separated training enriched graph dirs")
-    p.add_argument("--val-dir", default=None,
-                   help="Comma-separated validation enriched graph dirs")
-    p.add_argument("--train-labels", default=None,
-                   help="Comma-separated training label JSON files")
-    p.add_argument("--val-labels", default=None,
-                   help="Comma-separated validation label JSON files")
-    p.add_argument("--epochs", type=int, default=50)
-    p.add_argument("--lr", type=float, default=1e-3)
+    p.add_argument("--train-dir", default=None)
+    p.add_argument("--val-dir", default=None)
+    p.add_argument("--train-labels", default=None)
+    p.add_argument("--val-labels", default=None)
+    p.add_argument("--epochs", type=int, default=EPOCHS)
+    p.add_argument("--lr", type=float, default=LEARNING_RATE)
+    p.add_argument("--weight-decay", type=float, default=WEIGHT_DECAY)
+    p.add_argument("--dropout", type=float, default=DROPOUT)
+    p.add_argument("--hidden-dim", type=int, default=HIDDEN_DIM)
+    p.add_argument("--heads", type=int, default=HEADS)
+    p.add_argument("--batch-size", type=int, default=BATCH_SIZE)
+    p.add_argument("--seed", type=int, default=SEED)
     return p.parse_args()
 
 

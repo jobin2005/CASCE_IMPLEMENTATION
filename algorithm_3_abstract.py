@@ -128,7 +128,11 @@ def initialize_templates():
     g_account = nx.DiGraph()
     g_account.add_node("T_Query", type="Query")
     g_account.add_node("T_Role", type="Role")
-    g_account.add_edge("T_Query", "T_Role", relation="modifies")
+    # Algorithm 2 (and codegen's expectation mirror of it) links Query->Role with
+    # "accesses"; it never emits "modifies". Requiring "modifies" here meant this
+    # template could not match any real graph (ACCOUNT_MANIPULATION fired 0 times
+    # across the 10k corpus, CREATE ROLE ... SUPERUSER included).
+    g_account.add_edge("T_Query", "T_Role", relation="accesses")
     templates.append(BehaviorTemplate(
         label="ACCOUNT_MANIPULATION", 
         mitre_id="T1098", 

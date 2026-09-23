@@ -977,6 +977,8 @@ def _identify_node_types(rec: EmittedRecord) -> List[str]:
             types.append("Table")
         if facts.get("role_name"):
             types.append("Role")
+        if facts.get("is_system_config") and facts.get("setting_name"):
+            types.append("Configuration")
         return types
 
     syscall = rec.raw.get("syscall")
@@ -1004,6 +1006,9 @@ def _node_key_hint(node_type, rec: EmittedRecord):
     if node_type == "Role":
         v = facts.get("role_name")
         return v, str(v)
+    if node_type == "Configuration":
+        v = facts.get("setting_name")
+        return v, str(v)
     if node_type == "Process":
         v = rec.raw.get("pid")
         return v, str(v)
@@ -1021,6 +1026,8 @@ def _find_connection(node_type, rec, process_keys, pending, pending_ts):
         return ("Session", rec.session.backend_pid), "executes"
     if node_type in ("Table", "Role"):
         return ("Query", rec.event_id), "accesses"
+    if node_type == "Configuration":
+        return ("Query", rec.event_id), "modifies"
     if node_type == "Process":
         ppid = rec.raw.get("ppid")
         if ppid and ("Process", ppid) in process_keys:

@@ -20,6 +20,11 @@ def identify_node_types(e: dict, facts: dict) -> list[str]:
             types.append("Table")
         if facts.get("role_name"):
             types.append("Role")
+        # ALTER SYSTEM SET / SET <setting> (sqlfacts: is_system_config): config
+        # tampering has neither a table nor a role, so without this branch the
+        # Query node stayed disconnected -- invisible to DEFENSE_IMPAIRMENT.
+        if facts.get("is_system_config") and facts.get("setting_name"):
+            types.append("Configuration")
         return types
     syscall = e.get("syscall")
     if syscall == "execve":

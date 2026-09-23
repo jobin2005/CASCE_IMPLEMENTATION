@@ -48,6 +48,9 @@ def find_connection_rule(G, node_type, e, facts):
     if node_type == "Role":
         return get_node(G, "Query", e["event_id"]), "accesses"
 
+    if node_type == "Configuration":
+        return get_node(G, "Query", e["event_id"]), "modifies"
+
     if node_type == "Process":
         # Priority 1: PID lineage -- parent already a Process node in G?
         # Handles multi-hop chains (sh -> gzip -> curl) regardless of elapsed
