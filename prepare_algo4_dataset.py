@@ -101,18 +101,36 @@ def prepare_splits(data_dir: Path, train_ratio=0.6, val_ratio=0.2, seed=42):
 
         families[fid].append((filename, label))
 
-    # Split families into train/val/test
-    family_ids = sorted(families.keys())
-    random.seed(seed)
-    random.shuffle(family_ids)
+    # Split families into train/val/test using stratified family assignment
+    mal_fams = []
+    ben_fams = []
+    for fid, items in families.items():
+        if any(lbl == 1 for _, lbl in items):
+            mal_fams.append(fid)
+        else:
+            ben_fams.append(fid)
 
-    n_families = len(family_ids)
-    n_train = int(n_families * train_ratio)
-    n_val = int(n_families * val_ratio)
+    rng = random.Random(seed)
+    rng.shuffle(mal_fams)
+    rng.shuffle(ben_fams)
 
-    train_families = set(family_ids[:n_train])
-    val_families = set(family_ids[n_train:n_train + n_val])
-    test_families = set(family_ids[n_train + n_val:])
+    def _split_list(lst):
+        n = len(lst)
+        n_tr = max(1, int(n * train_ratio)) if n > 0 else 0
+        n_v = max(1, int(n * val_ratio)) if n - n_tr > 1 else (1 if n - n_tr > 0 else 0)
+        return set(lst[:n_tr]), set(lst[n_tr:n_tr + n_v]), set(lst[n_tr + n_v:])
+
+    tr_mal, v_mal, te_mal = _split_list(mal_fams)
+    tr_ben, v_ben, te_ben = _split_list(ben_fams)
+
+    train_families = tr_mal | tr_ben
+    val_families = v_mal | v_ben
+    test_families = te_mal | te_ben
+
+    # Handle edge case where small sample size left test empty
+    if not test_families and (val_families or train_families):
+        donor = val_families if len(val_families) > 1 else train_families
+        test_families.add(donor.pop())
 
     train_dict = {}
     val_dict = {}
@@ -157,6 +175,7 @@ def prepare_splits(data_dir: Path, train_ratio=0.6, val_ratio=0.2, seed=42):
         n_mal = sum(d.values())
         return f"{len(d)} graphs ({n_mal} malicious, {len(d)-n_mal} benign)"
 
+    n_families = len(families)
     print(f"\nSaved Family-Aware Splits to '{out_dir}':")
     print(f"  Families:  {n_families} total ({len(train_families)} train, "
           f"{len(val_families)} val, {len(test_families)} test)")

