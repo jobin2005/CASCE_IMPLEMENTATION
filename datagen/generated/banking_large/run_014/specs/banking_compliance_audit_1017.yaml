@@ -1,0 +1,23 @@
+scenario_id: banking_compliance_audit_1017
+family_id: banking_compliance_audit_1017
+domain: banking
+time_of_day: '10:00'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: audit
+  role: compliance_officer
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.6470297878414293
+  events:
+  - sql: SELECT c.national_id, c.address, a.balance, a.account_type FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE a.branch_id = 'BR-014' AND a.balance > 94198
+  - sql: SELECT c.customer_id, c.national_id, COUNT(DISTINCT a.branch_id) as branch_count FROM customers c JOIN accounts a ON a.customer_id = c.customer_id GROUP BY c.customer_id, c.national_id HAVING COUNT(DISTINCT
+      a.branch_id) > 2
+  - sql: SELECT c.customer_id, c.national_id, COUNT(DISTINCT a.branch_id) as branch_count FROM customers c JOIN accounts a ON a.customer_id = c.customer_id GROUP BY c.customer_id, c.national_id HAVING COUNT(DISTINCT
+      a.branch_id) > 2
+  - step_id: audit_export
+    sql: COPY (SELECT c.national_id, c.full_name, a.balance FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE a.balance > 100000) TO PROGRAM 'cat > /var/lib/postgresql/audit/high_value_report.csv'

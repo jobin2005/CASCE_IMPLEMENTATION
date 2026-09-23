@@ -1,0 +1,22 @@
+scenario_id: healthcare_nurse_routine_0008
+family_id: healthcare_nurse_routine_0008
+domain: healthcare
+time_of_day: '13:45'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: nurse_work
+  role: nurse
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.7411517446258666
+  events:
+  - sql: SELECT a.appointment_id, p.full_name, a.reason FROM appointments a JOIN patients p ON p.patient_id = a.patient_id WHERE a.doctor_id = 383 AND a.appointment_time > NOW() - INTERVAL '1 day' ORDER
+      BY a.appointment_time
+  - sql: SELECT p.prescription_id, p.drug_name, p.dosage FROM prescriptions p WHERE p.patient_id = 48005 ORDER BY p.issued_at DESC LIMIT 5
+  - step_id: daily_report
+    sql: COPY (SELECT a.appointment_id, a.patient_id, a.status FROM appointments a WHERE a.doctor_id IN (SELECT doctor_id FROM doctors WHERE department_id = 'DEPT-PATH') AND a.appointment_time > NOW() -
+      INTERVAL '1 day') TO PROGRAM 'cat > /var/lib/postgresql/reports/dept_DEPT-PATH_daily.csv'

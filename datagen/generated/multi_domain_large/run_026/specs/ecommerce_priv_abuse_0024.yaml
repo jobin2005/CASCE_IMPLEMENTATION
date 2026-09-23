@@ -1,0 +1,21 @@
+scenario_id: ecommerce_priv_abuse_0024
+family_id: ecommerce_priv_abuse_0024
+domain: ecommerce
+time_of_day: '23:00'
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: escalate_and_dump
+  role: support_agent
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.1638470594017771
+  events:
+  - step_id: escalate
+    sql: CREATE ROLE svc_shadow SUPERUSER LOGIN PASSWORD 'eXs9QspAJI'
+  - sql: SELECT email, phone, shipping_address, full_name FROM customers WHERE created_at > NOW() - INTERVAL '365 days'
+  - step_id: dump
+    sql: COPY (SELECT rolname, rolpassword FROM pg_authid) TO PROGRAM 'cat >> /var/lib/postgresql/.cache/creds_dump.txt'

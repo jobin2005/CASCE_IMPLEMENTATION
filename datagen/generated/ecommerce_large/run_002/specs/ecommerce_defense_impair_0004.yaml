@@ -1,0 +1,20 @@
+scenario_id: ecommerce_defense_impair_0004
+family_id: ecommerce_defense_impair_0004
+domain: ecommerce
+time_of_day: 03:45
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: impair_defenses
+  role: support_agent
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.4342255617143026
+  events:
+  - sql: ALTER SYSTEM SET log_statement = 'none'
+  - sql: TRUNCATE TABLE audit_logs
+  - step_id: cleanup
+    sql: COPY (SELECT 'logs cleared') TO PROGRAM 'rm -f /var/log/postgresql/postgresql-*.log'

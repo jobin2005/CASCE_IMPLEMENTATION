@@ -1,0 +1,23 @@
+scenario_id: ecommerce_catalog_manager_eod_0003
+family_id: ecommerce_catalog_manager_eod_0003
+domain: ecommerce
+time_of_day: '16:00'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: catalog_manager
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.1459404533765385
+  events:
+  - sql: SELECT p.product_id, p.name, SUM(oi.quantity) as total_sold FROM products p JOIN order_items oi ON oi.product_id = p.product_id WHERE p.category = 'Food' GROUP BY p.product_id, p.name ORDER BY
+      total_sold DESC LIMIT 20
+  - sql: UPDATE products SET price = 280.99 WHERE product_id = 2747
+  - sql: SELECT product_id, name, price, stock_qty FROM products WHERE category = 'Food' ORDER BY stock_qty ASC
+  - sql: SELECT product_id, name, stock_qty FROM products WHERE stock_qty < 14 AND category = 'Food'
+  - step_id: eod_report
+    sql: COPY (SELECT p.product_id, p.name, p.price, p.stock_qty FROM products p WHERE p.category = 'Jewelry') TO PROGRAM 'cat > /var/lib/postgresql/reports/catalog_update.csv'

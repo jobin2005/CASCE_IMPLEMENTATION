@@ -1,0 +1,23 @@
+scenario_id: healthcare_physician_eod_0023
+family_id: healthcare_physician_eod_0023
+domain: healthcare
+time_of_day: '18:30'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: physician
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.224816790545135
+  events:
+  - sql: SELECT p.full_name, pr.drug_name, pr.dosage FROM patients p JOIN prescriptions pr ON pr.patient_id = p.patient_id WHERE pr.doctor_id = 210 AND pr.issued_at > NOW() - INTERVAL '30 days'
+  - sql: SELECT p.full_name, pr.drug_name, pr.dosage FROM patients p JOIN prescriptions pr ON pr.patient_id = p.patient_id WHERE pr.doctor_id = 210 AND pr.issued_at > NOW() - INTERVAL '30 days'
+  - sql: SELECT p.full_name, pr.drug_name, pr.dosage FROM patients p JOIN prescriptions pr ON pr.patient_id = p.patient_id WHERE pr.doctor_id = 210 AND pr.issued_at > NOW() - INTERVAL '30 days'
+  - sql: SELECT p.full_name, pr.drug_name, pr.dosage FROM patients p JOIN prescriptions pr ON pr.patient_id = p.patient_id WHERE pr.doctor_id = 210 AND pr.issued_at > NOW() - INTERVAL '30 days'
+  - step_id: eod_report
+    sql: COPY (SELECT a.appointment_id, p.full_name, a.reason FROM appointments a JOIN patients p ON p.patient_id = a.patient_id WHERE a.doctor_id IN (SELECT doctor_id FROM doctors WHERE department_id =
+      'DEPT-PEDS') AND a.appointment_time > NOW() - INTERVAL '1 day') TO PROGRAM 'cat > /var/lib/postgresql/reports/dept_DEPT-PEDS_daily.csv'

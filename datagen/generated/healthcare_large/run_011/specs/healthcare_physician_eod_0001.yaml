@@ -1,0 +1,23 @@
+scenario_id: healthcare_physician_eod_0001
+family_id: healthcare_physician_eod_0001
+domain: healthcare
+time_of_day: '18:30'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: physician
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.030845557661655
+  events:
+  - sql: SELECT a.appointment_id, p.full_name, a.reason FROM appointments a JOIN patients p ON p.patient_id = a.patient_id WHERE a.doctor_id = 144 AND a.status = 'scheduled' ORDER BY a.appointment_time
+  - sql: INSERT INTO prescriptions (patient_id, doctor_id, drug_name, dosage, issued_at) VALUES (31587, 144, 'Amoxicillin', '500mg TID x 10 days', NOW())
+  - sql: UPDATE appointments SET status = 'completed' WHERE appointment_id = 95942 AND doctor_id = 144
+  - sql: UPDATE appointments SET status = 'completed' WHERE appointment_id = 95942 AND doctor_id = 144
+  - step_id: eod_report
+    sql: COPY (SELECT a.appointment_id, p.full_name, a.reason FROM appointments a JOIN patients p ON p.patient_id = a.patient_id WHERE a.doctor_id IN (SELECT doctor_id FROM doctors WHERE department_id =
+      'DEPT-ICU') AND a.appointment_time > NOW() - INTERVAL '1 day') TO PROGRAM 'cat > /var/lib/postgresql/reports/dept_DEPT-ICU_daily.csv'

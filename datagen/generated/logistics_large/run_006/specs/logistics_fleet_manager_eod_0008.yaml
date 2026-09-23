@@ -1,0 +1,22 @@
+scenario_id: logistics_fleet_manager_eod_0008
+family_id: logistics_fleet_manager_eod_0008
+domain: logistics
+time_of_day: '18:00'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: fleet_manager
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.539252205645509
+  events:
+  - sql: SELECT d.depot_id, d.full_name, COUNT(s.shipment_id) as shipment_count FROM drivers d JOIN shipments s ON s.driver_id = d.driver_id WHERE d.depot_id IN ('DEPOT-PORT', 'DEPOT-HUB-2') AND s.dispatched_at
+      > NOW() - INTERVAL '30 days' GROUP BY d.depot_id, d.full_name ORDER BY shipment_count DESC
+  - sql: SELECT d.depot_id, d.full_name, COUNT(s.shipment_id) as shipment_count FROM drivers d JOIN shipments s ON s.driver_id = d.driver_id WHERE d.depot_id IN ('DEPOT-PORT', 'DEPOT-HUB-2') AND s.dispatched_at
+      > NOW() - INTERVAL '30 days' GROUP BY d.depot_id, d.full_name ORDER BY shipment_count DESC
+  - step_id: eod_report
+    sql: COPY (SELECT v.vehicle_id, v.plate_number, v.capacity_kg FROM vehicles v WHERE v.depot_id = 'DEPOT-RAIL') TO PROGRAM 'cat > /var/lib/postgresql/reports/fleet_DEPOT-RAIL_status.csv'

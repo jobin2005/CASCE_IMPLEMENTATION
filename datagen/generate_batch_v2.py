@@ -38,6 +38,18 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
+_DATAGEN_DIR = Path(__file__).resolve().parent
+if str(_DATAGEN_DIR) not in sys.path:
+    sys.path.insert(0, str(_DATAGEN_DIR))
+
+from domain_knowledge import (
+    get_domain_category_generators, ALL_DOMAINS, DOMAIN_CONFIG,
+    make_etl_benign as _dk_etl_benign,
+    make_etl_exfil_malicious as _dk_etl_exfil_mal,
+    make_frontline_routine_benign as _dk_frontline_benign,
+    make_audit_benign as _dk_audit_benign,
+    make_senior_eod_benign as _dk_senior_benign,
+)
 
 
 # ==========================================================================
@@ -722,21 +734,83 @@ def _weighted_choices(rng, categories, n):
     return rng.choices(funcs, weights=probs, k=n)
 
 
+def _is_etl_benign(func) -> bool:
+    if func is _make_etl_benign:
+        return True
+    return getattr(func, '__wrapped_original__', None) is _dk_etl_benign
+
+
+def _is_etl_malicious(func) -> bool:
+    if func is _make_etl_exfil_malicious:
+        return True
+    return getattr(func, '__wrapped_original__', None) is _dk_etl_exfil_mal
+
+
+def _get_func_domain(func) -> str:
+    return getattr(func, '__domain__', None) or "banking"
+
+
+def _build_domain_helpers(generators):
+    """Group ETL pairs and benign replacements by domain."""
+    etl_ben_by_domain = {}
+    etl_mal_by_domain = {}
+    replacements_by_domain = defaultdict(list)
+
+    banking_fallbacks = [_make_teller_routine_benign, _make_compliance_audit_benign, _make_manager_eod_benign]
+
+    for func, _ in generators:
+        dom = _get_func_domain(func)
+        if _is_etl_benign(func):
+            etl_ben_by_domain[dom] = func
+        elif _is_etl_malicious(func):
+            etl_mal_by_domain[dom] = func
+        else:
+            orig = getattr(func, '__wrapped_original__', None)
+            if dom == "banking":
+                if func in banking_fallbacks:
+                    replacements_by_domain[dom].append(func)
+            else:
+                if orig in (_dk_frontline_benign, _dk_audit_benign, _dk_senior_benign):
+                    replacements_by_domain[dom].append(func)
+
+    # Fallback if specific replacements weren't captured
+    for dom in list(etl_mal_by_domain.keys()) + list(etl_ben_by_domain.keys()):
+        if not replacements_by_domain[dom]:
+            dom_funcs = [f for f, _ in generators if _get_func_domain(f) == dom and not _is_etl_malicious(f)]
+            if dom_funcs:
+                replacements_by_domain[dom] = dom_funcs
+
+    return etl_ben_by_domain, etl_mal_by_domain, replacements_by_domain
+
+
 def generate_run(run_dir: Path, rng: random.Random,
-                 scenarios_per_run: int = 20) -> List[dict]:
+                 scenarios_per_run: int = 20,
+                 category_generators: List = None) -> List[dict]:
     """Generate one run directory with specs/*.yaml files.
+    
+    Args:
+        run_dir: Directory to write specs into.
+        rng: Random instance for reproducibility.
+        scenarios_per_run: Number of scenarios to generate.
+        category_generators: Optional list of (gen_func, weight) tuples.
+            If None, uses the banking CATEGORY_GENERATORS.
     
     Returns list of generated spec dicts.
     """
     specs_dir = run_dir / "specs"
     specs_dir.mkdir(parents=True, exist_ok=True)
 
+    generators = category_generators or CATEGORY_GENERATORS
+
     # Pick categories for this run
-    chosen = _weighted_choices(rng, CATEGORY_GENERATORS, scenarios_per_run)
+    chosen = _weighted_choices(rng, generators, scenarios_per_run)
+
+    # Identify ETL pairs and replacements per domain
+    etl_ben_by_dom, etl_mal_by_dom, repls_by_dom = _build_domain_helpers(generators)
 
     specs = []
-    # Track matched pair indices for proper pairing
-    pair_idx = 0
+    # Track matched pair indices per domain
+    pair_indices = defaultdict(int)
 
     # Handle matched pairs: ETL benign/malicious must be generated together
     i = 0
@@ -744,25 +818,29 @@ def generate_run(run_dir: Path, rng: random.Random,
     while i < len(chosen):
         gen = chosen[i]
         scenario_counter += 1
+        dom = _get_func_domain(gen)
 
-        if gen is _make_etl_benign:
-            # Generate the matched pair together
-            pair_idx += 1
-            spec_ben = _make_etl_benign(rng, pair_idx)
-            spec_mal = _make_etl_exfil_malicious(rng, pair_idx)
-            specs.extend([spec_ben, spec_mal])
+        if _is_etl_benign(gen):
+            # Generate the matched pair together for this domain
+            pair_indices[dom] += 1
+            p_idx = pair_indices[dom]
+            spec_ben = gen(rng, p_idx)
+            etl_mal = etl_mal_by_dom.get(dom)
+            if etl_mal is not None:
+                spec_mal = etl_mal(rng, p_idx)
+                specs.extend([spec_ben, spec_mal])
+            else:
+                specs.append(spec_ben)
             i += 1
             continue
-        elif gen is _make_etl_exfil_malicious:
-            # Skip — already generated with its benign pair above
-            # Generate a replacement scenario instead
-            replacement = rng.choice([
-                _make_teller_routine_benign,
-                _make_compliance_audit_benign,
-                _make_manager_eod_benign,
-            ])
-            spec = replacement(rng, scenario_counter + 1000)
-            specs.append(spec)
+        elif _is_etl_malicious(gen):
+            # Skip — standalone malicious ETL would leave an orphaned matched_pair_id.
+            # Generate a replacement benign scenario from the same domain instead.
+            dom_repls = repls_by_dom.get(dom)
+            if dom_repls:
+                replacement = rng.choice(dom_repls)
+                spec = replacement(rng, scenario_counter + 1000)
+                specs.append(spec)
             i += 1
             continue
 
@@ -826,6 +904,10 @@ def main(argv=None):
                         help="Random seed (default 42)")
     parser.add_argument("--skip-validate", action="store_true",
                         help="Skip validate_run.py (for debugging)")
+    parser.add_argument("--domain", default="banking",
+                        choices=["banking", "healthcare", "ecommerce", "logistics", "all"],
+                        help="Domain to generate scenarios for (default: banking). "
+                             "'all' mixes all domains within each run.")
     args = parser.parse_args(argv)
 
     out_base = Path(args.out)
@@ -840,9 +922,30 @@ def main(argv=None):
     class_counts = {"benign": 0, "malicious": 0}
     re_counts = defaultdict(int)
 
+    # Build domain generator lookup
+    domain_generators = {}
+    for d in ALL_DOMAINS:
+        if d == "banking":
+            domain_generators[d] = CATEGORY_GENERATORS
+        else:
+            domain_generators[d] = get_domain_category_generators(d)
+
+    # For --domain all, we'll build a mixed generator list per run
+    if args.domain == "all":
+        # Combine all domain generators into one big weighted list
+        all_generators = []
+        for d in ALL_DOMAINS:
+            all_generators.extend(domain_generators[d])
+        selected_generators = all_generators
+        domain_label = "all (banking+healthcare+ecommerce+logistics)"
+    else:
+        selected_generators = domain_generators[args.domain]
+        domain_label = args.domain
+
     print(f"\n{'='*60}")
     print(f"  CASCE Scenario Generator v2")
     print(f"  Output: {out_base}")
+    print(f"  Domain: {domain_label}")
     print(f"  Runs: {args.runs} × {args.scenarios_per_run} scenarios")
     print(f"  Seed: {args.seed}")
     print(f"{'='*60}\n")
@@ -851,7 +954,8 @@ def main(argv=None):
         run_dir = out_base / f"run_{run_idx:03d}"
         print(f"\n--- Run {run_idx}/{args.runs}: {run_dir.name} ---")
 
-        specs = generate_run(run_dir, rng, args.scenarios_per_run)
+        specs = generate_run(run_dir, rng, args.scenarios_per_run,
+                             category_generators=selected_generators)
 
         # Stats
         for spec in specs:

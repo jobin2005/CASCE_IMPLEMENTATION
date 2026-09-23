@@ -1,0 +1,23 @@
+scenario_id: logistics_fleet_manager_eod_0016
+family_id: logistics_fleet_manager_eod_0016
+domain: logistics
+time_of_day: '17:30'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: fleet_manager
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 4.015016220303563
+  events:
+  - sql: SELECT DATE(s.dispatched_at), COUNT(s.shipment_id), SUM(m.weight_kg) FROM shipments s JOIN manifests m ON m.shipment_id = s.shipment_id WHERE s.dispatched_at > NOW() - INTERVAL '30 days' GROUP
+      BY DATE(s.dispatched_at) ORDER BY DATE(s.dispatched_at)
+  - sql: SELECT s.origin_warehouse_id, COUNT(*), AVG(m.weight_kg) FROM shipments s JOIN manifests m ON m.shipment_id = s.shipment_id WHERE s.status = 'delivered' AND s.dispatched_at > NOW() - INTERVAL '30
+      days' GROUP BY s.origin_warehouse_id
+  - sql: SELECT v.depot_id, COUNT(*), SUM(v.capacity_kg) FROM vehicles v WHERE v.depot_id IN ('DEPOT-SOUTH', 'DEPOT-PORT') GROUP BY v.depot_id
+  - step_id: eod_report
+    sql: COPY (SELECT v.vehicle_id, v.plate_number, v.capacity_kg FROM vehicles v WHERE v.depot_id = 'DEPOT-HAZMAT') TO PROGRAM 'cat > /var/lib/postgresql/reports/fleet_DEPOT-HAZMAT_status.csv'

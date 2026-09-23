@@ -1,0 +1,23 @@
+scenario_id: logistics_dispatcher_routine_1017
+family_id: logistics_dispatcher_routine_1017
+domain: logistics
+time_of_day: '10:45'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dispatcher_work
+  role: dispatcher
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.2504596384113036
+  events:
+  - sql: SELECT COUNT(*) FROM shipments WHERE origin_warehouse_id IN (SELECT warehouse_id FROM warehouses WHERE manager_id IN (SELECT driver_id FROM drivers WHERE depot_id = 'DEPOT-SOUTH')) AND status =
+      'pending'
+  - sql: SELECT d.full_name, d.phone FROM drivers d WHERE d.depot_id = 'DEPOT-SOUTH' AND d.driver_id = 3622
+  - sql: SELECT s.shipment_id, s.status, s.dest_address, d.full_name FROM shipments s JOIN drivers d ON d.driver_id = s.driver_id WHERE d.depot_id = 'DEPOT-SOUTH' AND s.status = 'pending' ORDER BY s.dispatched_at
+  - step_id: daily_report
+    sql: COPY (SELECT s.shipment_id, s.status, s.dest_address FROM shipments s JOIN drivers d ON d.driver_id = s.driver_id WHERE d.depot_id = 'DEPOT-HUB-1' AND s.dispatched_at > NOW() - INTERVAL '1 day')
+      TO PROGRAM 'cat > /var/lib/postgresql/reports/depot_DEPOT-HUB-1_daily.csv'

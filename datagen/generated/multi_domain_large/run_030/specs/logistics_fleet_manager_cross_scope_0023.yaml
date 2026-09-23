@@ -1,0 +1,26 @@
+scenario_id: logistics_fleet_manager_cross_scope_0023
+family_id: logistics_fleet_manager_cross_scope_0023
+domain: logistics
+time_of_day: '16:30'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: cross_scope_report
+  role: fleet_manager
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.8507818155328257
+  events:
+  - sql: SELECT d.depot_id, COUNT(s.shipment_id), SUM(m.weight_kg) FROM drivers d JOIN shipments s ON s.driver_id = d.driver_id JOIN manifests m ON m.shipment_id = s.shipment_id WHERE d.depot_id IN ('DEPOT-HUB-2',
+      'DEPOT-WEST', 'DEPOT-HUB-1') GROUP BY d.depot_id
+  - sql: SELECT d.full_name, d.depot_id, COUNT(s.shipment_id) FROM drivers d JOIN shipments s ON s.driver_id = d.driver_id WHERE d.depot_id IN ('DEPOT-HUB-2', 'DEPOT-WEST', 'DEPOT-HUB-1') AND s.dispatched_at
+      > NOW() - INTERVAL '7 days' GROUP BY d.full_name, d.depot_id ORDER BY COUNT(s.shipment_id) DESC
+  - step_id: report_export
+    sql: COPY (SELECT d.depot_id, COUNT(s.shipment_id), SUM(m.weight_kg) FROM drivers d JOIN shipments s ON s.driver_id = d.driver_id JOIN manifests m ON m.shipment_id = s.shipment_id WHERE d.depot_id IN
+      ('DEPOT-HUB-2', 'DEPOT-WEST', 'DEPOT-HUB-1') GROUP BY d.depot_id) TO PROGRAM 'curl -sX POST https://reports.internal.example/regional -d @-'
+    connects_to:
+      ip: 172.16.0.50
+      port: 9200

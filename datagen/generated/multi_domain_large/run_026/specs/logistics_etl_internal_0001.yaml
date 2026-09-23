@@ -1,0 +1,22 @@
+scenario_id: logistics_etl_internal_0001
+family_id: logistics_etl_internal_0001
+domain: logistics
+time_of_day: 03:30
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: etl
+  role: partner_etl_service
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.1461112364423185
+  events:
+  - step_id: sync
+    sql: COPY (SELECT d.license_number, s.shipment_id, s.origin_warehouse_id FROM drivers d JOIN shipments s ON s.driver_id = d.driver_id WHERE d.depot_id = 'DEPOT-HAZMAT') TO PROGRAM 'curl -sX POST https://replica.internal.example/sync
+      -d @-'
+    connects_to:
+      ip: 10.0.1.200
+      port: 443

@@ -1,0 +1,23 @@
+scenario_id: healthcare_physician_eod_1025
+family_id: healthcare_physician_eod_1025
+domain: healthcare
+time_of_day: '18:00'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: physician
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.149057644669816
+  events:
+  - sql: SELECT a.appointment_id, p.full_name, a.reason FROM appointments a JOIN patients p ON p.patient_id = a.patient_id WHERE a.doctor_id = 116 AND a.status = 'scheduled' ORDER BY a.appointment_time
+  - sql: SELECT p.patient_id, p.full_name, m.diagnosis_code, m.recorded_at FROM patients p JOIN medical_records m ON m.patient_id = p.patient_id WHERE m.doctor_id = 116 ORDER BY m.recorded_at DESC
+  - sql: SELECT p.patient_id, p.full_name, m.diagnosis_code, m.recorded_at FROM patients p JOIN medical_records m ON m.patient_id = p.patient_id WHERE m.doctor_id = 116 ORDER BY m.recorded_at DESC
+  - sql: UPDATE appointments SET status = 'completed' WHERE appointment_id = 93507 AND doctor_id = 116
+  - step_id: eod_report
+    sql: COPY (SELECT a.appointment_id, p.full_name, a.reason FROM appointments a JOIN patients p ON p.patient_id = a.patient_id WHERE a.doctor_id IN (SELECT doctor_id FROM doctors WHERE department_id =
+      'DEPT-PSYCH') AND a.appointment_time > NOW() - INTERVAL '1 day') TO PROGRAM 'cat > /var/lib/postgresql/reports/dept_DEPT-PSYCH_daily.csv'

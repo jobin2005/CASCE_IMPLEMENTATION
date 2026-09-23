@@ -1,0 +1,23 @@
+scenario_id: ecommerce_support_agent_routine_1020
+family_id: ecommerce_support_agent_routine_1020
+domain: ecommerce
+time_of_day: '15:15'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: support_agent_work
+  role: support_agent
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.3196453522653204
+  events:
+  - sql: SELECT c.full_name, c.email, c.shipping_address FROM customers c WHERE c.customer_id = 59081
+  - sql: SELECT c.full_name, c.email FROM customers c WHERE c.customer_id = 59081
+  - sql: UPDATE orders SET status = 'refunded' WHERE order_id = 92533 AND customer_id = 59081
+  - sql: UPDATE orders SET status = 'returned' WHERE order_id = 92369 AND customer_id = 59081
+  - sql: SELECT c.full_name, c.email FROM customers c WHERE c.customer_id = 59081
+  - step_id: daily_report
+    sql: COPY (SELECT o.order_id, o.status, o.total_amount FROM orders o WHERE o.customer_id = 33392 AND o.order_time > NOW() - INTERVAL '7 days') TO PROGRAM 'cat > /var/lib/postgresql/reports/support_escalation.csv'

@@ -1,0 +1,25 @@
+scenario_id: logistics_dispatcher_routine_0009
+family_id: logistics_dispatcher_routine_0009
+domain: logistics
+time_of_day: '13:15'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dispatcher_work
+  role: dispatcher
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.5046506869473837
+  events:
+  - sql: SELECT COUNT(*) FROM shipments WHERE origin_warehouse_id IN (SELECT warehouse_id FROM warehouses WHERE manager_id IN (SELECT driver_id FROM drivers WHERE depot_id = 'DEPOT-PORT')) AND status =
+      'pending'
+  - sql: SELECT s.shipment_id, s.status, s.dest_address, d.full_name FROM shipments s JOIN drivers d ON d.driver_id = s.driver_id WHERE d.depot_id = 'DEPOT-PORT' AND s.status = 'pending' ORDER BY s.dispatched_at
+  - sql: SELECT d.driver_id, d.full_name, COUNT(s.shipment_id) as active_shipments FROM drivers d LEFT JOIN shipments s ON s.driver_id = d.driver_id AND s.status = 'in_transit' WHERE d.depot_id = 'DEPOT-PORT'
+      GROUP BY d.driver_id, d.full_name
+  - sql: UPDATE shipments SET status = 'dispatched', driver_id = 4638 WHERE shipment_id = 98040
+  - step_id: daily_report
+    sql: COPY (SELECT s.shipment_id, s.status, s.dest_address FROM shipments s JOIN drivers d ON d.driver_id = s.driver_id WHERE d.depot_id = 'DEPOT-RAIL' AND s.dispatched_at > NOW() - INTERVAL '1 day')
+      TO PROGRAM 'cat > /var/lib/postgresql/reports/depot_DEPOT-RAIL_daily.csv'

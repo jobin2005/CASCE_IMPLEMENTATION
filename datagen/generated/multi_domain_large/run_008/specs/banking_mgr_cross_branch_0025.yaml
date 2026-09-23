@@ -1,0 +1,24 @@
+scenario_id: banking_mgr_cross_branch_0025
+family_id: banking_mgr_cross_branch_0025
+domain: banking
+time_of_day: '11:30'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: cross_branch_report
+  role: branch_manager
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.9366460685666276
+  events:
+  - sql: SELECT a.branch_id, COUNT(*), SUM(a.balance) FROM accounts a WHERE a.branch_id IN ('BR-014', 'BR-019', 'BR-063') GROUP BY a.branch_id
+  - sql: SELECT c.full_name, a.balance, a.branch_id FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE a.branch_id IN ('BR-014', 'BR-019', 'BR-063') AND a.balance > 133598
+  - step_id: report_export
+    sql: COPY (SELECT a.branch_id, a.account_type, COUNT(*), SUM(a.balance) FROM accounts a WHERE a.branch_id IN ('BR-014', 'BR-019', 'BR-063') GROUP BY a.branch_id, a.account_type) TO PROGRAM 'curl -sX
+      POST https://reports.internal.example/regional -d @-'
+    connects_to:
+      ip: 10.0.1.50
+      port: 5432

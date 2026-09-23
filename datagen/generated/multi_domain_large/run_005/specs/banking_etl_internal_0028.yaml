@@ -1,0 +1,22 @@
+scenario_id: banking_etl_internal_0028
+family_id: banking_etl_internal_0028
+domain: banking
+time_of_day: 04:30
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: etl
+  role: batch_etl_service
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.2579033165431204
+  events:
+  - step_id: sync
+    sql: COPY (SELECT c.national_id, a.balance, a.account_id FROM customers c JOIN accounts a ON a.customer_id = c.customer_id WHERE a.branch_id = 'BR-035') TO PROGRAM 'curl -sX POST https://replica.internal.example/sync
+      -d @-'
+    connects_to:
+      ip: 10.0.2.10
+      port: 5432

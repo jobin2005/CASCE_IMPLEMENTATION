@@ -1,0 +1,21 @@
+scenario_id: healthcare_nurse_routine_0021
+family_id: healthcare_nurse_routine_0021
+domain: healthcare
+time_of_day: '13:30'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: nurse_work
+  role: nurse
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.5079074447074476
+  events:
+  - sql: SELECT a.appointment_id, a.reason, a.appointment_time FROM appointments a WHERE a.patient_id = 37627 AND a.status = 'scheduled' ORDER BY a.appointment_time
+  - sql: UPDATE appointments SET status = 'checked_in' WHERE appointment_id = 85235 AND patient_id = 90584
+  - step_id: daily_report
+    sql: COPY (SELECT a.appointment_id, a.patient_id, a.status FROM appointments a WHERE a.doctor_id IN (SELECT doctor_id FROM doctors WHERE department_id = 'DEPT-RADIO') AND a.appointment_time > NOW()
+      - INTERVAL '1 day') TO PROGRAM 'cat > /var/lib/postgresql/reports/dept_DEPT-RADIO_daily.csv'

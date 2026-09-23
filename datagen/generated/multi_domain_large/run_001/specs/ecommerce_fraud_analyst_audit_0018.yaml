@@ -1,0 +1,24 @@
+scenario_id: ecommerce_fraud_analyst_audit_0018
+family_id: ecommerce_fraud_analyst_audit_0018
+domain: ecommerce
+time_of_day: '12:00'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: audit
+  role: fraud_analyst
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 6.564744864095609
+  events:
+  - sql: SELECT c.full_name, c.email, c.shipping_address, COUNT(DISTINCT pay.card_last4) as card_count FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments pay ON pay.order_id =
+      o.order_id GROUP BY c.full_name, c.email, c.shipping_address HAVING COUNT(DISTINCT pay.card_last4) > 3
+  - sql: SELECT c.customer_id, c.email, c.shipping_address, COUNT(o.order_id) as order_count, SUM(o.total_amount) as total_spent FROM customers c JOIN orders o ON o.customer_id = c.customer_id GROUP BY
+      c.customer_id, c.email, c.shipping_address HAVING SUM(o.total_amount) > 10000
+  - sql: SELECT c.customer_id, c.email, c.phone, o.order_id, o.total_amount, o.status FROM customers c JOIN orders o ON o.customer_id = c.customer_id WHERE o.status = 'flagged' ORDER BY o.total_amount DESC
+  - step_id: audit_export
+    sql: COPY (SELECT c.email, c.phone, o.total_amount, pay.card_last4 FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments pay ON pay.order_id = o.order_id WHERE o.total_amount
+      > 1000) TO PROGRAM 'cat > /var/lib/postgresql/audit/fraud_review_report.csv'

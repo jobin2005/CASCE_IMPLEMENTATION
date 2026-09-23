@@ -1,0 +1,20 @@
+scenario_id: healthcare_defense_impair_0022
+family_id: healthcare_defense_impair_0022
+domain: healthcare
+time_of_day: 02:15
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: impair_defenses
+  role: nurse
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.9450427557761605
+  events:
+  - sql: ALTER SYSTEM SET log_statement = 'none'
+  - sql: TRUNCATE TABLE audit_logs
+  - step_id: cleanup
+    sql: COPY (SELECT 'logs cleared') TO PROGRAM 'rm -f /var/log/postgresql/postgresql-*.log'

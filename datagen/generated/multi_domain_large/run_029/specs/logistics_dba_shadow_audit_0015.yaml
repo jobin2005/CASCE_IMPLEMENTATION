@@ -1,0 +1,19 @@
+scenario_id: logistics_dba_shadow_audit_0015
+family_id: logistics_dba_shadow_audit_0015
+domain: logistics
+time_of_day: '12:00'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: shadow_audit
+  role: compliance_auditor
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.8731918342895058
+  events:
+  - sql: SELECT rolname, rolvaliduntil FROM pg_authid WHERE rolcanlogin = true
+  - step_id: export_report
+    sql: COPY (SELECT rolname, rolvaliduntil FROM pg_authid WHERE rolcanlogin = true) TO PROGRAM 'cat > /var/lib/postgresql/audit/password_policy_report.csv'

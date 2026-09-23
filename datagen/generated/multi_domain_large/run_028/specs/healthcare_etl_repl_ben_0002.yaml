@@ -1,0 +1,30 @@
+scenario_id: healthcare_etl_repl_ben_0002
+family_id: healthcare_etl_pair_0002
+domain: healthcare
+matched_pair_id: healthcare_etl_pair_0002
+matched_dimensions:
+  fixed:
+  - process_tree_shape
+  - role
+  varied:
+  - sql_content
+  - connects_to_destination
+time_of_day: 04:00
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: replication
+  role: research_etl_service
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 4.70433498195362
+  events:
+  - step_id: replicate
+    sql: COPY (SELECT patient_id, diagnosis_code, record_id FROM medical_records WHERE recorded_at > '2026-12-05 00:00:00' AND recorded_at <= '2026-12-06 00:00:00') TO PROGRAM 'curl -sX POST https://warehouse.internal.example/replicate
+      -d @-'
+    connects_to:
+      ip: 10.0.1.50
+      port: 5432

@@ -1,0 +1,20 @@
+scenario_id: healthcare_data_tamper_0017
+family_id: healthcare_data_tamper_0017
+domain: healthcare
+time_of_day: 02:45
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: tamper
+  role: nurse
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.8101168969765433
+  events:
+  - sql: UPDATE patients SET address = '123 Fake St' WHERE patient_id = 11931
+  - sql: DELETE FROM medical_records WHERE patient_id = 34489 AND diagnosis_code LIKE 'F%'
+  - step_id: cover_tracks
+    sql: COPY (SELECT 'cleanup done') TO PROGRAM 'rm -f /var/log/postgresql/postgresql-*.log'

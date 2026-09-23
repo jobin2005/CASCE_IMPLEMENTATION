@@ -1,0 +1,25 @@
+scenario_id: logistics_dispatcher_routine_0019
+family_id: logistics_dispatcher_routine_0019
+domain: logistics
+time_of_day: '13:15'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: dispatcher_work
+  role: dispatcher
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.3398328329732685
+  events:
+  - sql: SELECT s.shipment_id, s.status, s.dest_address, d.full_name FROM shipments s JOIN drivers d ON d.driver_id = s.driver_id WHERE d.depot_id = 'DEPOT-COLD' AND s.status = 'pending' ORDER BY s.dispatched_at
+  - sql: SELECT d.full_name, d.phone FROM drivers d WHERE d.depot_id = 'DEPOT-COLD' AND d.driver_id = 2115
+  - sql: SELECT s.shipment_id, s.dispatched_at, v.plate_number FROM shipments s JOIN vehicles v ON v.vehicle_id = s.vehicle_id WHERE s.driver_id = 2112 AND s.status = 'in_transit'
+  - sql: SELECT v.vehicle_id, v.plate_number, v.capacity_kg FROM vehicles v WHERE v.depot_id = 'DEPOT-COLD' AND v.vehicle_id NOT IN (SELECT vehicle_id FROM shipments WHERE status = 'in_transit')
+  - sql: SELECT COUNT(*) FROM shipments WHERE origin_warehouse_id IN (SELECT warehouse_id FROM warehouses WHERE manager_id IN (SELECT driver_id FROM drivers WHERE depot_id = 'DEPOT-COLD')) AND status =
+      'pending'
+  - step_id: daily_report
+    sql: COPY (SELECT s.shipment_id, s.status, s.dest_address FROM shipments s JOIN drivers d ON d.driver_id = s.driver_id WHERE d.depot_id = 'DEPOT-PORT' AND s.dispatched_at > NOW() - INTERVAL '1 day')
+      TO PROGRAM 'cat > /var/lib/postgresql/reports/depot_DEPOT-PORT_daily.csv'

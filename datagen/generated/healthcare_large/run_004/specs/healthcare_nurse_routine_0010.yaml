@@ -1,0 +1,24 @@
+scenario_id: healthcare_nurse_routine_0010
+family_id: healthcare_nurse_routine_0010
+domain: healthcare
+time_of_day: '15:15'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: nurse_work
+  role: nurse
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.6119513149877625
+  events:
+  - sql: SELECT a.appointment_id, a.reason, a.appointment_time FROM appointments a WHERE a.patient_id = 13544 AND a.status = 'scheduled' ORDER BY a.appointment_time
+  - sql: SELECT patient_id, full_name FROM patients WHERE primary_doctor_id = 380
+  - sql: UPDATE patients SET phone = '555-8751' WHERE patient_id = 31074
+  - sql: SELECT p.prescription_id, p.drug_name, p.dosage FROM prescriptions p WHERE p.patient_id = 15080 ORDER BY p.issued_at DESC LIMIT 5
+  - sql: UPDATE appointments SET status = 'checked_in' WHERE appointment_id = 65720 AND patient_id = 24710
+  - step_id: daily_report
+    sql: COPY (SELECT a.appointment_id, a.patient_id, a.status FROM appointments a WHERE a.doctor_id IN (SELECT doctor_id FROM doctors WHERE department_id = 'DEPT-CARDIO') AND a.appointment_time > NOW()
+      - INTERVAL '1 day') TO PROGRAM 'cat > /var/lib/postgresql/reports/dept_DEPT-CARDIO_daily.csv'

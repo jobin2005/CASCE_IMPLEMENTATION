@@ -1,0 +1,26 @@
+scenario_id: healthcare_physician_cross_scope_0012
+family_id: healthcare_physician_cross_scope_0012
+domain: healthcare
+time_of_day: '10:00'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: cross_scope_report
+  role: physician
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.008787791173372
+  events:
+  - sql: SELECT d.department_id, COUNT(a.appointment_id), COUNT(DISTINCT a.patient_id) FROM doctors d JOIN appointments a ON a.doctor_id = d.doctor_id WHERE d.department_id IN ('DEPT-RADIO', 'DEPT-PSYCH',
+      'DEPT-EMERG', 'DEPT-PATH') GROUP BY d.department_id
+  - sql: SELECT p.full_name, m.diagnosis_code, d.department_id FROM patients p JOIN medical_records m ON m.patient_id = p.patient_id JOIN doctors d ON d.doctor_id = m.doctor_id WHERE d.department_id IN
+      ('DEPT-RADIO', 'DEPT-PSYCH', 'DEPT-EMERG', 'DEPT-PATH') AND m.recorded_at > NOW() - INTERVAL '7 days'
+  - step_id: report_export
+    sql: COPY (SELECT d.department_id, COUNT(a.appointment_id), COUNT(DISTINCT a.patient_id) FROM doctors d JOIN appointments a ON a.doctor_id = d.doctor_id WHERE d.department_id IN ('DEPT-RADIO', 'DEPT-PSYCH',
+      'DEPT-EMERG', 'DEPT-PATH') GROUP BY d.department_id) TO PROGRAM 'curl -sX POST https://reports.internal.example/regional -d @-'
+    connects_to:
+      ip: 10.0.1.100
+      port: 8080

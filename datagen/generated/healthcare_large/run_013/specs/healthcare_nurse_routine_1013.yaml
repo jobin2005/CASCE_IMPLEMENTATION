@@ -1,0 +1,23 @@
+scenario_id: healthcare_nurse_routine_1013
+family_id: healthcare_nurse_routine_1013
+domain: healthcare
+time_of_day: '10:15'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: nurse_work
+  role: nurse
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.992915424050934
+  events:
+  - sql: SELECT a.appointment_id, a.reason, a.appointment_time FROM appointments a WHERE a.patient_id = 71968 AND a.status = 'scheduled' ORDER BY a.appointment_time
+  - sql: UPDATE patients SET phone = '555-7258' WHERE patient_id = 46391
+  - sql: SELECT COUNT(*) FROM appointments WHERE doctor_id = 275 AND status = 'scheduled' AND appointment_time > NOW()
+  - sql: UPDATE appointments SET status = 'checked_in' WHERE appointment_id = 94084 AND patient_id = 78838
+  - step_id: daily_report
+    sql: COPY (SELECT a.appointment_id, a.patient_id, a.status FROM appointments a WHERE a.doctor_id IN (SELECT doctor_id FROM doctors WHERE department_id = 'DEPT-NEURO') AND a.appointment_time > NOW()
+      - INTERVAL '1 day') TO PROGRAM 'cat > /var/lib/postgresql/reports/dept_DEPT-NEURO_daily.csv'

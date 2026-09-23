@@ -1,0 +1,21 @@
+scenario_id: banking_teller_routine_0019
+family_id: banking_teller_routine_0019
+domain: banking
+time_of_day: '14:00'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: teller_work
+  role: teller
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.7931117669524386
+  events:
+  - sql: SELECT a.account_id, a.balance FROM accounts a WHERE a.customer_id = 4578 AND a.branch_id = 'BR-042'
+  - sql: INSERT INTO transactions (account_id, amount, counterparty, transaction_time) VALUES (42435, -1443, 'Bill Payment', NOW())
+  - sql: SELECT COUNT(*) FROM transactions WHERE account_id = 78879 AND transaction_time > NOW() - INTERVAL '7 days'
+  - step_id: daily_report
+    sql: COPY (SELECT account_id, balance FROM accounts WHERE branch_id = 'BR-014') TO PROGRAM 'cat > /var/lib/postgresql/reports/branch_BR-014_daily.csv'

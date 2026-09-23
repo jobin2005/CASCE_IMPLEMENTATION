@@ -1,0 +1,23 @@
+scenario_id: healthcare_physician_eod_0017
+family_id: healthcare_physician_eod_0017
+domain: healthcare
+time_of_day: '16:30'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: physician
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.043143883066773
+  events:
+  - sql: INSERT INTO medical_records (patient_id, doctor_id, diagnosis_code, diagnosis_notes, recorded_at) VALUES (55900, 279, 'J06.9', 'Upper respiratory infection, prescribed amoxicillin', NOW())
+  - sql: SELECT p.full_name, pr.drug_name, pr.dosage FROM patients p JOIN prescriptions pr ON pr.patient_id = p.patient_id WHERE pr.doctor_id = 279 AND pr.issued_at > NOW() - INTERVAL '30 days'
+  - sql: SELECT p.patient_id, p.full_name, m.diagnosis_code, m.recorded_at FROM patients p JOIN medical_records m ON m.patient_id = p.patient_id WHERE m.doctor_id = 279 ORDER BY m.recorded_at DESC
+  - sql: SELECT COUNT(*) FROM appointments WHERE doctor_id = 279 AND status = 'completed' AND appointment_time > NOW() - INTERVAL '7 days'
+  - step_id: eod_report
+    sql: COPY (SELECT a.appointment_id, p.full_name, a.reason FROM appointments a JOIN patients p ON p.patient_id = a.patient_id WHERE a.doctor_id IN (SELECT doctor_id FROM doctors WHERE department_id =
+      'DEPT-ICU') AND a.appointment_time > NOW() - INTERVAL '1 day') TO PROGRAM 'cat > /var/lib/postgresql/reports/dept_DEPT-ICU_daily.csv'

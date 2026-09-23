@@ -1,0 +1,21 @@
+scenario_id: ecommerce_catalog_manager_eod_0020
+family_id: ecommerce_catalog_manager_eod_0020
+domain: ecommerce
+time_of_day: '17:00'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: catalog_manager
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 3.7261672777503274
+  events:
+  - sql: SELECT product_id, name, stock_qty FROM products WHERE stock_qty < 8 AND category = 'Books'
+  - sql: SELECT product_id, name, price, stock_qty FROM products WHERE category = 'Books' ORDER BY stock_qty ASC
+  - sql: SELECT product_id, name, price, stock_qty FROM products WHERE category = 'Books' ORDER BY stock_qty ASC
+  - step_id: eod_report
+    sql: COPY (SELECT p.product_id, p.name, p.price, p.stock_qty FROM products p WHERE p.category = 'Sports') TO PROGRAM 'cat > /var/lib/postgresql/reports/catalog_update.csv'

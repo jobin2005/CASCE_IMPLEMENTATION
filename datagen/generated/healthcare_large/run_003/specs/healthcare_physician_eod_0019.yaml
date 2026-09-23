@@ -1,0 +1,22 @@
+scenario_id: healthcare_physician_eod_0019
+family_id: healthcare_physician_eod_0019
+domain: healthcare
+time_of_day: '18:00'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: physician
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.7927931155804133
+  events:
+  - sql: SELECT COUNT(*) FROM appointments WHERE doctor_id = 136 AND status = 'completed' AND appointment_time > NOW() - INTERVAL '7 days'
+  - sql: SELECT p.patient_id, p.full_name, m.diagnosis_code, m.recorded_at FROM patients p JOIN medical_records m ON m.patient_id = p.patient_id WHERE m.doctor_id = 136 ORDER BY m.recorded_at DESC
+  - sql: SELECT COUNT(*) FROM appointments WHERE doctor_id = 136 AND status = 'completed' AND appointment_time > NOW() - INTERVAL '7 days'
+  - step_id: eod_report
+    sql: COPY (SELECT a.appointment_id, p.full_name, a.reason FROM appointments a JOIN patients p ON p.patient_id = a.patient_id WHERE a.doctor_id IN (SELECT doctor_id FROM doctors WHERE department_id =
+      'DEPT-CARDIO') AND a.appointment_time > NOW() - INTERVAL '1 day') TO PROGRAM 'cat > /var/lib/postgresql/reports/dept_DEPT-CARDIO_daily.csv'

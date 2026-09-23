@@ -1,0 +1,593 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d49" for="edge" attr.name="relation" attr.type="string"/>
+<key id="d48" for="edge" attr.name="last_seen" attr.type="double"/>
+<key id="d47" for="edge" attr.name="first_seen" attr.type="double"/>
+<key id="d46" for="edge" attr.name="event_ids" attr.type="string"/>
+<key id="d45" for="edge" attr.name="count" attr.type="long"/>
+<key id="d44" for="edge" attr.name="rel" attr.type="string"/>
+<key id="d43" for="node" attr.name="s_temp" attr.type="string"/>
+<key id="d42" for="node" attr.name="s_sem" attr.type="string"/>
+<key id="d41" for="node" attr.name="s_struct" attr.type="string"/>
+<key id="d40" for="node" attr.name="confidence" attr.type="string"/>
+<key id="d39" for="node" attr.name="behavior_label" attr.type="string"/>
+<key id="d38" for="node" attr.name="mitre_id" attr.type="string"/>
+<key id="d37" for="node" attr.name="label" attr.type="string"/>
+<key id="d36" for="node" attr.name="node_type" attr.type="string"/>
+<key id="d35" for="node" attr.name="filepath" attr.type="string"/>
+<key id="d34" for="node" attr.name="arg" attr.type="string"/>
+<key id="d33" for="node" attr.name="syscall" attr.type="string"/>
+<key id="d32" for="node" attr.name="comm" attr.type="string"/>
+<key id="d31" for="node" attr.name="timestamp" attr.type="long"/>
+<key id="d30" for="node" attr.name="uid" attr.type="long"/>
+<key id="d29" for="node" attr.name="ppid" attr.type="long"/>
+<key id="d28" for="node" attr.name="pid" attr.type="long"/>
+<key id="d27" for="node" attr.name="shell_cmd" attr.type="string"/>
+<key id="d26" for="node" attr.name="is_program" attr.type="string"/>
+<key id="d25" for="node" attr.name="tables" attr.type="string"/>
+<key id="d24" for="node" attr.name="table_name" attr.type="string"/>
+<key id="d23" for="node" attr.name="last_seen" attr.type="double"/>
+<key id="d22" for="node" attr.name="timestamp_unix" attr.type="double"/>
+<key id="d21" for="node" attr.name="source" attr.type="string"/>
+<key id="d20" for="node" attr.name="event_id" attr.type="long"/>
+<key id="d19" for="node" attr.name="session_key" attr.type="long"/>
+<key id="d18" for="node" attr.name="client_port" attr.type="string"/>
+<key id="d17" for="node" attr.name="client_addr" attr.type="string"/>
+<key id="d16" for="node" attr.name="username" attr.type="string"/>
+<key id="d15" for="node" attr.name="database" attr.type="string"/>
+<key id="d14" for="node" attr.name="query" attr.type="string"/>
+<key id="d13" for="node" attr.name="event_type" attr.type="string"/>
+<key id="d12" for="node" attr.name="timestamp" attr.type="double"/>
+<key id="d11" for="node" attr.name="backend_pid" attr.type="long"/>
+<key id="d10" for="node" attr.name="session_start_time" attr.type="long"/>
+<key id="d9" for="node" attr.name="session_id" attr.type="long"/>
+<key id="d8" for="node" attr.name="type" attr.type="string"/>
+<key id="d7" for="graph" attr.name="pending_spawn_ts" attr.type="double"/>
+<key id="d6" for="graph" attr.name="pending_spawn_source" attr.type="long"/>
+<key id="d5" for="graph" attr.name="active_dml_(20020, &quot;SELECT DISTINCT c.email, c.phone, pay.card_last4, pay.amount FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments pay ON pay.order_id = o.order_id WHERE pay.amount &gt; 1233 AND o.order_time &gt; NOW() - INTERVAL '7 days'&quot;)" attr.type="long"/>
+<key id="d4" for="graph" attr.name="active_dml_(20020, &quot;SELECT c.email, c.shipping_address, pay.card_last4, pay.card_token FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments pay ON pay.order_id = o.order_id WHERE pay.paid_at &gt; NOW() - INTERVAL '24 hours' ORDER BY pay.amount DESC&quot;)" attr.type="long"/>
+<key id="d3" for="graph" attr.name="active_dml_(20020, &quot;SELECT c.customer_id, c.email, c.phone, o.order_id, o.total_amount, o.status FROM customers c JOIN orders o ON o.customer_id = c.customer_id WHERE o.status = 'flagged' ORDER BY o.total_amount DESC&quot;)" attr.type="long"/>
+<key id="d2" for="graph" attr.name="active_dml_(20020, 'SELECT c.full_name, c.email, c.shipping_address, COUNT(DISTINCT pay.card_last4) as card_count FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments pay ON pay.order_id = o.order_id GROUP BY c.full_name, c.email, c.shipping_address HAVING COUNT(DISTINCT pay.card_last4) &gt; 3')" attr.type="long"/>
+<key id="d1" for="graph" attr.name="last_event_ts" attr.type="double"/>
+<key id="d0" for="graph" attr.name="active_dml_(20020, 'SELECT 1')" attr.type="long"/>
+<graph edgedefault="directed"><data key="d0">221</data>
+<data key="d1">1790055027.0830777</data>
+<data key="d2">210</data>
+<data key="d3">212</data>
+<data key="d4">214</data>
+<data key="d5">216</data>
+<data key="d6">218</data>
+<data key="d7">1790055022.5688148</data>
+<node id="('Query', 208)">
+  <data key="d8">Query</data>
+  <data key="d9">20020</data>
+  <data key="d10">1790055000</data>
+  <data key="d11">20020</data>
+  <data key="d12">1790055000.0</data>
+  <data key="d13">ExecutorStart</data>
+  <data key="d14">SELECT 1</data>
+  <data key="d15">casce_synthetic</data>
+  <data key="d16">fraud_analyst</data>
+  <data key="d17">192.168.1.200</data>
+  <data key="d18">20020</data>
+  <data key="d19">20020</data>
+  <data key="d20">208</data>
+  <data key="d21">postgres</data>
+  <data key="d22">1790055000.0</data>
+  <data key="d23">1790055000.0005</data>
+</node>
+<node id="('Session', 20020)">
+  <data key="d8">Session</data>
+  <data key="d19">20020</data>
+  <data key="d22">1790055000.0</data>
+</node>
+<node id="('Query', 210)">
+  <data key="d8">Query</data>
+  <data key="d9">20020</data>
+  <data key="d10">1790055000</data>
+  <data key="d11">20020</data>
+  <data key="d12">1790055004.513763</data>
+  <data key="d13">ExecutorStart</data>
+  <data key="d14">SELECT c.full_name, c.email, c.shipping_address, COUNT(DISTINCT pay.card_last4) as card_count FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments pay ON pay.order_id = o.order_id GROUP BY c.full_name, c.email, c.shipping_address HAVING COUNT(DISTINCT pay.card_last4) &gt; 3</data>
+  <data key="d15">casce_synthetic</data>
+  <data key="d16">fraud_analyst</data>
+  <data key="d17">192.168.1.200</data>
+  <data key="d18">20020</data>
+  <data key="d19">20020</data>
+  <data key="d20">210</data>
+  <data key="d21">postgres</data>
+  <data key="d22">1790055004.513763</data>
+  <data key="d24">customers</data>
+  <data key="d25">['customers', 'orders', 'payments']</data>
+  <data key="d23">1790055004.514263</data>
+</node>
+<node id="('Table', 'customers')">
+  <data key="d8">Table</data>
+  <data key="d9">20020</data>
+  <data key="d10">1790055000</data>
+  <data key="d11">20020</data>
+  <data key="d12">1790055004.513763</data>
+  <data key="d13">ExecutorStart</data>
+  <data key="d14">SELECT c.full_name, c.email, c.shipping_address, COUNT(DISTINCT pay.card_last4) as card_count FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments pay ON pay.order_id = o.order_id GROUP BY c.full_name, c.email, c.shipping_address HAVING COUNT(DISTINCT pay.card_last4) &gt; 3</data>
+  <data key="d15">casce_synthetic</data>
+  <data key="d16">fraud_analyst</data>
+  <data key="d17">192.168.1.200</data>
+  <data key="d18">20020</data>
+  <data key="d19">20020</data>
+  <data key="d20">210</data>
+  <data key="d21">postgres</data>
+  <data key="d22">1790055004.513763</data>
+  <data key="d24">customers</data>
+  <data key="d25">['customers', 'orders', 'payments']</data>
+  <data key="d23">1790055022.5688148</data>
+</node>
+<node id="('Table', 'orders')">
+  <data key="d8">Table</data>
+  <data key="d9">20020</data>
+  <data key="d10">1790055000</data>
+  <data key="d11">20020</data>
+  <data key="d12">1790055004.513763</data>
+  <data key="d13">ExecutorStart</data>
+  <data key="d14">SELECT c.full_name, c.email, c.shipping_address, COUNT(DISTINCT pay.card_last4) as card_count FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments pay ON pay.order_id = o.order_id GROUP BY c.full_name, c.email, c.shipping_address HAVING COUNT(DISTINCT pay.card_last4) &gt; 3</data>
+  <data key="d15">casce_synthetic</data>
+  <data key="d16">fraud_analyst</data>
+  <data key="d17">192.168.1.200</data>
+  <data key="d18">20020</data>
+  <data key="d19">20020</data>
+  <data key="d20">210</data>
+  <data key="d21">postgres</data>
+  <data key="d22">1790055004.513763</data>
+  <data key="d24">orders</data>
+  <data key="d25">['customers', 'orders', 'payments']</data>
+  <data key="d23">1790055022.5688148</data>
+</node>
+<node id="('Table', 'payments')">
+  <data key="d8">Table</data>
+  <data key="d9">20020</data>
+  <data key="d10">1790055000</data>
+  <data key="d11">20020</data>
+  <data key="d12">1790055004.513763</data>
+  <data key="d13">ExecutorStart</data>
+  <data key="d14">SELECT c.full_name, c.email, c.shipping_address, COUNT(DISTINCT pay.card_last4) as card_count FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments pay ON pay.order_id = o.order_id GROUP BY c.full_name, c.email, c.shipping_address HAVING COUNT(DISTINCT pay.card_last4) &gt; 3</data>
+  <data key="d15">casce_synthetic</data>
+  <data key="d16">fraud_analyst</data>
+  <data key="d17">192.168.1.200</data>
+  <data key="d18">20020</data>
+  <data key="d19">20020</data>
+  <data key="d20">210</data>
+  <data key="d21">postgres</data>
+  <data key="d22">1790055004.513763</data>
+  <data key="d24">payments</data>
+  <data key="d25">['customers', 'orders', 'payments']</data>
+  <data key="d23">1790055022.5688148</data>
+</node>
+<node id="('Query', 212)">
+  <data key="d8">Query</data>
+  <data key="d9">20020</data>
+  <data key="d10">1790055000</data>
+  <data key="d11">20020</data>
+  <data key="d12">1790055009.027526</data>
+  <data key="d13">ExecutorStart</data>
+  <data key="d14">SELECT c.customer_id, c.email, c.phone, o.order_id, o.total_amount, o.status FROM customers c JOIN orders o ON o.customer_id = c.customer_id WHERE o.status = 'flagged' ORDER BY o.total_amount DESC</data>
+  <data key="d15">casce_synthetic</data>
+  <data key="d16">fraud_analyst</data>
+  <data key="d17">192.168.1.200</data>
+  <data key="d18">20020</data>
+  <data key="d19">20020</data>
+  <data key="d20">212</data>
+  <data key="d21">postgres</data>
+  <data key="d22">1790055009.027526</data>
+  <data key="d24">customers</data>
+  <data key="d25">['customers', 'orders']</data>
+  <data key="d23">1790055009.0280259</data>
+</node>
+<node id="('Query', 214)">
+  <data key="d8">Query</data>
+  <data key="d9">20020</data>
+  <data key="d10">1790055000</data>
+  <data key="d11">20020</data>
+  <data key="d12">1790055013.5412889</data>
+  <data key="d13">ExecutorStart</data>
+  <data key="d14">SELECT c.email, c.shipping_address, pay.card_last4, pay.card_token FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments pay ON pay.order_id = o.order_id WHERE pay.paid_at &gt; NOW() - INTERVAL '24 hours' ORDER BY pay.amount DESC</data>
+  <data key="d15">casce_synthetic</data>
+  <data key="d16">fraud_analyst</data>
+  <data key="d17">192.168.1.200</data>
+  <data key="d18">20020</data>
+  <data key="d19">20020</data>
+  <data key="d20">214</data>
+  <data key="d21">postgres</data>
+  <data key="d22">1790055013.5412889</data>
+  <data key="d24">customers</data>
+  <data key="d25">['customers', 'orders', 'payments']</data>
+  <data key="d23">1790055013.5417888</data>
+</node>
+<node id="('Query', 216)">
+  <data key="d8">Query</data>
+  <data key="d9">20020</data>
+  <data key="d10">1790055000</data>
+  <data key="d11">20020</data>
+  <data key="d12">1790055018.0550518</data>
+  <data key="d13">ExecutorStart</data>
+  <data key="d14">SELECT DISTINCT c.email, c.phone, pay.card_last4, pay.amount FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments pay ON pay.order_id = o.order_id WHERE pay.amount &gt; 1233 AND o.order_time &gt; NOW() - INTERVAL '7 days'</data>
+  <data key="d15">casce_synthetic</data>
+  <data key="d16">fraud_analyst</data>
+  <data key="d17">192.168.1.200</data>
+  <data key="d18">20020</data>
+  <data key="d19">20020</data>
+  <data key="d20">216</data>
+  <data key="d21">postgres</data>
+  <data key="d22">1790055018.0550518</data>
+  <data key="d24">customers</data>
+  <data key="d25">['customers', 'orders', 'payments']</data>
+  <data key="d23">1790055018.0555518</data>
+</node>
+<node id="('Query', 218)">
+  <data key="d8">Query</data>
+  <data key="d9">20020</data>
+  <data key="d10">1790055000</data>
+  <data key="d11">20020</data>
+  <data key="d12">1790055022.5688148</data>
+  <data key="d13">ProcessUtility</data>
+  <data key="d14">COPY (SELECT c.email, c.phone, o.total_amount, pay.card_last4 FROM customers c JOIN orders o ON o.customer_id = c.customer_id JOIN payments pay ON pay.order_id = o.order_id WHERE o.total_amount &gt; 1000) TO PROGRAM 'cat &gt; /var/lib/postgresql/audit/fraud_review_report.csv'</data>
+  <data key="d15">casce_synthetic</data>
+  <data key="d16">fraud_analyst</data>
+  <data key="d17">192.168.1.200</data>
+  <data key="d18">20020</data>
+  <data key="d19">20020</data>
+  <data key="d20">218</data>
+  <data key="d21">postgres</data>
+  <data key="d22">1790055022.5688148</data>
+  <data key="d24">customers</data>
+  <data key="d25">['customers', 'orders', 'payments']</data>
+  <data key="d26">True</data>
+  <data key="d27">cat &gt; /var/lib/postgresql/audit/fraud_review_report.csv</data>
+</node>
+<node id="('Process', 20021)">
+  <data key="d8">Process</data>
+  <data key="d28">20021</data>
+  <data key="d29">20020</data>
+  <data key="d30">0</data>
+  <data key="d31">41022569814682</data>
+  <data key="d32">cat</data>
+  <data key="d33">execve</data>
+  <data key="d34">cat &gt; /var/lib/postgresql/audit/fraud_review_report.csv</data>
+  <data key="d19">20020</data>
+  <data key="d20">219</data>
+  <data key="d21">kernel</data>
+  <data key="d22">1790055022.5698147</data>
+  <data key="d23">1790055022.5708148</data>
+</node>
+<node id="('File', '/var/lib/postgresql/audit/fraud_review_report.csv')">
+  <data key="d8">File</data>
+  <data key="d28">20021</data>
+  <data key="d29">20020</data>
+  <data key="d30">0</data>
+  <data key="d31">41022570814848</data>
+  <data key="d32">cat</data>
+  <data key="d33">openat</data>
+  <data key="d34">/var/lib/postgresql/audit/fraud_review_report.csv</data>
+  <data key="d19">20020</data>
+  <data key="d20">220</data>
+  <data key="d21">kernel</data>
+  <data key="d22">1790055022.5708148</data>
+  <data key="d35">/var/lib/postgresql/audit/fraud_review_report.csv</data>
+</node>
+<node id="('Query', 221)">
+  <data key="d8">Query</data>
+  <data key="d9">20020</data>
+  <data key="d10">1790055000</data>
+  <data key="d11">20020</data>
+  <data key="d12">1790055027.0825777</data>
+  <data key="d13">ExecutorStart</data>
+  <data key="d14">SELECT 1</data>
+  <data key="d15">casce_synthetic</data>
+  <data key="d16">fraud_analyst</data>
+  <data key="d17">192.168.1.200</data>
+  <data key="d18">20020</data>
+  <data key="d19">20020</data>
+  <data key="d20">221</data>
+  <data key="d21">postgres</data>
+  <data key="d22">1790055027.0825777</data>
+  <data key="d23">1790055027.0830777</data>
+</node>
+<node id="Behavior_DATA_ACCESS_1">
+  <data key="d8">Behavior</data>
+  <data key="d36">Behavior</data>
+  <data key="d37">[N/A] DATA_ACCESS</data>
+  <data key="d38">N/A</data>
+  <data key="d39">DATA_ACCESS</data>
+  <data key="d40">0.596</data>
+  <data key="d41">1.0</data>
+  <data key="d42">0.191</data>
+  <data key="d43">0.0</data>
+  <data key="d22">1790055004.513763</data>
+</node>
+<node id="Behavior_DATA_ACCESS_2">
+  <data key="d8">Behavior</data>
+  <data key="d36">Behavior</data>
+  <data key="d37">[N/A] DATA_ACCESS</data>
+  <data key="d38">N/A</data>
+  <data key="d39">DATA_ACCESS</data>
+  <data key="d40">0.596</data>
+  <data key="d41">1.0</data>
+  <data key="d42">0.191</data>
+  <data key="d43">0.0</data>
+  <data key="d22">1790055009.027526</data>
+</node>
+<node id="Behavior_DATA_ACCESS_3">
+  <data key="d8">Behavior</data>
+  <data key="d36">Behavior</data>
+  <data key="d37">[N/A] DATA_ACCESS</data>
+  <data key="d38">N/A</data>
+  <data key="d39">DATA_ACCESS</data>
+  <data key="d40">0.596</data>
+  <data key="d41">1.0</data>
+  <data key="d42">0.191</data>
+  <data key="d43">0.0</data>
+  <data key="d22">1790055013.5412889</data>
+</node>
+<node id="Behavior_DATA_ACCESS_4">
+  <data key="d8">Behavior</data>
+  <data key="d36">Behavior</data>
+  <data key="d37">[N/A] DATA_ACCESS</data>
+  <data key="d38">N/A</data>
+  <data key="d39">DATA_ACCESS</data>
+  <data key="d40">0.596</data>
+  <data key="d41">1.0</data>
+  <data key="d42">0.191</data>
+  <data key="d43">0.0</data>
+  <data key="d22">1790055018.0550518</data>
+</node>
+<node id="Behavior_DATA_ACCESS_5">
+  <data key="d8">Behavior</data>
+  <data key="d36">Behavior</data>
+  <data key="d37">[N/A] DATA_ACCESS</data>
+  <data key="d38">N/A</data>
+  <data key="d39">DATA_ACCESS</data>
+  <data key="d40">0.592</data>
+  <data key="d41">1.0</data>
+  <data key="d42">0.184</data>
+  <data key="d43">0.0</data>
+  <data key="d22">1790055022.5688148</data>
+</node>
+<node id="Behavior_UNIX_SHELL_EXECUTION_6">
+  <data key="d8">Behavior</data>
+  <data key="d36">Behavior</data>
+  <data key="d37">[T1059.004] UNIX_SHELL_EXECUTION</data>
+  <data key="d38">T1059.004</data>
+  <data key="d39">UNIX_SHELL_EXECUTION</data>
+  <data key="d40">0.634</data>
+  <data key="d41">1.0</data>
+  <data key="d42">0.269</data>
+  <data key="d43">0.0</data>
+  <data key="d22">1790055022.5698147</data>
+</node>
+<edge source="('Session', 20020)" target="('Query', 208)" id="executes">
+  <data key="d44">executes</data>
+  <data key="d45">2</data>
+  <data key="d46">[208, 208]</data>
+  <data key="d47">1790055000.0</data>
+  <data key="d48">1790055000.0005</data>
+</edge>
+<edge source="('Session', 20020)" target="('Query', 210)" id="executes">
+  <data key="d44">executes</data>
+  <data key="d45">2</data>
+  <data key="d46">[210, 210]</data>
+  <data key="d47">1790055004.513763</data>
+  <data key="d48">1790055004.514263</data>
+</edge>
+<edge source="('Session', 20020)" target="('Query', 212)" id="executes">
+  <data key="d44">executes</data>
+  <data key="d45">2</data>
+  <data key="d46">[212, 212]</data>
+  <data key="d47">1790055009.027526</data>
+  <data key="d48">1790055009.0280259</data>
+</edge>
+<edge source="('Session', 20020)" target="('Query', 214)" id="executes">
+  <data key="d44">executes</data>
+  <data key="d45">2</data>
+  <data key="d46">[214, 214]</data>
+  <data key="d47">1790055013.5412889</data>
+  <data key="d48">1790055013.5417888</data>
+</edge>
+<edge source="('Session', 20020)" target="('Query', 216)" id="executes">
+  <data key="d44">executes</data>
+  <data key="d45">2</data>
+  <data key="d46">[216, 216]</data>
+  <data key="d47">1790055018.0550518</data>
+  <data key="d48">1790055018.0555518</data>
+</edge>
+<edge source="('Session', 20020)" target="('Query', 218)" id="executes">
+  <data key="d44">executes</data>
+  <data key="d45">1</data>
+  <data key="d46">[218]</data>
+  <data key="d47">1790055022.5688148</data>
+  <data key="d48">1790055022.5688148</data>
+</edge>
+<edge source="('Session', 20020)" target="('Query', 221)" id="executes">
+  <data key="d44">executes</data>
+  <data key="d45">2</data>
+  <data key="d46">[221, 221]</data>
+  <data key="d47">1790055027.0825777</data>
+  <data key="d48">1790055027.0830777</data>
+</edge>
+<edge source="('Query', 210)" target="('Table', 'customers')" id="accesses">
+  <data key="d44">accesses</data>
+  <data key="d45">2</data>
+  <data key="d46">[210, 210]</data>
+  <data key="d47">1790055004.513763</data>
+  <data key="d48">1790055004.514263</data>
+</edge>
+<edge source="('Query', 210)" target="('Table', 'orders')" id="accesses">
+  <data key="d44">accesses</data>
+  <data key="d45">2</data>
+  <data key="d46">[210, 210]</data>
+  <data key="d47">1790055004.513763</data>
+  <data key="d48">1790055004.514263</data>
+</edge>
+<edge source="('Query', 210)" target="('Table', 'payments')" id="accesses">
+  <data key="d44">accesses</data>
+  <data key="d45">2</data>
+  <data key="d46">[210, 210]</data>
+  <data key="d47">1790055004.513763</data>
+  <data key="d48">1790055004.514263</data>
+</edge>
+<edge source="('Query', 210)" target="Behavior_DATA_ACCESS_1" id="0">
+  <data key="d44">evidence_for</data>
+  <data key="d49">evidence_for</data>
+</edge>
+<edge source="('Table', 'customers')" target="Behavior_DATA_ACCESS_1" id="0">
+  <data key="d44">evidence_for</data>
+  <data key="d49">evidence_for</data>
+</edge>
+<edge source="('Table', 'customers')" target="Behavior_DATA_ACCESS_2" id="0">
+  <data key="d44">evidence_for</data>
+  <data key="d49">evidence_for</data>
+</edge>
+<edge source="('Table', 'customers')" target="Behavior_DATA_ACCESS_3" id="0">
+  <data key="d44">evidence_for</data>
+  <data key="d49">evidence_for</data>
+</edge>
+<edge source="('Table', 'customers')" target="Behavior_DATA_ACCESS_4" id="0">
+  <data key="d44">evidence_for</data>
+  <data key="d49">evidence_for</data>
+</edge>
+<edge source="('Table', 'customers')" target="Behavior_DATA_ACCESS_5" id="0">
+  <data key="d44">evidence_for</data>
+  <data key="d49">evidence_for</data>
+</edge>
+<edge source="('Query', 212)" target="('Table', 'customers')" id="accesses">
+  <data key="d44">accesses</data>
+  <data key="d45">2</data>
+  <data key="d46">[212, 212]</data>
+  <data key="d47">1790055009.027526</data>
+  <data key="d48">1790055009.0280259</data>
+</edge>
+<edge source="('Query', 212)" target="('Table', 'orders')" id="accesses">
+  <data key="d44">accesses</data>
+  <data key="d45">2</data>
+  <data key="d46">[212, 212]</data>
+  <data key="d47">1790055009.027526</data>
+  <data key="d48">1790055009.0280259</data>
+</edge>
+<edge source="('Query', 212)" target="Behavior_DATA_ACCESS_2" id="0">
+  <data key="d44">evidence_for</data>
+  <data key="d49">evidence_for</data>
+</edge>
+<edge source="('Query', 214)" target="('Table', 'customers')" id="accesses">
+  <data key="d44">accesses</data>
+  <data key="d45">2</data>
+  <data key="d46">[214, 214]</data>
+  <data key="d47">1790055013.5412889</data>
+  <data key="d48">1790055013.5417888</data>
+</edge>
+<edge source="('Query', 214)" target="('Table', 'orders')" id="accesses">
+  <data key="d44">accesses</data>
+  <data key="d45">2</data>
+  <data key="d46">[214, 214]</data>
+  <data key="d47">1790055013.5412889</data>
+  <data key="d48">1790055013.5417888</data>
+</edge>
+<edge source="('Query', 214)" target="('Table', 'payments')" id="accesses">
+  <data key="d44">accesses</data>
+  <data key="d45">2</data>
+  <data key="d46">[214, 214]</data>
+  <data key="d47">1790055013.5412889</data>
+  <data key="d48">1790055013.5417888</data>
+</edge>
+<edge source="('Query', 214)" target="Behavior_DATA_ACCESS_3" id="0">
+  <data key="d44">evidence_for</data>
+  <data key="d49">evidence_for</data>
+</edge>
+<edge source="('Query', 216)" target="('Table', 'customers')" id="accesses">
+  <data key="d44">accesses</data>
+  <data key="d45">2</data>
+  <data key="d46">[216, 216]</data>
+  <data key="d47">1790055018.0550518</data>
+  <data key="d48">1790055018.0555518</data>
+</edge>
+<edge source="('Query', 216)" target="('Table', 'orders')" id="accesses">
+  <data key="d44">accesses</data>
+  <data key="d45">2</data>
+  <data key="d46">[216, 216]</data>
+  <data key="d47">1790055018.0550518</data>
+  <data key="d48">1790055018.0555518</data>
+</edge>
+<edge source="('Query', 216)" target="('Table', 'payments')" id="accesses">
+  <data key="d44">accesses</data>
+  <data key="d45">2</data>
+  <data key="d46">[216, 216]</data>
+  <data key="d47">1790055018.0550518</data>
+  <data key="d48">1790055018.0555518</data>
+</edge>
+<edge source="('Query', 216)" target="Behavior_DATA_ACCESS_4" id="0">
+  <data key="d44">evidence_for</data>
+  <data key="d49">evidence_for</data>
+</edge>
+<edge source="('Query', 218)" target="('Table', 'customers')" id="accesses">
+  <data key="d44">accesses</data>
+  <data key="d45">1</data>
+  <data key="d46">[218]</data>
+  <data key="d47">1790055022.5688148</data>
+  <data key="d48">1790055022.5688148</data>
+</edge>
+<edge source="('Query', 218)" target="('Table', 'orders')" id="accesses">
+  <data key="d44">accesses</data>
+  <data key="d45">1</data>
+  <data key="d46">[218]</data>
+  <data key="d47">1790055022.5688148</data>
+  <data key="d48">1790055022.5688148</data>
+</edge>
+<edge source="('Query', 218)" target="('Table', 'payments')" id="accesses">
+  <data key="d44">accesses</data>
+  <data key="d45">1</data>
+  <data key="d46">[218]</data>
+  <data key="d47">1790055022.5688148</data>
+  <data key="d48">1790055022.5688148</data>
+</edge>
+<edge source="('Query', 218)" target="('Process', 20021)" id="spawns">
+  <data key="d44">spawns</data>
+  <data key="d45">2</data>
+  <data key="d46">[219, 220]</data>
+  <data key="d47">1790055022.5698147</data>
+  <data key="d48">1790055022.5708148</data>
+</edge>
+<edge source="('Query', 218)" target="Behavior_DATA_ACCESS_5" id="0">
+  <data key="d44">evidence_for</data>
+  <data key="d49">evidence_for</data>
+</edge>
+<edge source="('Query', 218)" target="Behavior_UNIX_SHELL_EXECUTION_6" id="0">
+  <data key="d44">evidence_for</data>
+  <data key="d49">evidence_for</data>
+</edge>
+<edge source="('Process', 20021)" target="('File', '/var/lib/postgresql/audit/fraud_review_report.csv')" id="opens">
+  <data key="d44">opens</data>
+  <data key="d45">1</data>
+  <data key="d46">[220]</data>
+  <data key="d47">1790055022.5708148</data>
+  <data key="d48">1790055022.5708148</data>
+</edge>
+<edge source="('Process', 20021)" target="Behavior_UNIX_SHELL_EXECUTION_6" id="0">
+  <data key="d44">evidence_for</data>
+  <data key="d49">evidence_for</data>
+</edge>
+<edge source="Behavior_DATA_ACCESS_1" target="Behavior_DATA_ACCESS_2" id="0">
+  <data key="d44">precedes</data>
+  <data key="d49">precedes</data>
+</edge>
+<edge source="Behavior_DATA_ACCESS_2" target="Behavior_DATA_ACCESS_3" id="0">
+  <data key="d44">precedes</data>
+  <data key="d49">precedes</data>
+</edge>
+<edge source="Behavior_DATA_ACCESS_3" target="Behavior_DATA_ACCESS_4" id="0">
+  <data key="d44">precedes</data>
+  <data key="d49">precedes</data>
+</edge>
+<edge source="Behavior_DATA_ACCESS_4" target="Behavior_DATA_ACCESS_5" id="0">
+  <data key="d44">precedes</data>
+  <data key="d49">precedes</data>
+</edge>
+<edge source="Behavior_DATA_ACCESS_5" target="Behavior_UNIX_SHELL_EXECUTION_6" id="0">
+  <data key="d44">precedes</data>
+  <data key="d49">precedes</data>
+</edge>
+</graph></graphml>

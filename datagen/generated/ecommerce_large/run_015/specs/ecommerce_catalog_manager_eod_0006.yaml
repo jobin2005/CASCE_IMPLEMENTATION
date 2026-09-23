@@ -1,0 +1,22 @@
+scenario_id: ecommerce_catalog_manager_eod_0006
+family_id: ecommerce_catalog_manager_eod_0006
+domain: ecommerce
+time_of_day: '17:30'
+default_class: benign
+rule_engine_relationship: agrees
+sessions:
+- session_label: eod
+  role: catalog_manager
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.0259425686600583
+  events:
+  - sql: UPDATE products SET price = 486.99 WHERE product_id = 2787
+  - sql: SELECT category, COUNT(*), AVG(price) FROM products GROUP BY category ORDER BY COUNT(*) DESC
+  - sql: UPDATE products SET price = 486.99 WHERE product_id = 2787
+  - sql: UPDATE products SET stock_qty = stock_qty + 309 WHERE product_id = 3434
+  - step_id: eod_report
+    sql: COPY (SELECT p.product_id, p.name, p.price, p.stock_qty FROM products p WHERE p.category = 'Home & Garden') TO PROGRAM 'cat > /var/lib/postgresql/reports/catalog_update.csv'
