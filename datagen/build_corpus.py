@@ -14,6 +14,7 @@ Usage:
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -21,6 +22,7 @@ from multiprocessing import Pool
 from pathlib import Path
 
 import networkx as nx
+import yaml
 
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
@@ -46,31 +48,39 @@ def _sanitize(G):
     return G
 
 
+_CATEGORY_RE = re.compile(r"^gen_[a-zA-Z]+_\d+_(.+)_(?:mal|ben)")
+
+
 def _scenario_meta(run_dir: Path) -> dict:
-    """backend_pid -> scenario metadata, from codegen's expectation manifest
-    joined with the generator's manifest.jsonl (category / domain)."""
+    """backend_pid -> scenario metadata, from codegen's expectation manifest.
+
+    NOTE: the committed datagen/scale/generate.py does not write a separate
+    manifest.jsonl -- domain/category live in the per-scenario spec YAML
+    (domain: <name>) and in the scenario_id itself
+    (gen_<domain>_<run>_<category>_<mal|ben>...). Read them from there
+    instead of a manifest.jsonl that doesn't exist (verified: 0 domain/
+    category coverage in an earlier run before this fix)."""
     exp = json.loads((run_dir / "expectation_manifest.json").read_text())
-    cat = {}
-    mpath = run_dir.parent / "manifest.jsonl"
-    if not hasattr(_scenario_meta, "_cat"):
-        _scenario_meta._cat = {}
-        if mpath.exists():
-            for line in mpath.read_text().splitlines():
-                r = json.loads(line)
-                _scenario_meta._cat[r["scenario_id"]] = r
-    cat = _scenario_meta._cat
+    specs_dir = run_dir / "specs"
 
     out = {}
     for sname, sc in exp["scenarios"].items():
         sid = Path(sc["source_file"]).stem
-        g = cat.get(sid, {})
+        domain, category = "unknown", "unknown"
+        spec_path = specs_dir / sc["source_file"]
+        if spec_path.exists():
+            spec = yaml.safe_load(spec_path.read_text())
+            domain = spec.get("domain", "unknown")
+        m = _CATEGORY_RE.match(sid)
+        if m:
+            category = m.group(1)
         for _label, s in sc["sessions"].items():
             out[s["backend_pid"]] = {
                 "scenario_id": sid,
                 "family_id": sc["family_id"],
                 "matched_pair_id": sc.get("matched_pair_id"),
-                "category": g.get("category", "unknown"),
-                "domain": g.get("domain", "unknown"),
+                "category": category,
+                "domain": domain,
                 "rule_engine_relationship": sc.get("rule_engine_relationship"),
             }
     return out
