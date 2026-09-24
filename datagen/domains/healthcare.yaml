@@ -1,0 +1,125 @@
+domain: healthcare
+institution_name: "Vellarikkapattanam General Hospital"
+
+# Domain model for the healthcare corpus. Same contract as banking.yaml:
+# keep table/column/role names stable across every scenario and every run,
+# or the "role-appropriate hard negative" property this model exists to
+# protect silently weakens. Not consumed by codegen.py / validate_run.py
+# (they don't read domain models) — this is author-facing documentation,
+# enforced by spec review, not by tooling. Every scenario authored against
+# `domain: healthcare` must use only the tables/columns/roles below.
+
+tables:
+  patients:
+    columns: [patient_id, full_name, ssn, date_of_birth, address, phone, insurance_id, primary_doctor_id]
+    sensitive_columns: [ssn, date_of_birth, address, phone]
+
+  doctors:
+    columns: [doctor_id, full_name, specialty, department_id, license_number]
+    sensitive_columns: [license_number]
+
+  appointments:
+    columns: [appointment_id, patient_id, doctor_id, appointment_time, reason, status]
+    sensitive_columns: []
+
+  medical_records:
+    columns: [record_id, patient_id, doctor_id, diagnosis_code, diagnosis_notes, recorded_at]
+    sensitive_columns: [diagnosis_code, diagnosis_notes]
+
+  prescriptions:
+    columns: [prescription_id, patient_id, doctor_id, drug_name, dosage, issued_at]
+    sensitive_columns: [drug_name, dosage]
+
+  billing:
+    columns: [invoice_id, patient_id, amount, insurance_id, payment_status]
+    sensitive_columns: [amount]
+
+roles:
+  nurse:
+    scope: department
+    normal_access: >
+      SELECT/UPDATE on patients, appointments, and prescriptions for
+      patients in the nurse's own department only. Small row counts,
+      frequent, business hours. Never DDL, never role-management
+      statements, never reads another department's patients, never
+      touches billing or medical_records diagnosis notes in bulk.
+
+  physician:
+    scope: department
+    normal_access: >
+      SELECT across patients, appointments, medical_records, and
+      prescriptions for the physician's own patients; INSERT/UPDATE on
+      medical_records and prescriptions they author. One department,
+      business hours plus on-call. Breadth within their own patient panel
+      is normal; enterprise-wide reads are not.
+
+  billing_clerk:
+    scope: enterprise
+    normal_access: >
+      SELECT on billing and the non-clinical patient columns
+      (patient_id, insurance_id) plus billing amounts, enterprise-wide,
+      for claims processing. Does NOT normally read clinical
+      medical_records notes or prescriptions — reading those is
+      out-of-role for this account.
+
+  him_officer:
+    scope: enterprise
+    normal_access: >
+      Health Information Management officer. SELECT across all
+      departments and all tables, including sensitive columns (ssn,
+      date_of_birth, address, diagnosis_notes), for scheduled regulatory
+      audits and authorized record releases. This is the only role whose
+      normal job includes routine sensitive-column reads across
+      departments — deliberately, so that "reads PHI" cannot by itself
+      distinguish this role's malicious cases from its benign ones. What
+      has to differ is destination/intent (piping PHI to an external
+      process or network vs. writing an internal audit log), not the
+      columns touched.
+
+  research_etl_service:
+    scope: enterprise
+    normal_access: >
+      COPY with scoped columns and an incremental filter (e.g.
+      `WHERE recorded_at > :checkpoint`) TO PROGRAM, enterprise-wide, to
+      the one documented nightly de-identification/replication endpoint,
+      off-hours. A compromised instance of this account (same role,
+      abused credentials) is the malicious half of the matched
+      exfiltration pair — the tell is query breadth, sensitive-column
+      selection, and destination, not the role, which is identical on
+      both sides on purpose.
+
+padding_profile:
+  nurse:
+    pre:
+      - sql: "SELECT 1"
+      - sql: "SELECT column_name FROM information_schema.columns WHERE table_name = 'appointments'"
+    post:
+      - sql: "SELECT department_id FROM doctors WHERE doctor_id = 118"
+
+  physician:
+    pre:
+      - sql: "SELECT 1"
+      - sql: "SELECT current_user, session_user"
+    post:
+      - sql: "SELECT count(*) FROM appointments WHERE status = 'scheduled'"
+
+  billing_clerk:
+    pre:
+      - sql: "SELECT 1"
+      - sql: "SELECT setting FROM pg_settings WHERE name = 'work_mem'"
+    post:
+      - sql: "SELECT count(*) FROM billing WHERE payment_status = 'pending'"
+
+  him_officer:
+    pre:
+      - sql: "SELECT 1"
+      - sql: "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'"
+    post:
+      - sql: "SELECT count(*) FROM patients"
+
+  research_etl_service:
+    pre:
+      - sql: "SELECT 1"
+      - sql: "SELECT setting FROM pg_settings WHERE name = 'server_version'"
+    post:
+      - sql: "SELECT pg_is_in_recovery()"

@@ -16,10 +16,15 @@ PARSE_ERROR_LOG: list[dict] = []
 def identify_node_types(e: dict, facts: dict) -> list[str]:
     if e.get("source") == "postgres":
         types = ["Query"]
-        if facts.get("table_name"):
+        if facts.get("table_name") or facts.get("tables"):
             types.append("Table")
         if facts.get("role_name"):
             types.append("Role")
+        # ALTER SYSTEM SET / SET <setting> (sqlfacts: is_system_config): config
+        # tampering has neither a table nor a role, so without this branch the
+        # Query node stayed disconnected -- invisible to DEFENSE_IMPAIRMENT.
+        if facts.get("is_system_config") and facts.get("setting_name"):
+            types.append("Configuration")
         return types
     syscall = e.get("syscall")
     if syscall == "execve":
@@ -59,16 +64,26 @@ def process_event(session_key: int, e: dict, active_graphs: dict[int, nx.MultiDi
     for nt in node_types:
         if nt not in NODE_TYPES:
             continue
-        attrs = {**e, **facts, "timestamp_unix": ts}
-        if nt == "File" and "filepath" not in attrs:
-            attrs["filepath"] = e.get("arg", "")  # real kernel schema stores path in 'arg'
-        v = add_or_update_node(G, nt, attrs)
-        u, rel = find_connection_rule(G, nt, e, facts)
-        if u is not None:
-            add_directed_edge(G, u, v, rel, e["event_id"], ts)
-        elif nt == "Process":
-            ORPHAN_LOG.append({"session_key": session_key, "event_id": e["event_id"],
-                                 "pid": e.get("pid"), "ppid": e.get("ppid"), "comm": e.get("comm")})
+        if nt == "Table":
+            tables = facts.get("tables") or ([facts["table_name"]] if facts.get("table_name") else [])
+            for tname in tables:
+                tfacts = {**facts, "table_name": tname}
+                attrs = {**e, **tfacts, "timestamp_unix": ts}
+                v = add_or_update_node(G, nt, attrs)
+                u, rel = find_connection_rule(G, nt, e, tfacts)
+                if u is not None:
+                    add_directed_edge(G, u, v, rel, e["event_id"], ts)
+        else:
+            attrs = {**e, **facts, "timestamp_unix": ts}
+            if nt == "File" and "filepath" not in attrs:
+                attrs["filepath"] = e.get("arg", "")  # real kernel schema stores path in 'arg'
+            v = add_or_update_node(G, nt, attrs)
+            u, rel = find_connection_rule(G, nt, e, facts)
+            if u is not None:
+                add_directed_edge(G, u, v, rel, e["event_id"], ts)
+            elif nt == "Process":
+                ORPHAN_LOG.append({"session_key": session_key, "event_id": e["event_id"],
+                                     "pid": e.get("pid"), "ppid": e.get("ppid"), "comm": e.get("comm")})
 
     if facts.get("is_program"):
         G.graph["pending_spawn_source"] = e["event_id"]

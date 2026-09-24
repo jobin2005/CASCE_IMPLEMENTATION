@@ -2,6 +2,28 @@ import pglast
 from pglast import ast
 
 
+def _extract_tables_from_node(node):
+    tables = []
+    if not node:
+        return tables
+    if hasattr(node, "relname") and node.relname:
+        tables.append(node.relname)
+    if hasattr(node, "larg"):
+        tables.extend(_extract_tables_from_node(node.larg))
+    if hasattr(node, "rarg"):
+        tables.extend(_extract_tables_from_node(node.rarg))
+    return tables
+
+
+def _extract_tables_from_from_clause(from_clause):
+    tables = []
+    if not from_clause:
+        return tables
+    for item in from_clause:
+        tables.extend(_extract_tables_from_node(item))
+    return tables
+
+
 def extract_query_facts(query_text: str) -> dict:
     """Parse one SQL statement into the facts Algorithm 2 needs.
     Never raises -- a parse failure degrades to {"parse_error": ...}
@@ -15,15 +37,21 @@ def extract_query_facts(query_text: str) -> dict:
         stmt = parsed[0].stmt
 
         if isinstance(stmt, ast.CopyStmt):
+            table_name = stmt.relation.relname if stmt.relation else None
+            tables = [table_name] if table_name else []
+            if not tables and getattr(stmt, "query", None):
+                sub_query = stmt.query
+                if isinstance(sub_query, ast.SelectStmt) and sub_query.fromClause:
+                    tables = _extract_tables_from_from_clause(sub_query.fromClause)
             return {
-                "table_name": stmt.relation.relname if stmt.relation else None,
+                "table_name": tables[0] if tables else None,
+                "tables": tables,
                 "is_program": bool(stmt.is_program),
                 "shell_cmd": stmt.filename if stmt.is_program else None,
             }
         if isinstance(stmt, ast.SelectStmt) and stmt.fromClause:
-            table = stmt.fromClause[0]
-            name = getattr(table, "relname", None)
-            return {"table_name": name} if name else {}
+            tables = _extract_tables_from_from_clause(stmt.fromClause)
+            return {"table_name": tables[0] if tables else None, "tables": tables}
         if isinstance(stmt, ast.DropStmt):
             names = [obj[-1].sval for obj in stmt.objects]
             return {"table_name": names[0] if names else None, "is_drop": True}
@@ -88,6 +116,11 @@ def extract_query_facts(query_text: str) -> dict:
                 return {"role_name": stmt.args[0].val.sval, "is_role_change": True}
             except Exception:
                 return {"is_role_change": True}
+        if isinstance(stmt, ast.VariableSetStmt) and stmt.name != "role":
+            return {
+                "setting_name": stmt.name,
+                "is_system_config": True,
+            }
         if isinstance(stmt, (ast.UpdateStmt, ast.InsertStmt, ast.DeleteStmt)):
             rel = getattr(stmt, "relation", None)
             name = getattr(rel, "relname", None) if rel else None

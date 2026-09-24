@@ -1,0 +1,113 @@
+domain: ecommerce
+institution_name: "Vellarikkapattanam Bazaar Online"
+
+# Domain model for the ecommerce corpus. Same contract as banking.yaml:
+# keep table/column/role names stable across every scenario and every run.
+# Not consumed by codegen.py / validate_run.py — author-facing
+# documentation, enforced by spec review. Every scenario authored against
+# `domain: ecommerce` must use only the tables/columns/roles below.
+
+tables:
+  customers:
+    columns: [customer_id, full_name, email, phone, shipping_address, created_at]
+    sensitive_columns: [email, phone, shipping_address]
+
+  products:
+    columns: [product_id, name, category, price, stock_qty]
+    sensitive_columns: []
+
+  orders:
+    columns: [order_id, customer_id, order_time, total_amount, status]
+    sensitive_columns: []
+
+  order_items:
+    columns: [order_item_id, order_id, product_id, quantity, unit_price]
+    sensitive_columns: []
+
+  payments:
+    columns: [payment_id, order_id, card_last4, card_token, amount, paid_at]
+    sensitive_columns: [card_last4, card_token]
+
+roles:
+  support_agent:
+    scope: per_customer
+    normal_access: >
+      SELECT/UPDATE on orders and the non-payment customer columns for
+      the specific customer whose ticket is being handled. Small row
+      counts, frequent, business hours. Never bulk customer exports,
+      never reads payments.card_token, never DDL or role management.
+
+  catalog_manager:
+    scope: catalog
+    normal_access: >
+      SELECT/UPDATE on products (name, category, price, stock_qty)
+      enterprise-wide for merchandising. Does not touch customer PII or
+      payments at all — any access to customers/payments is out-of-role
+      for this account.
+
+  payments_service:
+    scope: payments
+    normal_access: >
+      Automated service account. INSERT/SELECT on payments scoped to the
+      order it is currently settling, plus the matching orders row.
+      Narrow, high-frequency, machine-paced. Never enterprise-wide reads,
+      never customer PII beyond the order under settlement.
+
+  fraud_analyst:
+    scope: enterprise
+    normal_access: >
+      SELECT across orders, payments, and customers, including sensitive
+      columns (email, phone, shipping_address, card_last4), for scheduled
+      fraud reviews. This is the only role whose normal job includes
+      routine sensitive-column reads across all customers — deliberately,
+      so that "reads payment/PII columns" cannot by itself distinguish
+      this role's malicious cases from its benign ones. What differs is
+      destination/intent (external process or network vs. internal review
+      log), not the columns touched.
+
+  analytics_etl_service:
+    scope: enterprise
+    normal_access: >
+      COPY with scoped columns and an incremental filter (e.g.
+      `WHERE order_time > :checkpoint`) TO PROGRAM, enterprise-wide, to
+      the one documented nightly analytics-warehouse endpoint, off-hours.
+      A compromised instance of this account (same role, abused
+      credentials) is the malicious half of the matched exfiltration
+      pair — the tell is query breadth, sensitive-column selection, and
+      destination, not the role, which is identical on both sides.
+
+padding_profile:
+  support_agent:
+    pre:
+      - sql: "SELECT 1"
+      - sql: "SELECT column_name FROM information_schema.columns WHERE table_name = 'orders'"
+    post:
+      - sql: "SELECT status FROM orders WHERE order_id = 88213"
+
+  catalog_manager:
+    pre:
+      - sql: "SELECT 1"
+      - sql: "SELECT current_user, session_user"
+    post:
+      - sql: "SELECT count(*) FROM products WHERE stock_qty = 0"
+
+  payments_service:
+    pre:
+      - sql: "SELECT 1"
+      - sql: "SELECT setting FROM pg_settings WHERE name = 'statement_timeout'"
+    post:
+      - sql: "SELECT pg_is_in_recovery()"
+
+  fraud_analyst:
+    pre:
+      - sql: "SELECT 1"
+      - sql: "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'"
+    post:
+      - sql: "SELECT count(*) FROM orders WHERE status = 'flagged'"
+
+  analytics_etl_service:
+    pre:
+      - sql: "SELECT 1"
+      - sql: "SELECT setting FROM pg_settings WHERE name = 'server_version'"
+    post:
+      - sql: "SELECT pg_is_in_recovery()"

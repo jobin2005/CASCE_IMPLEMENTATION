@@ -30,7 +30,7 @@ def parse_args():
     parser.add_argument('--input-dir', required=True, help='Path to directory containing input graph files (.json or .graphml)')
     parser.add_argument('--outdir', required=True, help='Directory to save enriched graphs')
     parser.add_argument('--theta-struct', type=float, default=0.50, help='Structural similarity threshold')
-    parser.add_argument('--theta-beh', type=float, default=0.45, help='Behavior confidence threshold')
+    parser.add_argument('--theta-beh', type=float, default=0.50, help='Behavior confidence threshold')
     return parser.parse_args()
 
 
@@ -128,7 +128,11 @@ def initialize_templates():
     g_account = nx.DiGraph()
     g_account.add_node("T_Query", type="Query")
     g_account.add_node("T_Role", type="Role")
-    g_account.add_edge("T_Query", "T_Role", relation="modifies")
+    # Algorithm 2 (and codegen's expectation mirror of it) links Query->Role with
+    # "accesses"; it never emits "modifies". Requiring "modifies" here meant this
+    # template could not match any real graph (ACCOUNT_MANIPULATION fired 0 times
+    # across the 10k corpus, CREATE ROLE ... SUPERUSER included).
+    g_account.add_edge("T_Query", "T_Role", relation="accesses")
     templates.append(BehaviorTemplate(
         label="ACCOUNT_MANIPULATION", 
         mitre_id="T1098", 
@@ -320,34 +324,6 @@ def calculate_graded_s_struct(G_s, T, theta_struct=0.50, max_matches=10):
     return graded_matches
 
 
-import re
-
-
-def _keyword_matches(keyword: str, factual_text_lower: str) -> bool:
-    """Word/phrase-boundary match, not substring containment.
-
-    The previous version did `keyword in factual_text_lower`, which fires on
-    accidental substrings -- e.g. keyword "nc" matches inside "pgbench_branches",
-    keyword "sh" matches inside "shadow", keyword "login" matches inside any
-    ordinary auth-related text. This was the exact bug the overfitting report
-    found (EXTERNAL_TRANSFER/"nc" firing 529 times on ordinary branch-table
-    queries). A single-word keyword must match a whole token; a multi-word
-    phrase ("create role") is matched with \\b-anchored boundaries so it
-    doesn't fire on partial phrase overlap either.
-    """
-    keyword = keyword.strip()
-    if not keyword:
-        return False
-    if " " in keyword:
-        pattern = r"\b" + re.escape(keyword) + r"\b"
-        return re.search(pattern, factual_text_lower) is not None
-    tokens = set()
-    for t in re.findall(r"[\w./]+", factual_text_lower):
-        tokens.add(t)
-        tokens.update(p for p in re.split(r"[./]+", t) if p)  # also expose path/extension components, e.g. "/bin/sh" -> "bin", "sh"
-    return keyword in tokens
-
-
 def calculate_s_sem(matched_nodes, G_s, T_keywords):
     if not matched_nodes or not T_keywords:
         return 0.0
@@ -359,8 +335,8 @@ def calculate_s_sem(matched_nodes, G_s, T_keywords):
 
     matched_keywords = 0
     for keyword in T_keywords:
-        kw = str(keyword).lower()
-        if _keyword_matches(kw, factual_text):
+        kw = str(keyword).lower().strip()
+        if kw and kw in factual_text:
             matched_keywords += 1
 
     s_coverage = matched_keywords / max(1, len(T_keywords))
@@ -395,12 +371,8 @@ def calculate_s_temp(matched_nodes, G_s, template):
     return float(math.exp(-delta_t / max_gap))
 
 
-def abstract_session_graph(G_s, templates, theta_struct=0.50, theta_beh=0.45, chain_gap=120.0):
+def abstract_session_graph(G_s, templates, theta_struct=0.50, theta_beh=0.50, chain_gap=120.0):
     G_enriched = G_s.copy()
-
-    alpha = 0.40   # Structural
-    beta = 0.35    # Semantic
-    gamma = 0.25   # Temporal
 
     behavior_counter = 0
     detected_behaviors = []
@@ -424,26 +396,22 @@ def abstract_session_graph(G_s, templates, theta_struct=0.50, theta_beh=0.45, ch
             if s_sem == 0.0:
                 continue
 
-            s_temp = calculate_s_temp(matched_nodes, G_s, template)
+            # Determine weights dynamically:
+            # Single-hop templates (<= 1 edge) share identical node timestamps (delta_t = 0),
+            # making s_temp non-discriminative (1.0). For single-hop templates, we drop s_temp
+            # (gamma=0.0) and rebalance structural and semantic weights to require real s_sem contribution.
+            if template.structure.number_of_edges() <= 1:
+                alpha = 0.50
+                beta = 0.50
+                gamma = 0.0
+                s_temp = 0.0
+            else:
+                alpha = 0.40
+                beta = 0.35
+                gamma = 0.25
+                s_temp = calculate_s_temp(matched_nodes, G_s, template)
 
-            # For single-hop templates (all matched nodes come from ONE event,
-            # e.g. Query--accesses-->Table), delta_t is always exactly 0 and
-            # s_temp is therefore always exactly 1.0 -- not because the match
-            # is temporally tight, but because there's no second timestamp to
-            # compare against at all. Letting that automatic 1.0 count toward
-            # confidence gives every single-hop match a free 0.25, independent
-            # of whether anything temporal is actually being measured. Only
-            # score s_temp for templates where a real time gap can exist.
-            is_multi_hop = template.structure.number_of_edges() > 1
-            effective_gamma = gamma if is_multi_hop else 0.0
-            # Redistribute the freed weight to BETA (semantic), not alpha --
-            # s_struct is equally trivial (also always 1.0) for these
-            # templates, so boosting alpha would just recreate the same
-            # degenerate floor under a different name. Only s_sem carries
-            # real discriminating signal here.
-            effective_beta = beta if is_multi_hop else (beta + gamma)
-
-            confidence = (alpha * s_struct) + (effective_beta * s_sem) + (effective_gamma * s_temp)
+            confidence = (alpha * s_struct) + (beta * s_sem) + (gamma * s_temp)
 
             if confidence < theta_beh:
                 continue
@@ -496,7 +464,7 @@ def abstract_session_graph(G_s, templates, theta_struct=0.50, theta_beh=0.45, ch
     return G_enriched, detected_behaviors
 
 
-def run_batch(input_dir: Path, out_dir: Path, theta_struct=0.50, theta_beh=0.45):
+def run_batch(input_dir: Path, out_dir: Path, theta_struct=0.50, theta_beh=0.50):
     input_dir = Path(input_dir).resolve()
     out_dir = Path(out_dir).resolve()
 
