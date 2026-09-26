@@ -94,7 +94,9 @@ def extract_features(G: nx.MultiDiGraph) -> np.ndarray:
                 pass
 
     edge_rel_counts = {r: 0 for r in EDGE_RELATIONS}
-    for _, _, _k, d in G.edges(keys=True, data=True):
+    edge_iter = G.edges(keys=True, data=True) if G.is_multigraph() else G.edges(data=True)
+    for edge in edge_iter:
+        d = edge[-1]
         rel = d.get("relation", d.get("rel"))
         if rel in edge_rel_counts:
             edge_rel_counts[rel] += 1
