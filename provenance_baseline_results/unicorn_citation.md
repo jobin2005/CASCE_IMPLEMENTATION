@@ -1,8 +1,20 @@
-# Unicorn — cited, not reproduced
+# Unicorn — superseded by a real implementation
 
-**Status: cite-only, despite real public code existing.** Same category as
-Kairos and ShadeWatcher: real code found, but the integration cost is
-higher than this project's remaining scope justifies right now — not "no
+**Status update: this file's original "cite-only" call was reconsidered and
+reversed.** Unicorn's core algorithm (HistoSketch/CWS + K-medoids) turned
+out to be reproducible without the full 5-repo streaming infrastructure
+described below — see `baseline_models/unicorn.py` and
+`unicorn_results.json` for the actual implementation and measured result
+(roc_auc=0.4996, on CASCE's own corpus, directly comparable to the other
+reproduced baselines). The rest of this file is kept for the record of what
+was checked and why reproduction originally looked infeasible; it no longer
+reflects this baseline's current status.
+
+---
+
+**Original status: cite-only, despite real public code existing.** Same
+category as Kairos and ShadeWatcher: real code found, but the integration
+cost is higher than this project's remaining scope justifies right now — not "no
 code exists," which would be a different (and weaker) reason.
 
 ## Citation

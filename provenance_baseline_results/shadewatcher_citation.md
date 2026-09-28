@@ -1,8 +1,16 @@
-# ShadeWatcher — cited, not reproduced
+# ShadeWatcher — superseded by a real implementation
 
-**Status: cite-only, despite real public code existing.** Same situation as
-Kairos: a real reference implementation exists, but the cost of running it
-is documented (by its own authors) as prohibitive for this project's scope.
+**Status update: reconsidered.** ShadeWatcher's full pipeline (custom C++
+audit parser + 12-hour TransR training on DARPA-scale data) is still out of
+scope, but its dominant component -- TransR knowledge-graph embedding -- was
+implemented faithfully and scaled to CASCE's corpus. See
+`baseline_models/shadewatcher.py` and `shadewatcher_results.json`
+(roc_auc=0.611, on CASCE's own corpus). The rest of this file documents the
+original full-pipeline infeasibility assessment, which still applies to
+ShadeWatcher's complete system (parser + TransR + downstream GNN) — only
+the TransR piece was reproduced, disclosed explicitly in that script.
+
+---
 
 ## Citation
 

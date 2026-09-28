@@ -1,9 +1,16 @@
-# Kairos — cited, not reproduced
+# Kairos — superseded by a real implementation
 
-**Status: cite-only, despite real public code existing.** This is a
-different situation from CGL-AD/Unicorn (no code found at all) — Kairos has
-a real, actively-maintained reference implementation, but a hard resource
-requirement this machine cannot meet.
+**Status update: reconsidered.** The 64GB RAM requirement below applies to
+Kairos's own whole-host, DARPA-scale deployment. CASCE's session graphs are
+tiny (mean 9.5 nodes), so their core TGN mechanism was implemented directly
+via `torch_geometric.nn.TGNMemory` (the exact class their own code imports)
+at a scale that doesn't need anywhere near that much memory. See
+`baseline_models/kairos.py` and `kairos_results.json`
+(roc_auc=0.521, on CASCE's own corpus). The rest of this file documents the
+original assessment, which still correctly describes why their *full*
+pipeline (PostgreSQL ingestion + whole-host scale) wasn't attempted.
+
+---
 
 ## Citation
 
