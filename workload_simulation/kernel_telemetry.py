@@ -46,6 +46,8 @@ Every traced event is also written unmodified to kernel_events.raw.json,
 so the normalisation can be audited.
 """
 import argparse
+import heapq
+import itertools
 import json
 import os
 import signal
@@ -53,6 +55,7 @@ import socket
 import struct
 import sys
 import time
+from types import SimpleNamespace
 
 from bcc import BPF
 
@@ -219,6 +222,7 @@ EV_EXEC_ARG, EV_EXEC_ENTER, EV_EXEC_RET, EV_OPENAT, EV_CONNECT, EV_FORK, EV_EXIT
 EV_NAMES = {1: "exec_arg", 2: "exec_enter", 3: "exec_ret", 4: "openat", 5: "connect", 6: "fork", 7: "exit"}
 
 SHELLS = {"sh", "dash", "bash"}
+REORDER_HOLD_NS = 100_000_000   # 100 ms
 
 # Opened by the dynamic loader / libc / TLS / resolver for any command --
 # never part of the command's own behaviour, and absent from the corpus.
@@ -441,8 +445,22 @@ def main():
         pg.write(marker + "\n")
 
     norm = Normaliser(out, raw_out, wall, mono)
-    b["events"].open_perf_buffer(lambda cpu, data, size: norm.handle(b["events"].event(data)),
-                                 page_cnt=256,
+    # Per-CPU perf buffers deliver events out of order across CPUs (e.g. a child's
+    # exec before its sh -c parent's): hold them briefly, process in kernel-time order.
+    pending, seq = [], itertools.count()
+
+    def on_event(cpu, data, size):
+        e = b["events"].event(data)   # only valid inside this callback: copy it
+        heapq.heappush(pending, (e.ts, next(seq), SimpleNamespace(
+            type=e.type, pid=e.pid, ppid=e.ppid, uid=e.uid, depth=e.depth, ts=e.ts,
+            retval=e.retval, flags=e.flags, dest_ip=e.dest_ip, dest_port=e.dest_port,
+            child=e.child, comm=bytes(e.comm), arg=bytes(e.arg))))
+
+    def flush(cutoff_ns):
+        while pending and pending[0][0] <= cutoff_ns:
+            norm.handle(heapq.heappop(pending)[2])
+
+    b["events"].open_perf_buffer(on_event, page_cnt=256,
                                  lost_cb=lambda n: print(f"[kernel_telemetry] LOST {n} events",
                                                          file=sys.stderr, flush=True))
 
@@ -455,8 +473,10 @@ def main():
     signal.signal(signal.SIGTERM, lambda *_: stop.append(1))
     signal.signal(signal.SIGINT, lambda *_: stop.append(1))
     while not stop:
-        b.perf_buffer_poll(timeout=200)
+        b.perf_buffer_poll(timeout=50)
+        flush(time.clock_gettime_ns(time.CLOCK_MONOTONIC) - REORDER_HOLD_NS)
     b.perf_buffer_poll(timeout=0)  # drain what is left
+    flush(float("inf"))
     out.close()
     raw_out.close()
     try:
