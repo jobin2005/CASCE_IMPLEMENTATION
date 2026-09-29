@@ -571,10 +571,10 @@ def fuse_scores(rule_score, gat_score_val, w_rule=W_RULE, w_gat=W_GAT):
     return 1.0 - (1.0 - w_rule * r) * (1.0 - w_gat * g)
 
 
-def detect(G, model, session_id="unknown", theta_a=THETA_A, theta_r=THETA_R):
+def detect(G, model, session_id="unknown", theta_a=THETA_A, theta_r=THETA_R, w_rule=W_RULE, w_gat=W_GAT):
     rule_score, scenario, matched_nodes, _all = evaluate_rules(G)
     gat_prob = gat_score(G, model)
-    risk = fuse_scores(rule_score, gat_prob)
+    risk = fuse_scores(rule_score, gat_prob, w_rule=w_rule, w_gat=w_gat)
 
     assessment = {
         "session_id": session_id, "risk": round(risk, 4),
