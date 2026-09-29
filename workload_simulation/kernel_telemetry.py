@@ -39,6 +39,8 @@ Normalisation to the codegen conventions (raw events are kept, see below)
    ld.so.cache, locale, /proc, /sys, TLS config and certificate stores,
    resolver config, libc's /etc/passwd|group lookups (unless the command
    names the file), DNS (port 53) and non-IPv4 connects.
+7. When a backend exits, a {"marker": "SESSION_END", "backend_pid": ...} line is
+   written. Markers are skipped by Algorithms 1-4 (like LOGGING_START).
 
 Every traced event is also written unmodified to kernel_events.raw.json,
 so the normalisation can be audited.
@@ -63,7 +65,7 @@ BPF_TEXT = r"""
 #define ARGSIZE 128
 #define MAXARG  20
 
-enum ev_type { EV_EXEC_ARG = 1, EV_EXEC_ENTER = 2, EV_EXEC_RET = 3, EV_OPENAT = 4, EV_CONNECT = 5, EV_FORK = 6 };
+enum ev_type { EV_EXEC_ARG = 1, EV_EXEC_ENTER = 2, EV_EXEC_RET = 3, EV_OPENAT = 4, EV_CONNECT = 5, EV_FORK = 6, EV_EXIT = 7 };
 
 struct data_t {
     u32 type;
@@ -122,10 +124,17 @@ TRACEPOINT_PROBE(sched, sched_process_fork) {
 
 TRACEPOINT_PROBE(sched, sched_process_exit) {
     /* per task: a thread's own entry (from fork) or, for the main thread, the process */
-    u32 tid = (u32)bpf_get_current_pid_tgid();
+    u64 id = bpf_get_current_pid_tgid();
+    u32 tid = (u32)id;
     u32 *d = tracked.lookup(&tid);
-    if (d && *d > 0)
+    if (d && *d > 0) {
+        if (*d == 1 && tid == (u32)(id >> 32)) {  /* a backend (session) ends */
+            struct data_t data = {};
+            fill(&data, EV_EXIT, 1);
+            events.perf_submit(args, &data, sizeof(data));
+        }
         tracked.delete(&tid);
+    }
     return 0;
 }
 
@@ -206,8 +215,8 @@ TRACEPOINT_PROBE(syscalls, sys_enter_connect) {
 }
 """
 
-EV_EXEC_ARG, EV_EXEC_ENTER, EV_EXEC_RET, EV_OPENAT, EV_CONNECT, EV_FORK = 1, 2, 3, 4, 5, 6
-EV_NAMES = {1: "exec_arg", 2: "exec_enter", 3: "exec_ret", 4: "openat", 5: "connect", 6: "fork"}
+EV_EXEC_ARG, EV_EXEC_ENTER, EV_EXEC_RET, EV_OPENAT, EV_CONNECT, EV_FORK, EV_EXIT = 1, 2, 3, 4, 5, 6, 7
+EV_NAMES = {1: "exec_arg", 2: "exec_enter", 3: "exec_ret", 4: "openat", 5: "connect", 6: "fork", 7: "exit"}
 
 SHELLS = {"sh", "dash", "bash"}
 
@@ -271,9 +280,10 @@ def proc_ppid_map():
 class Normaliser:
     """Turns raw per-syscall events into codegen-shaped kernel records."""
 
-    def __init__(self, out, raw_out):
+    def __init__(self, out, raw_out, wall0, mono0):
         self.out = out
         self.raw_out = raw_out
+        self.wall0, self.mono0 = wall0, mono0   # clock anchor, for SESSION_END wall times
         self.argv = {}          # pid -> [argv...] collected for the in-flight execve
         self.exec_enter = {}    # pid -> (ts, filename)
         self.execd = {}         # pid -> {"comm", "ppid"} once a (normalised) exec has been emitted
@@ -308,6 +318,12 @@ class Normaliser:
             self._on_openat(e, arg)
         elif e.type == EV_CONNECT:
             self._on_connect(e, raw)
+        elif e.type == EV_EXIT:
+            # A marker, like LOGGING_START: Algorithms 1-4 skip marker lines, so the
+            # record stream stays identical to the corpus. The daemon uses it to
+            # finalise a session the moment it disconnects.
+            self.write({"marker": "SESSION_END", "backend_pid": e.pid,
+                        "timestamp": self.wall0 + (e.ts - self.mono0) / 1e9})
         elif e.type == EV_FORK and e.pid in self.wrappers:
             self.wrappers[e.pid]["children"].append(e.child)
 
@@ -424,7 +440,7 @@ def main():
     with open(args.pg_log, "a") as pg:
         pg.write(marker + "\n")
 
-    norm = Normaliser(out, raw_out)
+    norm = Normaliser(out, raw_out, wall, mono)
     b["events"].open_perf_buffer(lambda cpu, data, size: norm.handle(b["events"].event(data)),
                                  page_cnt=256,
                                  lost_cb=lambda n: print(f"[kernel_telemetry] LOST {n} events",

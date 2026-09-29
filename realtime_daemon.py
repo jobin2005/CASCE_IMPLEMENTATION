@@ -13,10 +13,12 @@ code path the offline pipeline uses (main.py -> algorithm_4_hybrid.py):
   Algorithm 4  algorithm_4_hybrid.detect with the trained casce_gat.pt
 
 When a session is scored
-  - every --rescore-every seconds, if it received new events since its last score
-    (early alerting while the session is still running), and
-  - once it has been idle for --idle-timeout seconds (final score; it is scored
-    again if more events for it arrive later).
+  - every --rescore-every seconds while it is running, if it received new events
+    since its last score (early alerting; 0 disables), and
+  - once it has ended (final score): when the collector's SESSION_END marker for
+    its backend arrives, or -- fallback -- after --idle-timeout seconds without
+    events. After a SESSION_END the session is evicted, so a reused pid starts
+    a new session.
 
 Outputs (in --out-dir)
   alerts.jsonl          first time each session's risk reaches theta_A, with latency
@@ -129,6 +131,7 @@ class Engine:
         self.kernel_clock_offset = None
         self.awaiting_anchor = False
         self.by_id = {}              # event_id -> LogEvent, while pending in Algorithm 1
+        self.ended = {}              # backend pid -> wall time of its SESSION_END marker
         self.sessions: dict[int, Session] = {}
         out_dir.mkdir(parents=True, exist_ok=True)
         self.alerts_f = open(out_dir / "alerts.jsonl", "a", buffering=1)
@@ -143,6 +146,8 @@ class Engine:
                 if source == "kernel" and rec["marker"] == "LOGGING_START":
                     self.awaiting_anchor = True
                     self._start_marker = float(rec["timestamp"])
+                elif source == "kernel" and rec["marker"] == "SESSION_END":
+                    self.ended[rec["backend_pid"]] = float(rec["timestamp"])
                 continue
             if source == "kernel":
                 if self.awaiting_anchor and "pid" in rec:
@@ -237,13 +242,24 @@ class Engine:
                   f"({len(s.events)} events, {timing['total_ms']:.1f} ms)", flush=True)
         return result
 
-    def scoring_pass(self, wall_now, idle_timeout, rescore_every, last_rescore):
+    def scoring_pass(self, wall_now, idle_timeout, rescore_every, last_rescore, settle):
+        # sessions whose backend exited: final score once their last events have
+        # passed the reorder window, then evict
+        for pid, end_ts in list(self.ended.items()):
+            if wall_now < end_ts + settle:
+                continue
+            del self.ended[pid]
+            s = self.sessions.get(pid)
+            if s is not None and not s.final:
+                self.score(pid, final=True)
+            self.sessions.pop(pid, None)
+            self.active_sessions.pop(pid, None)
         for sk, s in list(self.sessions.items()):
             if s.final:
                 continue
             if wall_now - s.last_event_wall >= idle_timeout:
                 self.score(sk, final=True)
-            elif s.dirty and wall_now - last_rescore >= rescore_every:
+            elif rescore_every > 0 and s.dirty and wall_now - last_rescore >= rescore_every:
                 self.score(sk, final=False)
 
     def finish(self):
@@ -273,8 +289,8 @@ def run_follow(engine, log_dir, args):
     signal.signal(signal.SIGINT, lambda *_: stop.append(1))
     signal.signal(signal.SIGTERM, lambda *_: stop.append(1))
     last_rescore = 0.0
-    print(f"[daemon] following {log_dir} (theta_A={args.theta_a}, idle {args.idle_timeout}s, "
-          f"reorder {args.reorder_delay}s). Ctrl+C to stop.", flush=True)
+    print(f"[daemon] following {log_dir} (theta_A={args.theta_a}, rescore every {args.rescore_every}s, "
+          f"idle fallback {args.idle_timeout}s, reorder {args.reorder_delay}s). Ctrl+C to stop.", flush=True)
 
     while not stop:
         buffer += engine.to_log_events(kern.read_new(), "kernel")
@@ -287,7 +303,8 @@ def run_follow(engine, log_dir, args):
         if ready:
             buffer = [e for e in buffer if e.timestamp > cutoff]
             engine.correlate(ready, wall_now=now)
-        engine.scoring_pass(now, args.idle_timeout, args.rescore_every, last_rescore)
+        engine.scoring_pass(now, args.idle_timeout, args.rescore_every, last_rescore,
+                            settle=args.reorder_delay + 0.5)
         if now - last_rescore >= args.rescore_every:
             last_rescore = now
         time.sleep(args.poll_interval)
@@ -308,10 +325,11 @@ def main():
     ap.add_argument("--model-path", default="casce_gat.pt")
     ap.add_argument("--theta-a", type=float, default=0.40, help="alert threshold (tuned on validation)")
     ap.add_argument("--theta-r", type=float, default=algorithm_4_hybrid.THETA_R)
-    ap.add_argument("--idle-timeout", type=float, default=5.0,
-                    help="seconds without new events before a session gets its final score")
+    ap.add_argument("--idle-timeout", type=float, default=60.0,
+                    help="fallback: final score after this many seconds without events "
+                         "(normally the SESSION_END marker finalises a session)")
     ap.add_argument("--rescore-every", type=float, default=2.0,
-                    help="rescore sessions with new events this often (early alerts)")
+                    help="rescore running sessions with new events this often (early alerts; 0 = off)")
     ap.add_argument("--reorder-delay", type=float, default=1.0,
                     help="hold events this long so both logs merge in timestamp order")
     ap.add_argument("--poll-interval", type=float, default=0.05)

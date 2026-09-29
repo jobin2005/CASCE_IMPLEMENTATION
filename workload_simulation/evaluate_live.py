@@ -67,6 +67,8 @@ def main():
     ap.add_argument("--run-dir", type=Path, required=True,
                     help="capture folder: session_labels.jsonl (+ live_manifest.jsonl)")
     ap.add_argument("--scores", type=Path, default=PROJECT_ROOT / "realtime_out" / "session_scores.jsonl")
+    ap.add_argument("--alerts", type=Path, default=None,
+                    help="daemon alerts.jsonl (default: next to --scores)")
     ap.add_argument("--theta", type=float, default=0.40)
     ap.add_argument("--compare-synthetic", action="store_true")
     ap.add_argument("--model-path", default=str(PROJECT_ROOT / "casce_gat.pt"))
@@ -95,6 +97,7 @@ def main():
                      "family": family(m.get("scenario_id")) if m else key, "key": key, "m": m,
                      "risk": sc["risk"], "rule": sc["rule_score"], "gat": sc["gat_score"],
                      "status": sc["status"], "scenario": sc.get("scenario"),
+                     "n_events": sc.get("n_events"),
                      "behaviors": sc.get("behaviors", [])})
 
     print(f"== Coverage")
@@ -113,13 +116,35 @@ def main():
         print(f"  unlabelled sessions (not from the runner/pgbench), e.g. "
               f"{[u['session_id'] for u in unlabelled[:5]]}")
 
-    print(f"\n== Detection at theta_A = {args.theta}")
+    alerts_path = args.alerts or args.scores.with_name("alerts.jsonl")
+    alerted = {}
+    if alerts_path.exists():
+        for a in read_jsonl(alerts_path):
+            alerted.setdefault(int(a["session_id"]), a)
+
+    print(f"\n== Final verdict per session (score once the session has ended), theta_A = {args.theta}")
     print(f"  ALL        {fmt(rates(rows, args.theta))}")
     by_src = defaultdict(list)
     for r in rows:
         by_src[r["source"]].append(r)
     for src, rs in sorted(by_src.items()):
         print(f"  {src:<10} {fmt(rates(rs, args.theta))}")
+
+    if alerted:
+        op_rows = [dict(r, risk=1.0 if r["session_id"] in alerted else 0.0) for r in rows]
+        early = [r for r in rows if r["session_id"] in alerted and r["risk"] < args.theta]
+        print(f"\n== Real-time view: alerted at ANY point while the session was running")
+        print(f"  ALL        {fmt(rates(op_rows, 0.5))}")
+        by_src_op = defaultdict(list)
+        for r in op_rows:
+            by_src_op[r["source"]].append(r)
+        for src, rs in sorted(by_src_op.items()):
+            print(f"  {src:<10} {fmt(rates(rs, 0.5))}")
+        print(f"  alerts raised on a partial session whose final verdict is benign: {len(early)}")
+        for r in early[:10]:
+            a = alerted[r["session_id"]]
+            print(f"    session {r['session_id']} {r['family']}: alert at {a['n_events']} events "
+                  f"(risk {a['risk']:.3f}), final {r['risk']:.3f} after {r['n_events']} events")
 
     print(f"\n== Per scenario family (theta_A = {args.theta})")
     by_fam = defaultdict(list)
