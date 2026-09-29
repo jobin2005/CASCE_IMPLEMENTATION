@@ -71,23 +71,23 @@ SELECT i,
        format('NID-%s', lpad((i * 7919 % 1000000)::text, 6, '0')),
        format('%s Main Road, City %s', i % 500, i % 40),
        format('BR-%s', lpad((1 + i % 30)::text, 3, '0'))
-FROM generate_series(1, 10000) i;
+FROM generate_series(1::bigint, 10000) i;
 
 -- 100,000 accounts, 10 per customer (scenario literals go up to account_id 97880)
 INSERT INTO accounts (account_id, customer_id, branch_id, account_type, balance)
 SELECT a, c.customer_id, c.branch_id,
-       (ARRAY['savings','current','fixed_deposit'])[1 + a % 3],
+       (ARRAY['savings','current','fixed_deposit'])[1 + (a % 3)::int],
        round((a * 104729 % 500000)::numeric / 1.7, 2)
-FROM generate_series(1, 100000) a
+FROM generate_series(1::bigint, 100000) a
 JOIN customers c ON c.customer_id = 1 + (a - 1) % 10000;
 
 -- 300,000 transactions spread over 2026
 INSERT INTO transactions (account_id, amount, counterparty, transaction_time)
 SELECT 1 + (t * 7349 % 100000),
        round((t * 31337 % 120000)::numeric / 1.3, 2),
-       (ARRAY['Customer Transfer','Salary','Utility Bill','Card Payment','Loan EMI'])[1 + t % 5],
+       (ARRAY['Customer Transfer','Salary','Utility Bill','Card Payment','Loan EMI'])[1 + (t % 5)::int],
        timestamp '2026-01-01' + (t * 97 % 31536000) * interval '1 second'
-FROM generate_series(1, 300000) t;
+FROM generate_series(1::bigint, 300000) t;
 
 INSERT INTO audit_logs (actor, action)
 SELECT 'system', format('nightly job %s', i) FROM generate_series(1, 1000) i;
