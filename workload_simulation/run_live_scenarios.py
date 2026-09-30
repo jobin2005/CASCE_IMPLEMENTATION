@@ -229,6 +229,18 @@ def start_pgbench(seconds, clients, rate):
         stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
 
+def report_pgbench(out):
+    lines = out.strip().splitlines()
+    errors = [l for l in lines if "error" in l.lower() or "aborted" in l.lower()]
+    for l in lines:
+        if l.startswith(("number of transactions actually processed", "number of failed", "tps")):
+            print(f"[pgbench] {l}", flush=True)
+    if errors:
+        print(f"[pgbench] WARNING: pgbench reported {len(errors)} error line(s), e.g.:", flush=True)
+        for l in errors[:3]:
+            print(f"[pgbench]   {l}", flush=True)
+
+
 def check_sql(plan):
     """EXPLAIN every distinct statement as its role (COPY: its inner query) --
     catches missing tables/columns/permissions without side effects.
@@ -276,7 +288,7 @@ def main():
         pb = start_pgbench(args.pgbench_only, args.pgbench_clients, args.pgbench_rate)
         out = pb.communicate()[0]
         (args.out_dir / "pgbench.log").write_text(out)
-        print(out.strip().splitlines()[-3:] if out.strip() else "", flush=True)
+        report_pgbench(out)
         return
 
     plan = load_plan([str(PROJECT_ROOT / g) if not Path(g).is_absolute() else g for g in args.specs],
@@ -316,7 +328,9 @@ def main():
         if pb:
             pb.terminate()
             try:
-                (args.out_dir / "pgbench.log").write_text(pb.communicate(timeout=10)[0] or "")
+                pb_out = pb.communicate(timeout=10)[0] or ""
+                (args.out_dir / "pgbench.log").write_text(pb_out)
+                report_pgbench(pb_out)
             except subprocess.TimeoutExpired:
                 pb.kill()
             dexec("pkill", "-INT", "pgbench", check=False)
