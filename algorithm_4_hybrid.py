@@ -59,6 +59,7 @@ import json
 import math
 import hashlib
 import argparse
+import random
 import warnings
 
 import networkx as nx
@@ -175,6 +176,15 @@ W_RULE = 0.75
 W_GAT = 0.75
 
 FEATURE_HASH_DIM = 16
+
+# Which text each node's hashed features come from.
+#   1: label, else query, else the node id -- Session/Process ids embed the pid,
+#      an arbitrary number that differs between runs (casce_gat.pt, the baseline).
+#   2: pid-free -- Process: command line; Session: constant; Endpoint: IP only
+#      (ports in the synthetic corpus were not the ports actually used);
+#      Table/Role: their name (v1 hashed the first query that touched them).
+# Set by load_model from the checkpoint's sidecar JSON, or by --feature-version.
+FEATURE_VERSION = 1
 NUM_NODE_FEATS = FEATURE_HASH_DIM + 8
 HIDDEN_DIM = 32
 HEADS = 4
@@ -364,10 +374,26 @@ def _stable_hash_bucket(text, dim=FEATURE_HASH_DIM):
     return vec
 
 
+def node_hash_text(n, data):
+    if FEATURE_VERSION >= 2:
+        ntype = data.get("type")
+        if ntype == "Process":
+            return f"process {data.get('arg') or data.get('comm', '')}"
+        if ntype == "Session":
+            return "session"
+        if ntype == "Endpoint":
+            return f"endpoint {data.get('dest_ip', '')}"
+        if ntype == "Table":
+            return f"table {data.get('table_name', '')}"
+        if ntype == "Role":
+            return f"role {data.get('role_name', '')}"
+    # Use label, query text, or node id as hash input for semantic features
+    return data.get("label", data.get("query", str(n)))
+
+
 def featurize_node(G, n, max_ts):
     data = G.nodes[n]
-    # Use label, query text, or node id as hash input for semantic features
-    hash_text = data.get("label", data.get("query", str(n)))
+    hash_text = node_hash_text(n, data)
     hash_feat = _stable_hash_bucket(hash_text)
     confidence = _safe_float(data.get("confidence"))
     s_struct = _safe_float(data.get("s_struct"))
@@ -669,15 +695,26 @@ def _load_dataset_from_dirs(dir_str, label_str):
     return dataset
 
 
+def _meta_path(model_path):
+    return os.path.splitext(model_path)[0] + ".json"
+
+
 def load_model(model_path):
+    global FEATURE_VERSION
     if not TORCH_AVAILABLE:
         return None
+    meta = {}
+    if model_path and os.path.exists(_meta_path(model_path)):
+        with open(_meta_path(model_path)) as f:
+            meta = json.load(f)
+    FEATURE_VERSION = int(meta.get("feature_version", 1))
     model = CasceHeteroGAT()
     if model_path and os.path.exists(model_path):
         state = torch.load(model_path, map_location="cpu", weights_only=False)
         try:
             model.load_state_dict(state, strict=False)
-            print(f"[algo4] Loaded trained GAT weights from {model_path}")
+            print(f"[algo4] Loaded trained GAT weights from {model_path} "
+                  f"(feature version {FEATURE_VERSION})")
         except Exception as e:
             print(f"[algo4] WARNING: could not load weights ({e}); using untrained model.")
     else:
@@ -725,8 +762,17 @@ def _compute_epoch_loss(model, dataset, loss_fn):
 
 def train_gat(args):
     """Train with proper train/validation split and early stopping."""
+    global FEATURE_VERSION
     if not TORCH_AVAILABLE:
         raise SystemExit("torch + torch_geometric are required for --mode train.")
+
+    # features are computed while loading, so the version must be set first
+    FEATURE_VERSION = args.feature_version
+    random.seed(args.seed)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    rng = random.Random(args.seed)
+    print(f"[train] feature version {FEATURE_VERSION}, seed {args.seed}")
 
     # Load training data
     train_data = _load_dataset_from_dirs(args.train_dir, args.train_labels)
@@ -762,6 +808,7 @@ def train_gat(args):
         # --- Training ---
         model.train()
         total_loss = 0.0
+        rng.shuffle(train_data)
         for data, y in train_data:
             optimizer.zero_grad()
             logit = model(data)
@@ -795,6 +842,10 @@ def train_gat(args):
         print(f"[train] Restored best model (val_loss={best_val_loss:.4f})")
 
     torch.save(model.state_dict(), args.model_path)
+    with open(_meta_path(args.model_path), "w") as f:
+        json.dump({"feature_version": FEATURE_VERSION, "seed": args.seed, "epochs_max": args.epochs,
+                   "train_dir": args.train_dir, "train_labels": args.train_labels,
+                   "val_dir": args.val_dir, "val_labels": args.val_labels}, f, indent=2)
     print(f"[train] Saved trained GAT weights to {args.model_path}")
 
 
@@ -965,6 +1016,9 @@ def parse_args():
                    help="Comma-separated validation label JSON files")
     p.add_argument("--epochs", type=int, default=50)
     p.add_argument("--lr", type=float, default=1e-3)
+    p.add_argument("--seed", type=int, default=42)
+    p.add_argument("--feature-version", type=int, default=1, choices=[1, 2],
+                   help="node text features (see FEATURE_VERSION); saved next to the model")
     return p.parse_args()
 
 

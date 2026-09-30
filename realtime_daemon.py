@@ -282,10 +282,23 @@ class Engine:
 # Main loops
 # --------------------------------------------------------------------------
 
-def run_replay(engine, log_dir):
-    """Offline replay of a finished capture: same as algorithm_1.run_one + main.py."""
+def run_replay(engine, log_dir, rescore_every=0.0):
+    """Offline replay of a finished capture: same as algorithm_1.run_one + main.py.
+    With rescore_every > 0, running sessions are also rescored every that many
+    seconds of event time, like the live daemon does -- so alerts.jsonl gives
+    the real-time view for a capture (e.g. to evaluate a new model on old runs)."""
     master_log = algorithm_1.load_master_log(log_dir)
-    engine.correlate(master_log, wall_now=0.0)
+    if rescore_every <= 0:
+        engine.correlate(master_log, wall_now=0.0)
+    else:
+        next_tick = master_log[0].timestamp + rescore_every if master_log else 0.0
+        for ev in master_log:
+            while ev.timestamp >= next_tick:
+                for sk, s in list(engine.sessions.items()):
+                    if s.dirty and not s.final:
+                        engine.score(sk, final=False)
+                next_tick += rescore_every
+            engine.correlate([ev], wall_now=ev.timestamp)
     engine.finish()
 
 
@@ -342,6 +355,9 @@ def main():
                     help="hold events this long so both logs merge in timestamp order")
     ap.add_argument("--poll-interval", type=float, default=0.05)
     ap.add_argument("--replay", action="store_true", help="process a finished capture and exit")
+    ap.add_argument("--replay-realtime", action="store_true",
+                    help="with --replay: also rescore running sessions every --rescore-every "
+                         "seconds of event time (fills alerts.jsonl like a live run)")
     args = ap.parse_args()
 
     model = algorithm_4_hybrid.load_model(args.model_path)
@@ -350,7 +366,7 @@ def main():
     engine = Engine(model, args.theta_a, args.theta_r, args.out_dir,
                     algorithm_3_abstract.initialize_templates())
     if args.replay:
-        run_replay(engine, args.log_dir)
+        run_replay(engine, args.log_dir, args.rescore_every if args.replay_realtime else 0.0)
     else:
         run_follow(engine, args.log_dir, args)
 
