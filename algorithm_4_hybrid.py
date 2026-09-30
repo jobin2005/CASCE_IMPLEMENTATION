@@ -760,6 +760,14 @@ def _compute_epoch_loss(model, dataset, loss_fn):
     return total / max(1, len(dataset))
 
 
+def _save_checkpoint(state, args, note):
+    torch.save(state, args.model_path)
+    with open(_meta_path(args.model_path), "w") as f:
+        json.dump({"feature_version": FEATURE_VERSION, "seed": args.seed, "epochs_max": args.epochs,
+                   "note": note, "train_dir": args.train_dir, "train_labels": args.train_labels,
+                   "val_dir": args.val_dir, "val_labels": args.val_labels}, f, indent=2)
+
+
 def train_gat(args):
     """Train with proper train/validation split and early stopping."""
     global FEATURE_VERSION
@@ -828,6 +836,8 @@ def train_gat(args):
                 best_val_loss = val_loss
                 patience_counter = 0
                 best_state = {k: v.clone() for k, v in model.state_dict().items()}
+                # save the best model so far: an interrupted run keeps its progress
+                _save_checkpoint(best_state, args, note=f"best so far: epoch {epoch}, val_loss {val_loss:.4f}")
             else:
                 patience_counter += 1
                 if patience_counter >= patience:
@@ -841,11 +851,7 @@ def train_gat(args):
         model.load_state_dict(best_state)
         print(f"[train] Restored best model (val_loss={best_val_loss:.4f})")
 
-    torch.save(model.state_dict(), args.model_path)
-    with open(_meta_path(args.model_path), "w") as f:
-        json.dump({"feature_version": FEATURE_VERSION, "seed": args.seed, "epochs_max": args.epochs,
-                   "train_dir": args.train_dir, "train_labels": args.train_labels,
-                   "val_dir": args.val_dir, "val_labels": args.val_labels}, f, indent=2)
+    _save_checkpoint(model.state_dict(), args, note="final")
     print(f"[train] Saved trained GAT weights to {args.model_path}")
 
 
