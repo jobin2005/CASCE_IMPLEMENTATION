@@ -5,6 +5,7 @@
 #   logger.sh stop                       stop capturing
 #   logger.sh status                     is capturing active?
 #   logger.sh mark_attack <name> start|end   annotate an attack window
+#   logger.sh archive                    move the current logs to archive/<timestamp>/
 #
 # The eBPF collector writes the LOGGING_START marker and the clock anchor
 # itself (same instant, like datagen/codegen.py), so this script no longer
@@ -49,6 +50,15 @@ start() {
         echo "Already running (use 'status' to check, 'stop' to stop)."
         exit 0
     fi
+
+    # One capture per run: never append a new run to an old one.
+    for f in "$KERNEL_LOG" "$PG_LOG" "$LABEL_LOG"; do
+        if [ -s "$f" ]; then
+            echo "Refusing to start: $(basename "$f") still holds a previous capture."
+            echo "Copy it where you need it, then run:  $0 archive"
+            exit 1
+        fi
+    done
 
     # Postgres backends run as user postgres and append to these files.
     touch "$KERNEL_LOG" "$KERNEL_RAW_LOG" "$PG_LOG" "$LABEL_LOG"
@@ -123,10 +133,23 @@ mark_attack() {
     marker "\"marker\": \"ATTACK_${phase^^}\", \"attack\": \"${name}\""
 }
 
+archive() {
+    if is_active; then
+        echo "Logging is active -- stop it before archiving."; exit 1
+    fi
+    local dest="${WORKDIR}/archive/$(date +%Y%m%d_%H%M%S)"
+    mkdir -p "$dest"
+    for f in "$KERNEL_LOG" "$KERNEL_RAW_LOG" "$PG_LOG" "$LABEL_LOG" "${WORKDIR}/time_sync.json" "$TRACER_LOG"; do
+        [ -e "$f" ] && mv "$f" "$dest/"
+    done
+    echo "Archived previous capture to $dest"
+}
+
 case "${1:-}" in
     start)       start ;;
     stop)        stop ;;
     status)      status ;;
     mark_attack) shift; mark_attack "$@" ;;
-    *) echo "usage: $0 start|stop|status|mark_attack <name> start|end"; exit 1 ;;
+    archive)     archive ;;
+    *) echo "usage: $0 start|stop|status|archive|mark_attack <name> start|end"; exit 1 ;;
 esac
