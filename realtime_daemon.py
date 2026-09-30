@@ -132,6 +132,7 @@ class Engine:
         self.awaiting_anchor = False
         self.by_id = {}              # event_id -> LogEvent, while pending in Algorithm 1
         self.ended = {}              # backend pid -> wall time of its SESSION_END marker
+        self.evicted = {}            # backend pid -> SESSION_END time, after its final score
         self.sessions: dict[int, Session] = {}
         out_dir.mkdir(parents=True, exist_ok=True)
         self.alerts_f = open(out_dir / "alerts.jsonl", "a", buffering=1)
@@ -182,6 +183,12 @@ class Engine:
         # identical to loader.load_attributed_events
         merged = {**ev.raw, "session_key": session_key, "event_id": ev.event_id,
                   "source": ev.source, "timestamp_unix": ev.timestamp}
+        if session_key in self.evicted and ev.timestamp <= self.evicted[session_key] + 5:
+            # an event of a session that was already finalised: its SESSION_END
+            # came too early relative to this event (clock problem) -- say so
+            print(f"[daemon] WARNING: event at {ev.timestamp:.3f} for session {session_key}, "
+                  f"which already ended at {self.evicted[session_key]:.3f}; its final score "
+                  f"missed this event", file=sys.stderr, flush=True)
         s = self.sessions.setdefault(session_key, Session())
         s.events.append(merged)
         s.last_event_wall = wall_now
@@ -254,6 +261,7 @@ class Engine:
                 self.score(pid, final=True)
             self.sessions.pop(pid, None)
             self.active_sessions.pop(pid, None)
+            self.evicted[pid] = end_ts
         for sk, s in list(self.sessions.items()):
             if s.final:
                 continue

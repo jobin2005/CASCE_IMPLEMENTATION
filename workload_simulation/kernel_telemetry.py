@@ -41,6 +41,9 @@ Normalisation to the codegen conventions (raw events are kept, see below)
    names the file), DNS (port 53) and non-IPv4 connects.
 7. When a backend exits, a {"marker": "SESSION_END", "backend_pid": ...} line is
    written. Markers are skipped by Algorithms 1-4 (like LOGGING_START).
+8. Wall-clock steps (NTP): Postgres timestamps follow the wall clock, eBPF the
+   monotonic clock. Any change of wall-minus-monotonic after the anchor is added
+   to kernel timestamps, so both stay on one clock (raw log: clock_shift_ns).
 
 Every traced event is also written unmodified to kernel_events.raw.json,
 so the normalisation can be audited.
@@ -300,9 +303,10 @@ class Normaliser:
     def handle(self, e):
         comm = e.comm.decode("utf-8", "replace")
         arg = e.arg.decode("utf-8", "replace")
+        shift = getattr(e, "clock_shift", 0)
         raw = {"type": EV_NAMES.get(e.type, e.type), "pid": e.pid, "ppid": e.ppid, "uid": e.uid,
-               "depth": e.depth, "timestamp": e.ts, "comm": comm, "arg": arg,
-               "flags": e.flags, "retval": e.retval}
+               "depth": e.depth, "timestamp": e.ts - shift, "clock_shift_ns": shift,
+               "comm": comm, "arg": arg, "flags": e.flags, "retval": e.retval}
         if e.type == EV_FORK:
             raw["child"] = e.child
         if e.type == EV_CONNECT and e.dest_ip:
@@ -456,9 +460,26 @@ def main():
             retval=e.retval, flags=e.flags, dest_ip=e.dest_ip, dest_port=e.dest_port,
             child=e.child, comm=bytes(e.comm), arg=bytes(e.arg))))
 
+    # Postgres stamps events with the wall clock, which NTP may step; eBPF uses the
+    # monotonic clock, aligned to it once (the anchor). Track the wall-minus-monotonic
+    # difference and shift kernel timestamps by any change since the anchor, so both
+    # logs stay on the same wall clock and Algorithm 1's single offset stays valid.
+    delta0 = int(wall * 1e9) - mono
+    shift = [0]
+
+    def update_clock_shift():
+        now_shift = (time.time_ns() - time.clock_gettime_ns(time.CLOCK_MONOTONIC)) - delta0
+        if abs(now_shift - shift[0]) > 1_000_000:   # > 1 ms: the wall clock was stepped
+            print(f"[kernel_telemetry] wall clock stepped by {(now_shift - shift[0]) / 1e6:+.1f} ms; "
+                  f"kernel timestamps now shifted by {now_shift / 1e6:+.1f} ms", flush=True)
+            shift[0] = now_shift
+
     def flush(cutoff_ns):
         while pending and pending[0][0] <= cutoff_ns:
-            norm.handle(heapq.heappop(pending)[2])
+            e = heapq.heappop(pending)[2]
+            e.clock_shift = shift[0]
+            e.ts += shift[0]
+            norm.handle(e)
 
     b["events"].open_perf_buffer(on_event, page_cnt=256,
                                  lost_cb=lambda n: print(f"[kernel_telemetry] LOST {n} events",
@@ -474,6 +495,7 @@ def main():
     signal.signal(signal.SIGINT, lambda *_: stop.append(1))
     while not stop:
         b.perf_buffer_poll(timeout=50)
+        update_clock_shift()
         flush(time.clock_gettime_ns(time.CLOCK_MONOTONIC) - REORDER_HOLD_NS)
     b.perf_buffer_poll(timeout=0)  # drain what is left
     flush(float("inf"))
