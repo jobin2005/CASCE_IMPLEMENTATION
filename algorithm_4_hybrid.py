@@ -968,7 +968,7 @@ def tune_thresholds(args):
     best_f1, best_theta = 0, THETA_A
     sweep_results = []
 
-    for theta_int in range(10, 91, 5):
+    for theta_int in range(5, 96, 5):
         theta = theta_int / 100.0
         y_pred = [1 if s >= theta else 0 for s in y_scores]
         tp = sum(1 for t, p in zip(y_true, y_pred) if t == 1 and p == 1)
@@ -987,6 +987,14 @@ def tune_thresholds(args):
             best_f1 = f1
             best_theta = theta
 
+    # Several thresholds can tie for the best F1 (e.g. when validation is fully
+    # separable); taking the first one would always pick the LOWEST of them.
+    # Use the middle of the best range instead -- the most margin on both sides.
+    tied = [r['theta'] for r in sweep_results if r['f1'] >= best_f1 - 1e-9]
+    best_theta = tied[len(tied) // 2]
+    if len(tied) > 1:
+        print(f"\n  Best F1 reached at {len(tied)} thresholds, θ_A = {tied[0]:.2f} … {tied[-1]:.2f}; "
+              f"using the middle one")
     print(f"\n  ★ Best F1 = {best_f1:.4f} at θ_A = {best_theta:.2f}")
     print(f"    Recommended: update THETA_A = {best_theta}")
 
