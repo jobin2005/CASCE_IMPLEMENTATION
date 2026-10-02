@@ -1,0 +1,248 @@
+{
+  "templates_per_split": {
+    "train": {
+      "banking_alter_role_esc": 19,
+      "banking_compliance_audit": 29,
+      "banking_compliance_exfil": 24,
+      "banking_dba_shadow_audit": 15,
+      "banking_defense_impair": 25,
+      "banking_etl_exfil_mal": 2,
+      "banking_etl_internal": 22,
+      "banking_etl_repl_ben": 2,
+      "banking_manager_eod": 33,
+      "banking_multi_apt": 57,
+      "banking_priv_abuse": 27,
+      "banking_teller_pii_dump": 26,
+      "banking_teller_routine": 27
+    },
+    "val": {
+      "banking_alter_role_esc": 5,
+      "banking_compliance_audit": 14,
+      "banking_compliance_exfil": 1,
+      "banking_defense_impair": 5,
+      "banking_etl_internal": 4,
+      "banking_manager_eod": 16,
+      "banking_multi_apt": 6,
+      "banking_priv_abuse": 2,
+      "banking_teller_pii_dump": 7,
+      "banking_teller_routine": 7
+    },
+    "test": {
+      "banking_alter_role_esc": 3,
+      "banking_compliance_audit": 32,
+      "banking_compliance_exfil": 16,
+      "banking_dba_shadow_audit": 13,
+      "banking_defense_impair": 12,
+      "banking_etl_exfil_mal": 14,
+      "banking_etl_internal": 15,
+      "banking_etl_repl_ben": 14,
+      "banking_manager_eod": 28,
+      "banking_multi_apt": 18,
+      "banking_priv_abuse": 16,
+      "banking_teller_pii_dump": 14,
+      "banking_teller_routine": 31
+    }
+  },
+  "test_templates_not_in_train": [],
+  "test_vs_train_sql_matches": {
+    "sql": {
+      "test_graphs_matched": 108,
+      "of": 226,
+      "malicious_matched": 71,
+      "of_malicious": 93,
+      "label_conflicts": 0,
+      "per_template": {
+        "banking_alter_role_esc": 3,
+        "banking_compliance_audit": 8,
+        "banking_compliance_exfil": 16,
+        "banking_dba_shadow_audit": 13,
+        "banking_defense_impair": 12,
+        "banking_etl_exfil_mal": 14,
+        "banking_etl_internal": 15,
+        "banking_etl_repl_ben": 1,
+        "banking_multi_apt": 12,
+        "banking_teller_pii_dump": 14
+      }
+    },
+    "sql_norm": {
+      "test_graphs_matched": 153,
+      "of": 226,
+      "malicious_matched": 93,
+      "of_malicious": 93,
+      "label_conflicts": 0,
+      "per_template": {
+        "banking_alter_role_esc": 3,
+        "banking_compliance_audit": 8,
+        "banking_compliance_exfil": 16,
+        "banking_dba_shadow_audit": 13,
+        "banking_defense_impair": 12,
+        "banking_etl_exfil_mal": 14,
+        "banking_etl_internal": 15,
+        "banking_etl_repl_ben": 14,
+        "banking_manager_eod": 8,
+        "banking_multi_apt": 18,
+        "banking_priv_abuse": 16,
+        "banking_teller_pii_dump": 14,
+        "banking_teller_routine": 2
+      }
+    }
+  },
+  "test_vs_train_val_sql_matches": {
+    "sql": {
+      "test_graphs_matched": 114,
+      "of": 226,
+      "malicious_matched": 71,
+      "of_malicious": 93,
+      "label_conflicts": 0,
+      "per_template": {
+        "banking_alter_role_esc": 3,
+        "banking_compliance_audit": 13,
+        "banking_compliance_exfil": 16,
+        "banking_dba_shadow_audit": 13,
+        "banking_defense_impair": 12,
+        "banking_etl_exfil_mal": 14,
+        "banking_etl_internal": 15,
+        "banking_etl_repl_ben": 1,
+        "banking_manager_eod": 1,
+        "banking_multi_apt": 12,
+        "banking_teller_pii_dump": 14
+      }
+    },
+    "sql_norm": {
+      "test_graphs_matched": 161,
+      "of": 226,
+      "malicious_matched": 93,
+      "of_malicious": 93,
+      "label_conflicts": 0,
+      "per_template": {
+        "banking_alter_role_esc": 3,
+        "banking_compliance_audit": 13,
+        "banking_compliance_exfil": 16,
+        "banking_dba_shadow_audit": 13,
+        "banking_defense_impair": 12,
+        "banking_etl_exfil_mal": 14,
+        "banking_etl_internal": 15,
+        "banking_etl_repl_ben": 14,
+        "banking_manager_eod": 11,
+        "banking_multi_apt": 18,
+        "banking_priv_abuse": 16,
+        "banking_teller_pii_dump": 14,
+        "banking_teller_routine": 2
+      }
+    }
+  },
+  "class_exclusive_node_types_all_splits": {
+    "malicious_only": {
+      "Role": 96
+    },
+    "benign_only": {}
+  },
+  "class_exclusive_file_paths": {
+    "malicious_only": {
+      "('File', '/dev/null')": 25,
+      "('File', '/tmp/.cache/roles.txt')": 24,
+      "('File', '/var/lib/postgresql/.cache/creds_dump.txt')": 42
+    },
+    "benign_only": {
+      "('File', '/var/lib/postgresql/audit/high_value_report.csv')": 56,
+      "('File', '/var/lib/postgresql/reports/branch_BR-001_daily.csv')": 12,
+      "('File', '/var/lib/postgresql/reports/branch_BR-002_daily.csv')": 9,
+      "('File', '/var/lib/postgresql/audit/password_policy_report.csv')": 24,
+      "('File', '/var/lib/postgresql/reports/eod_BR-002.csv')": 11,
+      "('File', '/var/lib/postgresql/reports/branch_BR-014_daily.csv')": 12,
+      "('File', '/var/lib/postgresql/reports/branch_BR-003_daily.csv')": 14,
+      "('File', '/var/lib/postgresql/reports/eod_BR-001.csv')": 6,
+      "('File', '/var/lib/postgresql/reports/eod_BR-027.csv')": 11,
+      "('File', '/var/lib/postgresql/reports/eod_BR-003.csv')": 11,
+      "('File', '/var/lib/postgresql/reports/branch_BR-027_daily.csv')": 6,
+      "('File', '/var/lib/postgresql/reports/eod_BR-014.csv')": 18
+    }
+  },
+  "class_exclusive_role_names": {
+    "malicious_only": {
+      "apt_shadow": 24,
+      "dba_maint": 19,
+      "svc_shadow": 11,
+      "admin_backup": 12,
+      "branch_manager": 11,
+      "compliance_officer": 11
+    },
+    "benign_only": {}
+  },
+  "holdout": {
+    "family": "banking_priv_abuse",
+    "holdout_train_graphs_of_family": 0,
+    "test_graphs_of_family": 16,
+    "test_vs_holdout_train_sql_matches": {
+      "sql": {
+        "test_graphs_matched": 0,
+        "of": 16,
+        "malicious_matched": 0,
+        "of_malicious": 16,
+        "label_conflicts": 0,
+        "per_template": {}
+      },
+      "sql_norm": {
+        "test_graphs_matched": 0,
+        "of": 16,
+        "malicious_matched": 0,
+        "of_malicious": 16,
+        "label_conflicts": 0,
+        "per_template": {}
+      }
+    },
+    "family_statements_also_in_holdout_train": {
+      "copy (select rolname, rolpassword from pg_authid) to program 'S'": [],
+      "create role admin_backup superuser login password 'S'": [],
+      "create role dba_maint superuser login password 'S'": [],
+      "create role svc_shadow superuser login password 'S'": [],
+      "select N": [
+        "banking_alter_role_esc",
+        "banking_compliance_audit",
+        "banking_compliance_exfil",
+        "banking_dba_shadow_audit",
+        "banking_defense_impair",
+        "banking_etl_exfil_mal",
+        "banking_etl_internal",
+        "banking_etl_repl_ben",
+        "banking_manager_eod",
+        "banking_multi_apt",
+        "banking_teller_pii_dump",
+        "banking_teller_routine"
+      ],
+      "select branch_id from branches where is_active = true": [
+        "banking_alter_role_esc",
+        "banking_defense_impair",
+        "banking_multi_apt",
+        "banking_teller_pii_dump",
+        "banking_teller_routine"
+      ],
+      "select column_name from information_schema.columns where table_name = 'S'": [
+        "banking_alter_role_esc",
+        "banking_defense_impair",
+        "banking_multi_apt",
+        "banking_teller_pii_dump",
+        "banking_teller_routine"
+      ],
+      "select national_id, address from customers where branch_id = 'S'": []
+    },
+    "family_statements_unseen": 5,
+    "family_statements_total": 8,
+    "holdout_train_graphs_with_pattern": {
+      "CREATE ROLE": {
+        "banking_multi_apt": 19
+      },
+      "ALTER ROLE": {
+        "banking_alter_role_esc": 19
+      },
+      "SUPERUSER": {
+        "banking_alter_role_esc": 19,
+        "banking_multi_apt": 19
+      },
+      "pg_authid": {
+        "banking_dba_shadow_audit": 15,
+        "banking_multi_apt": 19
+      }
+    }
+  }
+}

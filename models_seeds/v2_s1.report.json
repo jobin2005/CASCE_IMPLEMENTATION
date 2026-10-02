@@ -1,0 +1,286 @@
+{
+  "family": "banking_priv_abuse",
+  "theta": 0.55,
+  "labels": "dataset_test/algo4_splits/test_labels.json",
+  "n_heldout_test_graphs": 16,
+  "models": {
+    "v2": {
+      "model_path": "models_seeds/v2_s1.pt",
+      "all_test": {
+        "n": 226,
+        "n_malicious": 93,
+        "tp": 87,
+        "fp": 0,
+        "fn": 6,
+        "tn": 133,
+        "precision": 1.0,
+        "recall": 0.9355,
+        "f1": 0.9667,
+        "accuracy": 0.9735,
+        "fpr": 0.0,
+        "roc_auc": 1.0,
+        "pr_auc": 1.0,
+        "min_malicious_score": 0.3682,
+        "max_benign_score": 0.327,
+        "margin": 0.0412
+      },
+      "heldout_vs_benign": {
+        "n": 149,
+        "n_malicious": 16,
+        "tp": 16,
+        "fp": 0,
+        "fn": 0,
+        "tn": 133,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "accuracy": 1.0,
+        "fpr": 0.0,
+        "roc_auc": 1.0,
+        "pr_auc": 1.0,
+        "min_malicious_score": 0.75,
+        "max_benign_score": 0.327,
+        "margin": 0.423
+      },
+      "heldout_vs_benign_gat_only": {
+        "n": 149,
+        "n_malicious": 16,
+        "tp": 16,
+        "fp": 0,
+        "fn": 0,
+        "tn": 133,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "accuracy": 1.0,
+        "fpr": 0.0,
+        "roc_auc": 1.0,
+        "pr_auc": 1.0,
+        "min_malicious_score": 1.0,
+        "max_benign_score": 0.0584,
+        "margin": 0.9416
+      },
+      "seen_templates": {
+        "n": 210,
+        "n_malicious": 77,
+        "tp": 71,
+        "fp": 0,
+        "fn": 6,
+        "tn": 133,
+        "precision": 1.0,
+        "recall": 0.9221,
+        "f1": 0.9595,
+        "accuracy": 0.9714,
+        "fpr": 0.0,
+        "roc_auc": 1.0,
+        "pr_auc": 1.0,
+        "min_malicious_score": 0.3682,
+        "max_benign_score": 0.327,
+        "margin": 0.0412
+      },
+      "per_template": {
+        "banking_alter_role_esc:escalate": {
+          "n": 3,
+          "label": 1,
+          "detected": 3,
+          "risk_min": 0.8217,
+          "risk_median": 0.8217,
+          "risk_max": 0.8217,
+          "gat_min": 1.0,
+          "gat_median": 1.0
+        },
+        "banking_compliance_audit:audit (benign)": {
+          "n": 32,
+          "label": 0,
+          "false_alarms": 0,
+          "risk_min": 0.0,
+          "risk_median": 0.0,
+          "risk_max": 0.0,
+          "gat_min": 0.0,
+          "gat_median": 0.0
+        },
+        "banking_compliance_exfil:exfil": {
+          "n": 16,
+          "label": 1,
+          "detected": 16,
+          "risk_min": 0.8232,
+          "risk_median": 0.8232,
+          "risk_max": 0.8232,
+          "gat_min": 1.0,
+          "gat_median": 1.0
+        },
+        "banking_dba_shadow_audit:shadow_audit (benign)": {
+          "n": 13,
+          "label": 0,
+          "false_alarms": 0,
+          "risk_min": 0.0,
+          "risk_median": 0.0,
+          "risk_max": 0.0,
+          "gat_min": 0.0,
+          "gat_median": 0.0
+        },
+        "banking_defense_impair:impair_defenses": {
+          "n": 12,
+          "label": 1,
+          "detected": 12,
+          "risk_min": 0.8023,
+          "risk_median": 0.8023,
+          "risk_max": 0.8023,
+          "gat_min": 1.0,
+          "gat_median": 1.0
+        },
+        "banking_etl_exfil_mal:replication": {
+          "n": 14,
+          "label": 1,
+          "detected": 8,
+          "risk_min": 0.3682,
+          "risk_median": 0.76115,
+          "risk_max": 0.8146,
+          "gat_min": 0.1423,
+          "gat_median": 0.88305
+        },
+        "banking_etl_internal:etl (benign)": {
+          "n": 15,
+          "label": 0,
+          "false_alarms": 0,
+          "risk_min": 0.2927,
+          "risk_median": 0.2929,
+          "risk_max": 0.293,
+          "gat_min": 0.0,
+          "gat_median": 0.0002
+        },
+        "banking_etl_repl_ben:replication (benign)": {
+          "n": 14,
+          "label": 0,
+          "false_alarms": 0,
+          "risk_min": 0.2962,
+          "risk_median": 0.29645,
+          "risk_max": 0.327,
+          "gat_min": 0.0,
+          "gat_median": 0.0005499999999999999
+        },
+        "banking_manager_eod:eod (benign)": {
+          "n": 28,
+          "label": 0,
+          "false_alarms": 0,
+          "risk_min": 0.0,
+          "risk_median": 0.0,
+          "risk_max": 0.0,
+          "gat_min": 0.0,
+          "gat_median": 0.0
+        },
+        "banking_multi_apt:escalate": {
+          "n": 6,
+          "label": 1,
+          "detected": 6,
+          "risk_min": 0.75,
+          "risk_median": 0.75,
+          "risk_max": 0.75,
+          "gat_min": 1.0,
+          "gat_median": 1.0
+        },
+        "banking_multi_apt:exfil": {
+          "n": 6,
+          "label": 1,
+          "detected": 6,
+          "risk_min": 0.8227,
+          "risk_median": 0.8230500000000001,
+          "risk_max": 0.8232,
+          "gat_min": 0.9992,
+          "gat_median": 0.9998
+        },
+        "banking_multi_apt:recon": {
+          "n": 6,
+          "label": 1,
+          "detected": 6,
+          "risk_min": 0.75,
+          "risk_median": 0.75,
+          "risk_max": 0.75,
+          "gat_min": 1.0,
+          "gat_median": 1.0
+        },
+        "banking_priv_abuse:escalate_and_dump": {
+          "n": 16,
+          "label": 1,
+          "detected": 16,
+          "risk_min": 0.75,
+          "risk_median": 0.75,
+          "risk_max": 0.75,
+          "gat_min": 1.0,
+          "gat_median": 1.0
+        },
+        "banking_teller_pii_dump:pii_dump": {
+          "n": 14,
+          "label": 1,
+          "detected": 14,
+          "risk_min": 0.8215,
+          "risk_median": 0.8216,
+          "risk_max": 0.8217,
+          "gat_min": 0.9996,
+          "gat_median": 0.99995
+        },
+        "banking_teller_routine:teller_work (benign)": {
+          "n": 31,
+          "label": 0,
+          "false_alarms": 0,
+          "risk_min": 0.0,
+          "risk_median": 0.0,
+          "risk_max": 0.0,
+          "gat_min": 0.0,
+          "gat_median": 0.0
+        }
+      },
+      "missed_malicious": [
+        {
+          "graph": "enriched_run_001_20014_Malicious.graphml",
+          "scenario_id": "banking_etl_exfil_mal_0001",
+          "session": "replication",
+          "risk": 0.3974,
+          "gat": 0.1973,
+          "rule": 0.3903
+        },
+        {
+          "graph": "enriched_run_004_20018_Malicious.graphml",
+          "scenario_id": "banking_etl_exfil_mal_0002",
+          "session": "replication",
+          "risk": 0.3682,
+          "gat": 0.1423,
+          "rule": 0.3903
+        },
+        {
+          "graph": "enriched_run_005_20014_Malicious.graphml",
+          "scenario_id": "banking_etl_exfil_mal_0001",
+          "session": "replication",
+          "risk": 0.3974,
+          "gat": 0.1974,
+          "rule": 0.3903
+        },
+        {
+          "graph": "enriched_run_007_20012_Malicious.graphml",
+          "scenario_id": "banking_etl_exfil_mal_0001",
+          "session": "replication",
+          "risk": 0.3682,
+          "gat": 0.1423,
+          "rule": 0.3903
+        },
+        {
+          "graph": "enriched_run_008_20018_Malicious.graphml",
+          "scenario_id": "banking_etl_exfil_mal_0001",
+          "session": "replication",
+          "risk": 0.3974,
+          "gat": 0.1974,
+          "rule": 0.3903
+        },
+        {
+          "graph": "enriched_run_009_20020_Malicious.graphml",
+          "scenario_id": "banking_etl_exfil_mal_0001",
+          "session": "replication",
+          "risk": 0.3974,
+          "gat": 0.1974,
+          "rule": 0.3903
+        }
+      ],
+      "false_alarms": []
+    }
+  }
+}
