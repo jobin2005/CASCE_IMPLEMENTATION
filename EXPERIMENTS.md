@@ -224,3 +224,28 @@ Pooled confusion matrices (unseen test, all folds):
 - **Priv_abuse held out:** recall 1.0, FPR 0.16 ± 0.18 on unseen benign `teller_routine` (T fold). The template is unseen, but its key SQL steps occur in other training attacks.
 - **Next step (P3, a method change; decide before implementing):** run a feature ablation that masks SQL literals, paths and role names, fixes the recency units and adds the dropped edge types. Evaluate it on these same folds, so any change in the T numbers can be attributed to the features.
 
+
+## v3: fixes 1–3 (implemented Oct 3; NOT yet evaluated)
+`--feature-version 3` in `algorithm_4_hybrid.py`. v1 and v2 behaviour is unchanged: re-evaluating `casce_gat_v2.pt` and the holdout model gives byte-identical `evaluation_results.json`.
+
+1. **Dropped edges (bug).**
+   - v3 adds `Query —spawns→ Process`, the SQL statement that started an OS program and the core cross-layer link, and `Query —accesses→ Role`.
+   - The **recency** feature now uses one clock (`timestamp_unix`) and measures position within the session (0 = first event, 1 = last). In v1/v2 it mixed kernel nanoseconds with Postgres seconds.
+2. **Behaviour instead of identifiers (shortcut features).** Node text in v3:
+
+   | Node | v3 text |
+   |---|---|
+   | Query | SQL with quoted literals → `s`, numbers → `n`, and the role name in CREATE/ALTER/DROP ROLE → `r`; statement type, clauses and table/column names are kept |
+   | Process | program name only (`curl`, `cat`, …), not the full command line |
+   | Endpoint | `internal` / `external` / `loopback` instead of the IP |
+   | File | top-level directory + hidden-directory flag + extension, instead of the full path |
+   | Role | constant `role`, without its name |
+
+   Session, Table and Behavior are as in v2.
+3. **Threshold from benign traffic.** `--mode tune --theta-mode fpr --target-fpr 0.01` picks the lowest θ whose false-positive rate on the *benign* validation sessions is ≤ 1%. It needs no attack examples, so it does not depend on which unseen attack validation holds. The default `--theta-mode f1` is unchanged, and the chosen mode is recorded in the model sidecar.
+
+**Planned evaluation** uses the same 7 template-disjoint folds:
+```
+FV=3 THETA_MODE=fpr OUT=loto_v3 SEEDS="1 2 3" setsid nohup bash loto/run_all.sh > loto_v3.queue.log 2>&1 &
+python3 loto_summary.py --dir loto_v3 --out loto_v3/loto_summary.json
+```

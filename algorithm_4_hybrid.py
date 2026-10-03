@@ -58,6 +58,7 @@ import re
 import json
 import math
 import hashlib
+import ipaddress
 import argparse
 import random
 import warnings
@@ -115,10 +116,26 @@ FORWARD_EDGE_TYPES = list(dict.fromkeys(FORWARD_EDGE_TYPES))
 # --- BUG 2 FIX: add a reverse relation for every forward relation, so every
 # node type is a destination of at least one edge type and keeps updating
 # across HeteroConv layers instead of silently vanishing from x_dict.
-EDGE_TYPES = list(FORWARD_EDGE_TYPES)
-for (s, rel, d) in FORWARD_EDGE_TYPES:
-    EDGE_TYPES.append((d, f"rev_{rel}", s))
-EDGE_TYPES = list(dict.fromkeys(EDGE_TYPES))
+def _with_reverse(forward):
+    out = list(forward)
+    for (s, rel, d) in forward:
+        out.append((d, f"rev_{rel}", s))
+    return list(dict.fromkeys(out))
+
+
+EDGE_TYPES = _with_reverse(FORWARD_EDGE_TYPES)
+
+# Feature version 3 adds the two relations Algorithm 2 actually emits but v1/v2
+# dropped at load time: the SQL statement that started an OS process (the
+# cross-layer link) and a role-changing statement's target role.
+FORWARD_EDGE_TYPES_V3 = FORWARD_EDGE_TYPES + [("Query", "spawns", "Process"),
+                                              ("Query", "accesses", "Role")]
+EDGE_TYPES_V3 = _with_reverse(FORWARD_EDGE_TYPES_V3)
+
+
+def edge_types():
+    """Edge schema for the current FEATURE_VERSION (v1/v2 unchanged)."""
+    return EDGE_TYPES_V3 if FEATURE_VERSION >= 3 else EDGE_TYPES
 
 
 # Chain rules (Table III extended to the 11 templates your friend implemented).
@@ -183,6 +200,11 @@ FEATURE_HASH_DIM = 16
 #   2: pid-free -- Process: command line; Session: constant; Endpoint: IP only
 #      (ports in the synthetic corpus were not the ports actually used);
 #      Table/Role: their name (v1 hashed the first query that touched them).
+#   3: behaviour, not identifiers -- Query: SQL with literals/numbers/role names
+#      masked; Process: program name; Endpoint: internal/external/loopback;
+#      File: top directory + hidden-dir flag + extension; Role: constant.
+#      Also adds the Query->Process and Query->Role edges and fixes recency to
+#      one clock (timestamp_unix). See EXPERIMENTS.md, "v3".
 # Set by load_model from the checkpoint's sidecar JSON, or by --feature-version.
 FEATURE_VERSION = 1
 NUM_NODE_FEATS = FEATURE_HASH_DIM + 8
@@ -374,7 +396,58 @@ def _stable_hash_bucket(text, dim=FEATURE_HASH_DIM):
     return vec
 
 
+_PRIVATE_NETS = [ipaddress.ip_network(n) for n in ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16")]
+
+
+def _mask_sql(q):
+    """SQL shape without instance identifiers: quoted literals (passwords, paths,
+    program command lines, branch codes) -> s, numbers -> n, and the role name in
+    CREATE/ALTER/DROP ROLE|USER -> r. Statement type, clauses and table/column
+    names are kept -- they describe what the statement does."""
+    q = re.sub(r"'(?:[^']|'')*'", " s ", str(q).lower())
+    q = re.sub(r"\b\d+(\.\d+)?\b", " n ", q)
+    return re.sub(r"\b(create|alter|drop)\s+(role|user)\s+(if\s+exists\s+)?\w+", r"\1 \2 r", q)
+
+
+def _endpoint_class(ip):
+    try:
+        addr = ipaddress.ip_address(str(ip))
+    except ValueError:
+        return "unknown"
+    if addr.is_loopback:
+        return "loopback"
+    return "internal" if any(addr in net for net in _PRIVATE_NETS) else "external"
+
+
+def _file_class(path):
+    """Coarse location of a file instead of its exact path: top-level directory,
+    whether it sits in a hidden directory, and its extension."""
+    parts = [p for p in str(path).split("/") if p]
+    top = parts[0] if parts else ""
+    hidden = "hidden" if any(p.startswith(".") for p in parts[:-1]) else ""
+    ext = parts[-1].rsplit(".", 1)[1] if parts and "." in parts[-1] else ""
+    return f"{top} {hidden} {ext}".strip()
+
+
 def node_hash_text(n, data):
+    if FEATURE_VERSION >= 3:
+        # v3: behaviour, not instance identifiers (see _mask_sql etc.)
+        ntype = data.get("type")
+        if ntype == "Query":
+            return f"query {_mask_sql(data.get('query', ''))}"
+        if ntype == "Process":
+            return f"process {data.get('comm', '')}"
+        if ntype == "Session":
+            return "session"
+        if ntype == "Endpoint":
+            return f"endpoint {_endpoint_class(data.get('dest_ip', ''))}"
+        if ntype == "Table":
+            return f"table {data.get('table_name', '')}"
+        if ntype == "Role":
+            return "role"
+        if ntype == "File":
+            return f"file {_file_class(data.get('filepath') or data.get('arg', ''))}"
+        return data.get("label", ntype or "")
     if FEATURE_VERSION >= 2:
         ntype = data.get("type")
         if ntype == "Process":
@@ -402,7 +475,16 @@ def featurize_node(G, n, max_ts):
     # Accept both "timestamp" and "timestamp_unix" (jobs branch uses timestamp_unix)
     ts_raw = data.get("timestamp", data.get("timestamp_unix", None))
     has_ts = 1.0 if ts_raw is not None else 0.0
-    recency = (_safe_float(ts_raw) / max_ts) if max_ts > 0 else 0.0
+    if FEATURE_VERSION >= 3:
+        # v3: position in the session on ONE clock. "timestamp" is raw kernel
+        # nanoseconds for kernel nodes but epoch seconds for Postgres nodes, so
+        # v1/v2's ts/max_ts mostly encoded "session has kernel events";
+        # timestamp_unix is wall-clock seconds for both planes.
+        t0, t1 = max_ts
+        ts = data.get("timestamp_unix", ts_raw)
+        recency = (_safe_float(ts) - t0) / (t1 - t0) if ts is not None and t1 > t0 else 0.0
+    else:
+        recency = (_safe_float(ts_raw) / max_ts) if max_ts > 0 else 0.0
     in_deg = G.in_degree(n) if G.is_directed() else G.degree(n)
     out_deg = G.out_degree(n) if G.is_directed() else 0
     numeric_feat = np.array([confidence, s_struct, s_sem, s_temp, has_ts, recency,
@@ -424,6 +506,10 @@ if TORCH_AVAILABLE:
             if ts is not None:
                 timestamps.append(_safe_float(ts))
         max_ts = max(timestamps) if timestamps else 1.0
+        if FEATURE_VERSION >= 3:   # (first, last) wall-clock time of the session
+            wall = [_safe_float(d["timestamp_unix"]) for _, d in G.nodes(data=True)
+                    if d.get("timestamp_unix") is not None]
+            max_ts = (min(wall), max(wall)) if wall else (0.0, 0.0)
 
         unknown_types = set()
         for n, d in G.nodes(data=True):
@@ -442,7 +528,7 @@ if TORCH_AVAILABLE:
             else:
                 data[nt].x = torch.zeros((0, NUM_NODE_FEATS), dtype=torch.float32)
 
-        edge_buckets = {et: ([], []) for et in EDGE_TYPES}
+        edge_buckets = {et: ([], []) for et in edge_types()}
         unknown_edges = set()
         # Handle both DiGraph (u, v, data) and MultiDiGraph (u, v, key, data).
         # Rather than pulling a single mixed-arity tuple out of a generically
@@ -501,10 +587,12 @@ if TORCH_AVAILABLE:
         relations, so every node type is a destination somewhere and keeps
         being updated across layers instead of vanishing from x_dict.
         """
-        def __init__(self, node_types=ALL_NODE_TYPES, edge_types=EDGE_TYPES,
+        def __init__(self, node_types=ALL_NODE_TYPES, edge_types=None,
                      in_dim=NUM_NODE_FEATS, hidden_dim=HIDDEN_DIM, heads=HEADS,
                      num_layers=NUM_LAYERS, dropout=0.2):
             super().__init__()
+            if edge_types is None:
+                edge_types = globals()["edge_types"]()   # schema of the current FEATURE_VERSION
             self.node_types = node_types
             self.hidden_dim = hidden_dim
             self.heads = heads
@@ -1029,6 +1117,18 @@ def tune_thresholds(args):
               f"using the middle one")
     print(f"\n  ★ Best F1 = {best_f1:.4f} at θ_A = {best_theta:.2f}")
 
+    if args.theta_mode == "fpr":
+        # Benign-only rule: the lowest θ whose false-positive rate on the benign
+        # validation sessions is within --target-fpr. Needs no attack examples,
+        # so it does not depend on which (unseen) attacks validation happens to hold.
+        neg = [s for t, s in zip(y_true, y_scores) if t == 0]
+        ok = [th / 100.0 for th in range(5, 96, 5)
+              if sum(s >= th / 100.0 for s in neg) <= args.target_fpr * len(neg)]
+        best_theta = ok[0] if ok else 0.95
+        tied = [best_theta]
+        print(f"  ★ θ_A = {best_theta:.2f}: lowest θ with benign validation FPR ≤ {args.target_fpr} "
+              f"({len(neg)} benign sessions)")
+
     # Record θ_A with the model so detection/evaluation tools use the threshold
     # tuned for THIS model instead of a hard-coded default.
     meta_path = _meta_path(args.model_path)
@@ -1037,7 +1137,9 @@ def tune_thresholds(args):
         with open(meta_path) as f:
             meta = json.load(f)
     meta.update({"theta_a": best_theta, "theta_tuned_on": args.labels,
-                 "theta_tied_range": [tied[0], tied[-1]]})
+                 "theta_tied_range": [tied[0], tied[-1]], "theta_mode": args.theta_mode})
+    if args.theta_mode == "fpr":
+        meta["theta_target_fpr"] = args.target_fpr
     with open(meta_path, "w") as f:
         json.dump(meta, f, indent=2)
     print(f"    Recorded θ_A = {best_theta} in {meta_path}")
@@ -1063,6 +1165,10 @@ def parse_args():
     p.add_argument("--theta-a", type=float, default=None,
                    help="alert threshold; default: the θ_A --mode tune recorded for --model-path")
     p.add_argument("--theta-r", type=float, default=THETA_R)
+    p.add_argument("--theta-mode", choices=["f1", "fpr"], default="f1",
+                   help="tune: f1 = middle of the best-F1 range on validation (default); "
+                        "fpr = lowest θ with benign validation FPR <= --target-fpr")
+    p.add_argument("--target-fpr", type=float, default=0.01)
 
     # Train-specific
     p.add_argument("--train-dir", default=None,
@@ -1076,7 +1182,7 @@ def parse_args():
     p.add_argument("--epochs", type=int, default=50)
     p.add_argument("--lr", type=float, default=1e-3)
     p.add_argument("--seed", type=int, default=42)
-    p.add_argument("--feature-version", type=int, default=1, choices=[1, 2],
+    p.add_argument("--feature-version", type=int, default=1, choices=[1, 2, 3],
                    help="node text features (see FEATURE_VERSION); saved next to the model")
     return p.parse_args()
 
