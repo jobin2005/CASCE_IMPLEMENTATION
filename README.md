@@ -1,101 +1,82 @@
-# CASCE: Cross-layer Session-Centric Environment for PostgreSQL Threat Detection
+# CASCE: cross-layer threat detection for PostgreSQL
 
-![CASCE Status](https://img.shields.io/badge/Status-Active_Development-blue)
-![Architecture](https://img.shields.io/badge/Architecture-eBPF_%7C_PostgreSQL_%7C_PyTorch-success)
-![Pipeline](https://img.shields.io/badge/Dataset-Spec--Driven_Datagen-green)
+CASCE (Context-Aware Semantic Correlation Engine) detects attacks on a PostgreSQL database by combining two views of each database session:
+- **what the session did in SQL**, captured by a Postgres executor hook;
+- **what it caused in the operating system** (programs started, files opened, network connections), captured with eBPF.
 
-## Overview
-**CASCE** is a state-of-the-art cybersecurity provenance framework specifically architected to detect Advanced Persistent Threats (APTs) targeting PostgreSQL database environments. 
+Each session becomes a small heterogeneous graph. A rule engine and a heterogeneous graph attention network (GATv2) score that graph, and an alert is raised when the risk crosses a threshold θ. The system runs offline on recorded logs and in real time on a live database.
 
-Traditional provenance IDS systems rely solely on OS-level hooks or static database logs, suffering heavily from "dependency explosion" (yielding massive False Positives) or structural brittleness (yielding massive False Negatives). CASCE fundamentally resolves this by dynamically fusing Linux Kernel telemetry mapped through eBPF with native PostgreSQL Abstract Syntax Tree (AST) logic. By processing this unified cross-layer data through a Heterogeneous Graph Attention Network (**HeteroGATv2**), CASCE mathematically eliminates baseline limitations and achieves a theoretically proven minimum Bayes classification error.
+**Detailed results, exact commands and known limitations are in [EXPERIMENTS.md](EXPERIMENTS.md).** Instructions for coding agents generating data are in [.agents/skills/casce-datagen/SKILL.md](.agents/skills/casce-datagen/SKILL.md).
 
----
+## Pipeline
 
-## Dataset Generation Pipeline (`datagen/`)
+```
+postgres_events.json (SQL hook) + kernel_events.json (eBPF)
+        │
+        ▼  Algorithm 1  algorithm_1.py         session correlation: kernel events → session via the ppid chain; one clock
+        ▼  Algorithm 2  algorithm2.py          one graph per session: Session, Query, Table, Role, Process, File, Endpoint
+        ▼  Algorithm 3  algorithm_3_abstract.py   behaviour nodes (MITRE ATT&CK-style): data access, shell, external transfer, …
+        ▼  Algorithm 4  algorithm_4_hybrid.py     rules + HeteroGATv2 → risk = 1 − (1 − 0.75·rule)(1 − 0.75·gat); alert if risk ≥ θ
+```
 
-Real database captures suffer from privacy restrictions and near-duplicate leakage across train/val/test splits. CASCE resolves this with a **declarative, spec-driven synthetic dataset generation engine** that enforces strict cross-layer invariants, matched pairs (counterfactual controls), and automated graph verification.
+- **Real-time daemon.** `realtime_daemon.py` follows the two log files live, re-scores running sessions every 2 s and writes `alerts.jsonl` / `session_scores.jsonl`. With `--replay` it re-scores a recorded capture.
+- **Threshold.** θ is tuned on validation data and stored in each model's sidecar JSON. Evaluation and the daemon read it from there.
 
-### Core Components
-1. **Scenario Specs (`specs/*.yaml`)**: Declarative YAML files defining scenario identity, family grouping, matched-pair constraints, PostgreSQL sessions, SQL queries, and OS process/file/network side-effects.
-2. **Domain Models (`datagen/domains/*.yaml`)**: Ground-truth schema contracts (tables, sensitive PII columns, roles, normal role privileges).
-3. **Deterministic Generator (`datagen/codegen.py`)**: Converts YAML specs into deterministic `postgres_events.json`, `kernel_events.json`, `labels.csv`, and `expectation_manifest.json` with isolated PID namespaces and clock calibration offsets.
-4. **Pipeline Validator (`datagen/validate_run.py`)**: Executes generated logs through `algorithm_1` (Session-Anchored Correlation) and `algorithm2` (NetworkX graph construction) to verify structural and edge correctness.
-5. **Agentic Batch Orchestration (`.agents/skills/casce-datagen/`)**: Agent skill enabling Antigravity to plan batch generation (`plan_<batch_id>.json`), manage worker isolation, evaluate pilot statistical shortcut gates, and maintain idempotency (`manifest.jsonl`).
+## Repository layout
 
-### CLI Usage
+| Path | Contents |
+|---|---|
+| `algorithm_1.py`, `algorithm2.py`, `algorithm_3_abstract.py`, `algorithm_4_hybrid.py` | The four algorithms. `algorithm_4_hybrid.py --mode train/tune/evaluate/detect` |
+| `schema.py`, `sqlfacts.py`, `graphsops.py`, `loader.py`, `main.py` | Graph schema, SQL fact extraction, graph helpers; `main.py` builds the enriched graphs of `dataset_dev`/`dataset_test` |
+| `build_training_graphs.py` | Full-session and prefix (partial-session) graphs for any runs, synthetic or live |
+| `datagen/` | Spec-driven synthetic data generator (`generate_batch.py`, `codegen.py`, `validate_run.py`), banking domain model, spec docs |
+| `dataset_dev/`, `dataset_test/` | Synthetic banking corpus: 900 / 226 sessions, 13 scenario templates (7 attack, 6 benign) |
+| `dataset_benign_extra/` | 240 sessions of 6 extra benign templates, used for training only |
+| `prepare_algo4_dataset.py` | Instance-level train/val/test split (E1) |
+| `make_template_folds.py`, `run_loto.sh`, `fold_report.py`, `loto_summary.py`, `loto/` | **Template-disjoint evaluation**: 7 folds, each testing on attack and benign templates never seen in training |
+| `make_holdout_labels.py`, `holdout_report.py`, `leakage_report.py`, `run_seed.sh`, `seed_summary.py` | priv_abuse holdout, train/test overlap diagnostics, seed variance |
+| `realtime_daemon.py`, `workload_simulation/` | Real-time detection; live capture (`pg_telemetry.c`, `kernel_telemetry.py`, `logger.sh`), live scenario runner, live evaluation |
+| `casce_gat_v2.pt` (+ `.json`) | Current model (feature v2, θ = 0.55). `casce_gat.pt` is the legacy v1 baseline |
+| `loto*/`, `models_seeds/`, `eval_test_report_*/`, `tune_out_*/` | Result files referenced in EXPERIMENTS.md |
+
+## Quick start
+
+The tested setup is Python 3.14 with torch 2.11, torch_geometric 2.8, networkx, pglast, scikit-learn and pyyaml.
 
 ```bash
-# 1. Generate run artifacts from specs
-python datagen/codegen.py datagen/smoke_run
+# evaluate the current model on the synthetic test set (θ read from casce_gat_v2.json)
+python3 algorithm_4_hybrid.py --mode evaluate --model-path casce_gat_v2.pt \
+    --input-dir dataset_test/enriched_graphs/graphml --labels dataset_test/algo4_splits/test_labels.json \
+    --outdir eval_out
 
-# 2. Validate run artifacts through the detection pipeline
-python datagen/validate_run.py datagen/smoke_run
+# one template-disjoint fold (train → tune θ on validation templates → test on unseen templates)
+./run_loto.sh priv_abuse 1                 # v2 features
+FV=3 OUT=loto_v3_f1 ./run_loto.sh priv_abuse 1   # v3 features
+
+# score a recorded live capture with the real-time daemon, then evaluate it against its labels
+python3 realtime_daemon.py --replay --log-dir live_runs/<run> --model-path casce_gat_v2.pt --out-dir live_runs/<run>/daemon
+python3 workload_simulation/evaluate_live.py --run-dir live_runs/<run> \
+    --scores live_runs/<run>/daemon/session_scores.jsonl --model-path casce_gat_v2.pt
 ```
 
----
+The live setup (Docker container, Postgres hook, eBPF tracer, banking database) is described in `workload_simulation/` and in EXPERIMENTS.md → "4D environment".
 
-## Detection Pipeline Architecture
+## Results so far
 
-The detection pipeline consists of four sequential algorithms:
+All data is synthetic banking traffic. Full tables, per-template results and caveats are in EXPERIMENTS.md.
 
-```
-datagen Logs (postgres_events.json & kernel_events.json)
-                         │
-                         ▼
-        Algorithm 1: Session-Anchored Correlation (SAC)
-                         │
-                         ▼
-        Algorithm 2: Heterogeneous Base Graph Construction
-        (Nodes: Session, Query, Table, Role, Process, File, Endpoint)
-                         │
-                         ▼
-        Algorithm 3: Behavioral Abstraction & MITRE ATT&CK Enrichment
-        (Adds high-level Behavior nodes: DATA_ACCESS, EXTERNAL_TRANSFER, etc.)
-                         │
-                         ▼
-        Algorithm 4 / GAT Engine: HeteroGAT Threat Classification
-```
+| Evaluation | What is tested | Result |
+|---|---|---|
+| **Seen templates** (E1) | New instances of the 13 training templates | F1 **0.985 ± 0.017** (3 seeds), precision 1.0, FPR 0 |
+| **Live, mixed traffic** (5b) | 1,251 live sessions: 1,025 pgbench + 133 benign + 93 attacks, same templates | TP 93, FP 0, FN 0, TN 1,158; alerts after a median 1.7 s; live verdicts identical to synthetic for 226/226 sessions |
+| **Unseen templates**, v2 (T) | 7 folds × 3 seeds; test templates never seen in training | Recall 0.82, FPR 0.40, F1 **0.67 ± 0.13**, ROC-AUC 0.61 |
+| **Unseen templates**, v3 features (provisional) | Same folds, 1 seed | Recall 0.91, FPR 0.29, F1 **0.83**. 4 of 7 unseen attack templates are perfect. **Still to be confirmed** on more seeds and the live 4D test |
 
-1. **Algorithm 1 (`algorithm_1.py`)**: Correlates PostgreSQL audit logs and eBPF kernel event streams into distinct session keys via PID ancestry tracing (`ppid` chain up to `D_MAX=8`).
-2. **Algorithm 2 (`algorithm2.py`)**: Constructs multi-directed NetworkX graphs with heterogeneous node types (`Session`, `Query`, `Table`, `Role`, `Process`, `File`, `Endpoint`) and directed relation edges (`executes`, `queries`, `targets`, `spawns`, `opens`, `connects_to`).
-3. **Algorithm 3 (`algorithm_3_abstract.py`)**: Evaluates MITRE ATT&CK behavioral templates via structural isomorphism, semantic TF-IDF matching, and temporal decay ($S_{\text{struct}}, S_{\text{sem}}, S_{\text{temp}}$), enriching the graph with `Behavior` nodes.
-4. **Algorithm 4 & PyTorch GAT (`algorithm_4_hybrid.py`, `casce_gat.pt`)**: Encodes heterogeneous graph structures via PyTorch Geometric to compute threat probabilities and classify malicious activity.
+**What these numbers mean.** On attack types it was trained on, CASCE is near-perfect, offline and live, with no false alarms. On attack types it has never seen, it generalises only partly. The main failure is mistaking unseen *legitimate* data movement (ETL replication, audits) for attacks. Feature v3, which describes behaviour instead of exact SQL strings, paths and names, is the most promising fix so far.
 
----
+## Open work
 
-## Repository Structure
-
-```
-.
-├── .agents/skills/casce-datagen/  # Agentic batch generation skill
-├── datagen/                       # Synthetic dataset generator & validator
-│   ├── codegen.py                 # Spec-to-log deterministic generator
-│   ├── validate_run.py            # Pipeline validator
-│   ├── scenario_spec.md           # Spec format v1 documentation
-│   ├── scenario_spec.schema.json  # JSON schema for scenario specs
-│   ├── domains/                   # Domain models (banking.yaml)
-│   └── smoke_run/                 # Smoke test run directory
-├── algorithm_1.py                 # Session-Anchored Correlation (SAC)
-├── algorithm2.py                  # Base heterogeneous graph builder
-├── algorithm_3_abstract.py        # MITRE ATT&CK behavioral abstractor
-├── algorithm_4_hybrid.py          # Hybrid GAT threat classifier
-├── main.py                        # Pipeline entry point & queue manager
-├── loader.py                      # Attributed event loader
-├── schema.py                      # Schema & node/edge definitions
-├── sqlfacts.py                    # SQL AST fact extractor (pglast)
-├── graphsops.py                   # Graph modification helpers
-├── undersample.py                 # Dataset balancing utility
-└── evaluate.py                    # Model evaluation script
-```
-
----
-
-## Agentic Skill Usage
-
-To generate synthetic dataset batches using Antigravity, request a batch with target count, domain, and mode:
-
-```text
-Generate 100 banking scenarios with the casce-datagen skill.
-Balanced benign and malicious, pilot mode.
-```
-
+- **Confirm v3:** seeds 2–3 for the template-disjoint folds.
+- **Live 4D:** run unseen attacks and benign workload on the live database. The environment is ready and verified.
+- **Unsolved case:** distinguishing malicious from benign ETL replication when neither was seen in training.
+- **Known limitations** (see EXPERIMENTS.md): three rule types can never fire; single banking domain only.

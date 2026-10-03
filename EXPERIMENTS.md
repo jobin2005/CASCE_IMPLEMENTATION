@@ -14,7 +14,7 @@ All commands use the system `python3` (torch 2.11, torch_geometric 2.8, scikit-l
 | H1-live | Holdout model on the 5b_mixed live capture (replay) | Run Oct 2 | `live_runs/5b_mixed/daemon_holdout_priv_abuse/`, `live_runs/5b_mixed/eval_holdout_priv_abuse.txt` |
 | S | Seed variance for v2 and H1 (original seed 42 + retrained seeds 1, 2) | Run Oct 2 | `models_seeds/*.report.json`, `models_seeds/seed_summary.json` |
 | L | Train/test overlap diagnostics | Run Oct 2 | `eval_test_report_v2/leakage_report.json` |
-| **T** | **Template-disjoint evaluation (LOTO)**: 7 folds × 3 seeds, each testing on a malicious and a benign template never seen in training or validation | Run Oct 2–3, all 21 runs complete | `loto/folds.json`, `loto/*_s*.report.json`, `loto/loto_summary.json`, `loto/INTERIM_RESULTS.md` |
+| **T** | **Template-disjoint evaluation (LOTO)**: 7 folds × 3 seeds, each testing on a malicious and a benign template never seen in training or validation | Run Oct 2–3, all 21 runs complete | `loto/folds.json`, `loto/*_s*.report.json`, `loto/loto_summary.json` |
 | 4D | Live test on attacks/benign traffic that are not datagen templates | **Environment ready and verified (Oct 3, `live_runs/4d_smoke`); the out-of-distribution workload itself has not been run yet** | `live_runs/4d_smoke/` |
 
 ## Data and splits
@@ -144,13 +144,8 @@ Test results at θ = 0.55, single seed (42):
   - The current `logger.sh` and `ebpf_telemetry/kernel_telemetry.py` are installed in `~/Desktop/Projects/CASCE_DATASET`. The old August capture and logger are in its `archive/aug28_old_capture/`.
   - `pgbench_history` was recreated, and `iproute2` was installed.
   - **Verified end to end** (`live_runs/4d_smoke`): one labelled benign `COPY … TO PROGRAM gzip` session plus 22 pgbench sessions. The kernel trace linked `gzip` to its backend through the ppid. All 23 sessions were scored by the v2 replay, giving FPR 0. θ was read from the model sidecar.
-- **Stale scripts.** These target an old data layout and naming scheme. Do not use them for results:
-  - `evaluate_holdout_experiment.py`: v1 features, a nonexistent `datagen/generated/banking_1000`, and early stopping on the held-out family.
-  - `test_zeroday_holdout.py`.
-  - `run_pipeline.py`.
-  - `undersample.py`.
-  - The per-class filename parsing in `evaluate.py`.
-- **Legacy material.** `workload_simulation/attack_workload/*.sh` and `README_REALTIME.md` are legacy and were not used in any recorded run.
+- **Stale scripts (removed Oct 3).** `evaluate.py`, `evaluate_holdout_experiment.py`, `test_zeroday_holdout.py`, `run_pipeline.py` and `undersample.py` targeted an old data layout and file-naming scheme (e.g. v1 features, the nonexistent `datagen/generated/banking_1000`, early stopping on the held-out family). Their replacements are `algorithm_4_hybrid.py --mode evaluate`, `holdout_report.py` and `fold_report.py`. The old v1 result folders (`eval_test_report*`, `tune_out`, `tune_out_recovered`) were removed too. Everything is in git history (e.g. commit 9593f8fc).
+- **Legacy material.** `workload_simulation/attack_workload/*.sh` (hand-written attacks, not datagen templates) were not used in any recorded run; they are the candidate workload for the live 4D test.
 
 ## S: seed variance
 `./run_seed.sh <v2|holdout_priv_abuse> <seed>` runs train → tune θ on val → `holdout_report.py`, writing to `models_seeds/`. `python3 seed_summary.py --out models_seeds/seed_summary.json` then collects the results.
