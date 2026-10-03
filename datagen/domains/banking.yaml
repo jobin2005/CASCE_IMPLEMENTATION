@@ -64,6 +64,17 @@ roles:
       pair in this run — the tell is query breadth and destination, not
       the role, since the role is identical on both sides on purpose.
 
+  dba:
+    scope: enterprise
+    normal_access: >
+      Database administration: creates and expires ordinary (non-superuser)
+      logins and grants table privileges for new staff, runs retention jobs
+      (archive old audit_logs rows to a compressed file, then delete them;
+      remove temporary report files), during or just after business hours.
+      Added with the benign_extra template set; never grants SUPERUSER and
+      never disables logging -- that is what separates it from the
+      privilege-escalation and defense-impairment attacks.
+
 padding_profile:
   teller:
     pre:
@@ -93,3 +104,9 @@ padding_profile:
     post:
       - sql: "SELECT pg_is_in_recovery()"
 
+  dba:
+    pre:
+      - sql: "SELECT 1"
+      - sql: "SELECT datname, numbackends FROM pg_stat_database WHERE datname = current_database()"
+    post:
+      - sql: "SELECT count(*) FROM pg_stat_activity"

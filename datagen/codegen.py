@@ -459,6 +459,10 @@ DEFAULT_PADDING_PROFILE = {
     "batch_etl_service": {
         "pre": [{"sql": "SELECT 1"}, {"sql": "SELECT setting FROM pg_settings WHERE name = 'server_version'"}],
         "post": [{"sql": "SELECT pg_is_in_recovery()"}]
+    },
+    "dba": {
+        "pre": [{"sql": "SELECT 1"}, {"sql": "SELECT datname, numbackends FROM pg_stat_database WHERE datname = current_database()"}],
+        "post": [{"sql": "SELECT count(*) FROM pg_stat_activity"}]
     }
 }
 

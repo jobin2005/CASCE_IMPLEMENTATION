@@ -1,0 +1,20 @@
+scenario_id: banking_user_provisioning_0018
+family_id: banking_user_provisioning_0018
+domain: banking
+time_of_day: '12:30'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: provision
+  role: dba
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 4.820143070359979
+  events:
+  - sql: CREATE ROLE auditor_958 LOGIN PASSWORD 'fDmGNjXkFk9F' VALID UNTIL '2027-12-31'
+  - sql: GRANT SELECT ON transactions TO auditor_958
+  - step_id: log
+    sql: COPY (SELECT rolname, rolvaliduntil FROM pg_roles WHERE rolname = 'auditor_958') TO PROGRAM 'cat >> /var/lib/postgresql/audit/provisioning.log'

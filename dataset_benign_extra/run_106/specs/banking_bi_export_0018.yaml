@@ -1,0 +1,23 @@
+scenario_id: banking_bi_export_0018
+family_id: banking_bi_export_0018
+domain: banking
+time_of_day: '18:00'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: bi_export
+  role: branch_manager
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 4.901952284266786
+  events:
+  - sql: SELECT a.account_type, COUNT(*), SUM(a.balance) FROM accounts a WHERE a.branch_id = 'BR-003' GROUP BY a.account_type
+  - step_id: push
+    sql: COPY (SELECT t.account_id, SUM(t.amount) FROM transactions t JOIN accounts a ON a.account_id = t.account_id WHERE a.branch_id = 'BR-003' AND t.transaction_time BETWEEN '2026-12-21 00:00:00' AND
+      '2026-12-22 00:00:00' GROUP BY t.account_id) TO PROGRAM 'curl -sX POST https://bi.internal.example/kpi -d @-'
+    connects_to:
+      ip: 198.51.100.77
+      port: 443

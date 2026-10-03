@@ -1,0 +1,19 @@
+scenario_id: banking_nightly_backup_0020
+family_id: banking_nightly_backup_0020
+domain: banking
+time_of_day: 02:30
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: backup
+  role: batch_etl_service
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.6530888874633027
+  events:
+  - sql: SELECT count(*) FROM accounts
+  - step_id: backup
+    sql: COPY (SELECT * FROM accounts) TO PROGRAM 'gzip > /var/backups/postgresql/accounts_20260823.csv.gz'

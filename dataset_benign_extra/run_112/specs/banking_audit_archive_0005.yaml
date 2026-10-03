@@ -1,0 +1,21 @@
+scenario_id: banking_audit_archive_0005
+family_id: banking_audit_archive_0005
+domain: banking
+time_of_day: 03:00
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: archive
+  role: dba
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 4.0140747009215545
+  events:
+  - step_id: archive
+    sql: COPY (SELECT * FROM audit_logs WHERE logged_at < '2026-02-01') TO PROGRAM 'gzip > /var/backups/audit/audit_logs_2026-02-01.csv.gz'
+  - sql: DELETE FROM audit_logs WHERE logged_at < '2026-02-01'
+  - step_id: cleanup
+    sql: COPY (SELECT 'cleanup') TO PROGRAM 'rm -f /var/lib/postgresql/reports/tmp_2026_02.csv'

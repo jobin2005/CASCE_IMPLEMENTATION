@@ -736,6 +736,187 @@ def _make_alter_role_escalation(rng, idx) -> dict:
 
 
 # ==========================================================================
+# Extra benign templates (template set "benign_extra")
+#
+# Legitimate versions of the behaviours the template-disjoint evaluation
+# (EXPERIMENTS.md, "T") showed the model flags when it has not seen them:
+# data leaving the database through COPY ... TO PROGRAM (local or to an
+# internal service), bulk/sensitive reads, role administration, and file
+# deletion around logs. Generated as a separate, benign-only corpus that is
+# added to TRAINING only, so the template-disjoint test folds stay identical.
+# ==========================================================================
+
+def _make_nightly_backup_benign(rng, idx) -> dict:
+    """Benign: scheduled local compressed backup of a table (no network)."""
+    table = rng.choice(["accounts", "transactions", "customers"])
+    compressor = rng.choice(["gzip", "bzip2", "xz"])
+    ext = {"gzip": "gz", "bzip2": "bz2", "xz": "xz"}[compressor]
+    day = rng.randint(1, 28)
+    month = rng.randint(1, 12)
+    target = f"/var/backups/postgresql/{table}_2026{month:02d}{day:02d}.csv.{ext}"
+    return {
+        "scenario_id": f"banking_nightly_backup_{idx:04d}",
+        "family_id": f"banking_nightly_backup_{idx:04d}",
+        "domain": "banking",
+        "time_of_day": f"{rng.choice(['00', '01', '02'])}:{rng.choice(['00', '30'])}",
+        "default_class": "benign",
+        "rule_engine_relationship": "benign_false_positive",
+        "sessions": [{
+            "session_label": "backup",
+            "role": "batch_etl_service",
+            "class": "benign",
+            "anchor": "db",
+            "timing": {"tempo": "steady", "step_gaps_seconds": [rng.uniform(2.0, 5.0)]},
+            "events": [
+                {"sql": f"SELECT count(*) FROM {table}"},
+                {"step_id": "backup",
+                 "sql": f"COPY (SELECT * FROM {table}) TO PROGRAM '{compressor} > {target}'"},
+            ],
+        }],
+    }
+
+
+def _make_bi_export_benign(rng, idx) -> dict:
+    """Benign: aggregated (non-PII) branch KPIs pushed to the internal BI service."""
+    branch = _random_branch(rng)
+    dest = pick_destination(rng, is_malicious=False)
+    start, end = _random_date_range(rng)
+    return {
+        "scenario_id": f"banking_bi_export_{idx:04d}",
+        "family_id": f"banking_bi_export_{idx:04d}",
+        "domain": "banking",
+        "time_of_day": f"{rng.randint(17, 20):02d}:{rng.choice(['00', '15', '30'])}",
+        "default_class": "benign",
+        "rule_engine_relationship": "benign_false_positive",
+        "sessions": [{
+            "session_label": "bi_export",
+            "role": "branch_manager",
+            "class": "benign",
+            "anchor": "db",
+            "timing": {"tempo": "steady", "step_gaps_seconds": [rng.uniform(2.0, 5.0)]},
+            "events": [
+                {"sql": f"SELECT a.account_type, COUNT(*), SUM(a.balance) FROM accounts a WHERE a.branch_id = '{branch}' GROUP BY a.account_type"},
+                {"step_id": "push",
+                 "sql": f"COPY (SELECT t.account_id, SUM(t.amount) FROM transactions t JOIN accounts a ON a.account_id = t.account_id WHERE a.branch_id = '{branch}' AND t.transaction_time BETWEEN '{start}' AND '{end}' GROUP BY t.account_id) TO PROGRAM 'curl -sX POST https://bi.internal.example/kpi -d @-'",
+                 "connects_to": {"ip": dest[0], "port": dest[1]}},
+            ],
+        }],
+    }
+
+
+def _make_kyc_review_benign(rng, idx) -> dict:
+    """Benign: targeted KYC case review -- a few named customers' national_id/address."""
+    case = rng.randint(100, 999)
+    customers = [_random_cust_id(rng) for _ in range(rng.randint(2, 4))]
+    events = [{"sql": f"SELECT full_name, national_id, address FROM customers WHERE customer_id = {c}"}
+              for c in customers]
+    events.append({
+        "step_id": "case_file",
+        "sql": f"COPY (SELECT customer_id, full_name, national_id FROM customers WHERE customer_id IN ({', '.join(map(str, customers))})) TO PROGRAM 'cat > /var/lib/postgresql/kyc/case_{case}.csv'",
+    })
+    return {
+        "scenario_id": f"banking_kyc_review_{idx:04d}",
+        "family_id": f"banking_kyc_review_{idx:04d}",
+        "domain": "banking",
+        "time_of_day": f"{rng.randint(9, 16):02d}:{rng.choice(['00', '20', '40'])}",
+        "default_class": "benign",
+        "rule_engine_relationship": "benign_false_positive",
+        "sessions": [{
+            "session_label": "kyc_review",
+            "role": "compliance_officer",
+            "class": "benign",
+            "anchor": "db",
+            "timing": {"tempo": "steady", "step_gaps_seconds": [rng.uniform(3.0, 8.0)]},
+            "events": events,
+        }],
+    }
+
+
+def _make_user_provisioning_benign(rng, idx) -> dict:
+    """Benign: DBA creates a normal (non-superuser) login for a new employee,
+    grants it table privileges and records the change in the provisioning log."""
+    new_role = f"{rng.choice(['teller', 'analyst', 'auditor'])}_{rng.randint(100, 999)}"
+    table = rng.choice(["accounts", "transactions"])
+    return {
+        "scenario_id": f"banking_user_provisioning_{idx:04d}",
+        "family_id": f"banking_user_provisioning_{idx:04d}",
+        "domain": "banking",
+        "time_of_day": f"{rng.randint(9, 16):02d}:{rng.choice(['00', '30'])}",
+        "default_class": "benign",
+        "rule_engine_relationship": "benign_false_positive",
+        "sessions": [{
+            "session_label": "provision",
+            "role": "dba",
+            "class": "benign",
+            "anchor": "db",
+            "timing": {"tempo": "steady", "step_gaps_seconds": [rng.uniform(2.0, 6.0)]},
+            "events": [
+                {"sql": f"CREATE ROLE {new_role} LOGIN PASSWORD '{''.join(rng.choices(string.ascii_letters + string.digits, k=12))}' VALID UNTIL '2027-12-31'"},
+                {"sql": f"GRANT SELECT ON {table} TO {new_role}"},
+                {"step_id": "log",
+                 "sql": f"COPY (SELECT rolname, rolvaliduntil FROM pg_roles WHERE rolname = '{new_role}') TO PROGRAM 'cat >> /var/lib/postgresql/audit/provisioning.log'"},
+            ],
+        }],
+    }
+
+
+def _make_audit_archive_benign(rng, idx) -> dict:
+    """Benign: retention job -- archive old audit_logs rows (compressed) before
+    deleting them, then remove the previous month's temporary report files."""
+    month = rng.randint(1, 12)
+    cutoff = f"2026-{month:02d}-01"
+    return {
+        "scenario_id": f"banking_audit_archive_{idx:04d}",
+        "family_id": f"banking_audit_archive_{idx:04d}",
+        "domain": "banking",
+        "time_of_day": f"{rng.choice(['03', '04', '05'])}:{rng.choice(['00', '30'])}",
+        "default_class": "benign",
+        "rule_engine_relationship": "benign_false_positive",
+        "sessions": [{
+            "session_label": "archive",
+            "role": "dba",
+            "class": "benign",
+            "anchor": "db",
+            "timing": {"tempo": "steady", "step_gaps_seconds": [rng.uniform(2.0, 5.0)]},
+            "events": [
+                {"step_id": "archive",
+                 "sql": f"COPY (SELECT * FROM audit_logs WHERE logged_at < '{cutoff}') TO PROGRAM 'gzip > /var/backups/audit/audit_logs_{cutoff}.csv.gz'"},
+                {"sql": f"DELETE FROM audit_logs WHERE logged_at < '{cutoff}'"},
+                {"step_id": "cleanup",
+                 "sql": f"COPY (SELECT 'cleanup') TO PROGRAM 'rm -f /var/lib/postgresql/reports/tmp_2026_{month:02d}.csv'"},
+            ],
+        }],
+    }
+
+
+def _make_replica_health_benign(rng, idx) -> dict:
+    """Benign: ETL service checks replication lag and reports it to the internal
+    monitoring endpoint (curl with no customer data)."""
+    dest = pick_destination(rng, is_malicious=False)
+    return {
+        "scenario_id": f"banking_replica_health_{idx:04d}",
+        "family_id": f"banking_replica_health_{idx:04d}",
+        "domain": "banking",
+        "time_of_day": f"{rng.randint(0, 23):02d}:{rng.choice(['00', '15', '30', '45'])}",
+        "default_class": "benign",
+        "rule_engine_relationship": "benign_false_positive",
+        "sessions": [{
+            "session_label": "health",
+            "role": "batch_etl_service",
+            "class": "benign",
+            "anchor": "db",
+            "timing": {"tempo": "steady", "step_gaps_seconds": [rng.uniform(1.0, 3.0)]},
+            "events": [
+                {"sql": "SELECT now() - pg_last_xact_replay_timestamp()"},
+                {"step_id": "report",
+                 "sql": "COPY (SELECT now(), count(*) FROM transactions WHERE transaction_time > now() - interval '1 hour') TO PROGRAM 'curl -sX POST https://monitor.internal.example/replica -d @-'",
+                 "connects_to": {"ip": dest[0], "port": dest[1]}},
+            ],
+        }],
+    }
+
+
+# ==========================================================================
 # Category registry and run assembly
 # ==========================================================================
 
@@ -757,6 +938,20 @@ CATEGORY_GENERATORS = [
 ]
 
 
+# Benign-only corpus of the extra templates (equal weights). Never mixed into the
+# default set, so dataset_dev/dataset_test (seeds 42/123) regenerate unchanged.
+BENIGN_EXTRA_GENERATORS = [
+    (_make_nightly_backup_benign,     1),
+    (_make_bi_export_benign,          1),
+    (_make_kyc_review_benign,         1),
+    (_make_user_provisioning_benign,  1),
+    (_make_audit_archive_benign,      1),
+    (_make_replica_health_benign,     1),
+]
+
+TEMPLATE_SETS = {"default": CATEGORY_GENERATORS, "benign_extra": BENIGN_EXTRA_GENERATORS}
+
+
 def _weighted_choices(rng, categories, n):
     """Pick n categories from the weighted list."""
     funcs, weights = zip(*categories)
@@ -768,7 +963,8 @@ def _weighted_choices(rng, categories, n):
 def generate_run(
     run_dir: Path,
     rng: random.Random,
-    scenarios_per_run: int = 20
+    scenarios_per_run: int = 20,
+    categories=None,
 ) -> List[dict]:
     """Generate one run directory with specs/*.yaml files.
 
@@ -780,7 +976,7 @@ def generate_run(
     # Pick categories for this run
     chosen = _weighted_choices(
         rng,
-        CATEGORY_GENERATORS,
+        categories or CATEGORY_GENERATORS,
         scenarios_per_run
     )
 
@@ -980,6 +1176,14 @@ def main(argv=None):
     )
 
     parser.add_argument(
+        "--template-set",
+        choices=sorted(TEMPLATE_SETS),
+        default="default",
+        help="default = the 13 original templates; benign_extra = only the "
+             "6 extra benign templates (training-only corpus)"
+    )
+
+    parser.add_argument(
         "--skip-validate",
         action="store_true",
         help="Skip validate_run.py (for debugging)"
@@ -1021,7 +1225,8 @@ def main(argv=None):
         specs = generate_run(
             run_dir,
             rng,
-            args.scenarios_per_run
+            args.scenarios_per_run,
+            TEMPLATE_SETS[args.template_set],
         )
 
         # Stats

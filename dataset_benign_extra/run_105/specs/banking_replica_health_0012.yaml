@@ -1,0 +1,22 @@
+scenario_id: banking_replica_health_0012
+family_id: banking_replica_health_0012
+domain: banking
+time_of_day: 05:00
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: health
+  role: batch_etl_service
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 2.7633098233516864
+  events:
+  - sql: SELECT now() - pg_last_xact_replay_timestamp()
+  - step_id: report
+    sql: COPY (SELECT now(), count(*) FROM transactions WHERE transaction_time > now() - interval '1 hour') TO PROGRAM 'curl -sX POST https://monitor.internal.example/replica -d @-'
+    connects_to:
+      ip: 203.0.113.42
+      port: 443

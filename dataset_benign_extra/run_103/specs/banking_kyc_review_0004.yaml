@@ -1,0 +1,21 @@
+scenario_id: banking_kyc_review_0004
+family_id: banking_kyc_review_0004
+domain: banking
+time_of_day: '15:00'
+default_class: benign
+rule_engine_relationship: benign_false_positive
+sessions:
+- session_label: kyc_review
+  role: compliance_officer
+  class: benign
+  anchor: db
+  timing:
+    tempo: steady
+    step_gaps_seconds:
+    - 6.512393568242916
+  events:
+  - sql: SELECT full_name, national_id, address FROM customers WHERE customer_id = 5687
+  - sql: SELECT full_name, national_id, address FROM customers WHERE customer_id = 3768
+  - sql: SELECT full_name, national_id, address FROM customers WHERE customer_id = 9690
+  - step_id: case_file
+    sql: COPY (SELECT customer_id, full_name, national_id FROM customers WHERE customer_id IN (5687, 3768, 9690)) TO PROGRAM 'cat > /var/lib/postgresql/kyc/case_122.csv'

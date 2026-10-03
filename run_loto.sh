@@ -5,6 +5,7 @@
 #
 #   ./run_loto.sh priv_abuse 1
 #   FV=3 THETA_MODE=fpr OUT=loto_v3 ./run_loto.sh priv_abuse 1     # feature v3, benign-FPR θ
+#   EXTRA=1 OUT=loto_v2_extra ./run_loto.sh priv_abuse 1           # + extra benign corpus (training only)
 #
 # Writes $OUT/<fold>_s<seed>.{pt,json}, .train.log, .tune/, .tune.log, .report.json
 # (defaults FV=2 THETA_MODE=f1 OUT=loto reproduce the v2 runs)
@@ -17,10 +18,17 @@ out=$outdir/${fold}_s${seed}
 full=dataset_dev/enriched_graphs/graphml
 pref=training_v2/dev_all_prefixes/graphml
 mkdir -p "$outdir"
+# EXTRA=1: add the benign-only corpus of extra templates (dataset_benign_extra,
+# datagen --template-set benign_extra) to TRAINING. Validation/test unchanged.
+extra_dir="" extra_lbl=""
+if [ -n "${EXTRA:-}" ]; then
+  extra_dir=,dataset_benign_extra/enriched_graphs/graphml
+  extra_lbl=,dataset_benign_extra/enriched_graphs/labels.json
+fi
 
 python3 -u algorithm_4_hybrid.py --mode train --feature-version "$fv" --seed "$seed" --epochs 50 \
-  --train-dir $full,$pref,training_v2/pgbench_train/graphml \
-  --train-labels $f/train_full.json,$f/train_prefixes.json,training_v2/pgbench_train/labels.json \
+  --train-dir $full,$pref,training_v2/pgbench_train/graphml$extra_dir \
+  --train-labels $f/train_full.json,$f/train_prefixes.json,training_v2/pgbench_train/labels.json$extra_lbl \
   --val-dir $full,$pref,training_v2/pgbench_val/graphml \
   --val-labels $f/val_full.json,$f/val_prefixes.json,training_v2/pgbench_val/labels.json \
   --model-path $out.pt > $out.train.log 2>&1

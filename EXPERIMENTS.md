@@ -249,3 +249,39 @@ Pooled confusion matrices (unseen test, all folds):
 FV=3 THETA_MODE=fpr OUT=loto_v3 SEEDS="1 2 3" setsid nohup bash loto/run_all.sh > loto_v3.queue.log 2>&1 &
 python3 loto_summary.py --dir loto_v3 --out loto_v3/loto_summary.json
 ```
+
+## Fix 4: extra benign templates (implemented Oct 3; NOT yet evaluated)
+**Why.** On unseen templates, most false alarms came from legitimate behaviour the model had never seen as benign: data leaving the database via `COPY … TO PROGRAM`, bulk sensitive reads and role or log administration. The original corpus has only 6 benign templates.
+
+**What.** `datagen/generate_batch.py --template-set benign_extra` adds 6 benign templates. Each is the legitimate counterpart of a behaviour that attacks use:
+
+| Template | Role | Legitimate counterpart of |
+|---|---|---|
+| `nightly_backup` | batch_etl_service | `COPY … TO PROGRAM 'gzip/bzip2/xz > /var/backups/…'`: local compressed backup (exfil-like, no network) |
+| `bi_export` | branch_manager | aggregated KPIs `curl`-ed to an internal BI service (exfil-like, no PII) |
+| `kyc_review` | compliance_officer | a few named customers' `national_id`/`address`, written to a case file (pii_dump-like, targeted) |
+| `user_provisioning` | **dba** (new role) | `CREATE ROLE … LOGIN PASSWORD … VALID UNTIL` (no SUPERUSER) + `GRANT` (priv_abuse / alter_role-like) |
+| `audit_archive` | **dba** | compress old `audit_logs` rows, `DELETE` them, `rm` temp report files (defense_impair-like) |
+| `replica_health` | batch_etl_service | replication-lag check `curl`-ed to internal monitoring (exfil-like, no customer data) |
+
+- **New `dba` role:** added to `datagen/domains/banking.yaml` (role description and padding) and to `codegen.DEFAULT_PADDING_PROFILE`. No existing template uses it.
+- **Default set unchanged:** with `--template-set default` (the default), regenerating seed 42 reproduces the `dataset_dev` specs exactly. Verified on all 40 runs.
+
+**Corpus.** `dataset_benign_extra/`: 12 runs, seed 777, 240 benign sessions (35–44 per template). All runs pass `validate_run.py`. Runs are renumbered `run_101…run_112` so graph file names never collide with `dataset_dev`.
+- Graphs (`enriched_graphs/`) come from `build_training_graphs.py` (full sessions + prefixes, 960 graphs). That builder produces graphs identical to `main.py`'s (checked on dev run_001).
+- These sessions carry Behavior nodes that previously occurred **only in malicious graphs**: DESTRUCTIVE_DB_OPERATION 86 and DEFENSE_IMPAIRMENT 86 from `audit_archive`, plus EXTERNAL_TRANSFER 156.
+
+Regenerate with:
+```
+python3 datagen/generate_batch.py --out dataset_benign_extra --runs 12 --seed 777 --template-set benign_extra
+for i in $(seq -w 1 12); do mv dataset_benign_extra/run_0$i dataset_benign_extra/run_1$i; done
+python3 build_training_graphs.py --runs dataset_benign_extra/run_1* --out-dir dataset_benign_extra/enriched_graphs
+```
+
+**How it is used.** The corpus goes into **training only**. The 7 template-disjoint folds (validation and test graphs) are unchanged, so any difference from the v2 results in "T" comes from the extra benign data alone:
+```
+EXTRA=1 OUT=loto_v2_extra SEEDS="1 2 3" setsid nohup bash loto/run_all.sh > loto_v2_extra.queue.log 2>&1 &
+```
+Training sets grow by 960 graphs (~+33%), so runs take about a third longer.
+
+**Live 4D.** `workload_simulation/setup_banking_db.sh` does not create the `dba` role yet. That is only needed to replay these templates live.
