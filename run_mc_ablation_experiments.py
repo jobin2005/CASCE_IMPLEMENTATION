@@ -47,9 +47,21 @@ from sklearn.metrics import (
 
 from algorithm_4_hybrid import (
     CasceHeteroGAT, load_model, detect, evaluate_rules, gat_score,
-    fuse_scores, _load_dataset_from_dirs, _compute_epoch_loss,
+    fuse_scores, _load_dataset_from_dirs,
     W_RULE, W_GAT, THETA_A, THETA_R
 )
+
+def _compute_epoch_loss(model, data_list, loss_fn):
+    model.eval()
+    tot_loss = 0.0
+    with torch.no_grad():
+        for data in data_list:
+            out = model(data)
+            y = data.y if hasattr(data, 'y') else torch.tensor([0.0])
+            loss = loss_fn(out.unsqueeze(0) if out.dim() == 0 else out, y.to(out.device))
+            tot_loss += loss.item()
+    return tot_loss / max(1, len(data_list))
+
 
 
 # ============================================================================
@@ -856,7 +868,7 @@ def run_exp6_seed_stability(data_dir: Path, train_labels_path: Path, val_labels_
     plot_keys = ["accuracy", "precision", "recall", "f1", "auroc"]
     plot_data = [[sm[k] for sm in seed_metrics] for k in plot_keys]
 
-    bp = plt.boxplot(plot_data, patch_artist=True, labels=[k.capitalize() for k in plot_keys])
+    bp = plt.boxplot(plot_data, patch_artist=True, tick_labels=[k.capitalize() for k in plot_keys])
     colors = ['#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5']
     for patch, color in zip(bp['boxes'], colors):
         patch.set_facecolor(color)
@@ -880,12 +892,12 @@ def run_exp6_seed_stability(data_dir: Path, train_labels_path: Path, val_labels_
 
 def main():
     parser = argparse.ArgumentParser(description="CASCE Model & Algorithm Ablation Suite (M C)")
-    parser.add_argument("--data-dir", default="datagen/generated/multi_domain_huge",
-                        help="Root directory containing dataset, splits, and enriched graphs.")
-    parser.add_argument("--model-path", default="casce_gat_huge.pt",
-                        help="Path to trained GAT checkpoint.")
+    parser.add_argument("--data-dir", default="output/corpus_multidomain",
+                        help="Root directory containing algo4_splits and graphml (default: output/corpus_multidomain).")
+    parser.add_argument("--model-path", default="casce_gat_multidomain.pt",
+                        help="Path to trained CasceHeteroGAT model file.")
     parser.add_argument("--outdir", default="casce_results",
-                        help="Output base directory for all experiment deliverables.")
+                        help="Output directory for ablation deliverables.")
     parser.add_argument("--theta-a", type=float, default=0.65,
                         help="Initial alert threshold (default: 0.65).")
     parser.add_argument("--theta-r", type=float, default=0.80,
@@ -899,9 +911,11 @@ def main():
     args = parser.parse_args()
 
     data_dir = Path(args.data_dir)
-    graphml_dir = data_dir / "enriched_graphs" / "graphml"
+    graphml_dir = (data_dir / "graphml") if (data_dir / "graphml").exists() else (data_dir / "enriched_graphs" / "graphml")
     splits_dir = data_dir / "algo4_splits"
     out_base = Path(args.outdir)
+
+
 
     for sub in ["main_detection_tables", "confusion_matrices", "ROC_PR_curves",
                 "algorithm3_ablation", "fusion_results", "threshold_results", "seed_results"]:
