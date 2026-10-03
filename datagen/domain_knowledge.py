@@ -18,35 +18,40 @@ import random
 import string
 from typing import Any, Dict, List, Tuple
 
+try:
+    from generator_diversity import (
+        get_diverse_external_endpoint,
+        get_diverse_internal_endpoint,
+        get_benign_external_endpoint,
+        generate_exfil_command,
+        generate_staging_command,
+        generate_cleanup_command,
+        generate_log_tampering_commands,
+        build_semantic_family_id,
+        vary_sql_query,
+    )
+except ImportError:
+    from datagen.generator_diversity import (
+        get_diverse_external_endpoint,
+        get_diverse_internal_endpoint,
+        get_benign_external_endpoint,
+        generate_exfil_command,
+        generate_staging_command,
+        generate_cleanup_command,
+        generate_log_tampering_commands,
+        build_semantic_family_id,
+        vary_sql_query,
+    )
+
 # ============================================================================
-# Common infrastructure (shared across all domains)
+# Dynamic fallback infrastructure (shared across all domains)
 # ============================================================================
 
-INTERNAL_IPS = [
-    ("10.0.1.50", 5432),
-    ("10.0.1.100", 8080),
-    ("10.0.2.10", 5432),
-    ("10.0.1.200", 443),
-    ("10.0.3.15", 8443),
-    ("172.16.0.50", 9200),
-    ("172.16.1.10", 443),
-    ("192.168.1.100", 8080),
-    ("198.51.100.20", 443),
-    ("198.51.100.25", 443),
-]
+def get_external_dest(rng: random.Random) -> Tuple[str, int]:
+    return get_diverse_external_endpoint(rng)
 
-EXTERNAL_IPS = [
-    ("93.184.216.34", 443),
-    ("45.33.12.9", 4444),
-    ("185.220.101.5", 8443),
-    ("203.0.113.42", 443),
-    ("198.51.100.77", 443),
-    ("91.219.236.174", 443),
-    ("104.244.72.115", 8080),
-    ("23.129.64.100", 443),
-    ("185.100.87.41", 9443),
-    ("77.247.181.165", 443),
-]
+def get_internal_dest(rng: random.Random) -> Tuple[str, int]:
+    return get_diverse_internal_endpoint(rng)
 
 
 def _random_date_range(rng):
@@ -422,6 +427,10 @@ DOMAIN_CONFIG = {
 # Generic domain-parameterized scenario generators
 # ============================================================================
 
+# ============================================================================
+# Generic domain-parameterized scenario generators
+# ============================================================================
+
 def make_frontline_routine_benign(cfg, rng, idx) -> dict:
     """Benign frontline role session — scoped queries, own scope."""
     scope_id = rng.choice(cfg["scope_ids"])
@@ -432,9 +441,10 @@ def make_frontline_routine_benign(cfg, rng, idx) -> dict:
         "step_id": "daily_report",
         "sql": cfg["frontline_report_copy"](rng, scope_id)
     })
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"{cfg['domain']}_{cfg['frontline_role']}_routine_{idx:04d}",
-        "family_id": f"{cfg['domain']}_{cfg['frontline_role']}_routine_{idx:04d}",
+        "family_id": f"{cfg['domain']}_{cfg['frontline_role']}_routine_fam{variant:02d}",
         "domain": cfg["domain"],
         "time_of_day": f"{rng.randint(9, 16):02d}:{rng.choice(['00', '15', '30', '45'])}",
         "default_class": "benign",
@@ -452,11 +462,15 @@ def make_frontline_routine_benign(cfg, rng, idx) -> dict:
 
 def make_frontline_pii_dump_malicious(cfg, rng, idx) -> dict:
     """Malicious frontline role — reads PII cross-scope, dumps via COPY."""
-    dest = rng.choice(EXTERNAL_IPS)
+    dest_ip, dest_port = get_diverse_external_endpoint(rng)
     scope_id = rng.choice(cfg["scope_ids"])
+    variant = (idx % 3) + 1
+    exfil_cmd = generate_exfil_command(rng, dest_ip, dest_port)
+    base_select = cfg["pii_dump_sql"](rng, scope_id)
+    
     return {
         "scenario_id": f"{cfg['domain']}_{cfg['frontline_role']}_pii_dump_{idx:04d}",
-        "family_id": f"{cfg['domain']}_{cfg['frontline_role']}_pii_dump_{idx:04d}",
+        "family_id": f"{cfg['domain']}_{cfg['frontline_role']}_pii_dump_fam{variant:02d}",
         "domain": cfg["domain"],
         "time_of_day": f"{rng.randint(10, 15):02d}:{rng.choice(['00', '15', '30', '45'])}",
         "default_class": "malicious",
@@ -468,10 +482,10 @@ def make_frontline_pii_dump_malicious(cfg, rng, idx) -> dict:
             "anchor": "db",
             "timing": {"tempo": "bursty", "step_gaps_seconds": [rng.uniform(0.3, 1.5)]},
             "events": [
-                {"sql": cfg["pii_dump_sql"](rng, scope_id)},
+                {"sql": base_select},
                 {"step_id": "exfil",
-                 "sql": cfg["pii_exfil_copy"](rng),
-                 "connects_to": {"ip": dest[0], "port": dest[1]}},
+                 "sql": f"COPY ({base_select}) TO PROGRAM '{exfil_cmd}'",
+                 "connects_to": {"ip": dest_ip, "port": dest_port}},
             ]
         }]
     }
@@ -480,10 +494,11 @@ def make_frontline_pii_dump_malicious(cfg, rng, idx) -> dict:
 def make_etl_benign(cfg, rng, idx) -> dict:
     """Benign ETL replication — scoped, incremental, to approved endpoint."""
     start, end = _random_date_range(rng)
-    dest = rng.choice(INTERNAL_IPS)
+    dest_ip, dest_port = get_diverse_internal_endpoint(rng)
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"{cfg['domain']}_etl_repl_ben_{idx:04d}",
-        "family_id": f"{cfg['domain']}_etl_pair_{idx:04d}",
+        "family_id": f"{cfg['domain']}_etl_pair_fam{variant:02d}",
         "domain": cfg["domain"],
         "matched_pair_id": f"{cfg['domain']}_etl_pair_{idx:04d}",
         "matched_dimensions": {
@@ -502,7 +517,7 @@ def make_etl_benign(cfg, rng, idx) -> dict:
             "events": [
                 {"step_id": "replicate",
                  "sql": cfg["etl_scoped_copy"](rng, start, end),
-                 "connects_to": {"ip": dest[0], "port": dest[1]}},
+                 "connects_to": {"ip": dest_ip, "port": dest_port}},
             ]
         }]
     }
@@ -510,10 +525,11 @@ def make_etl_benign(cfg, rng, idx) -> dict:
 
 def make_etl_exfil_malicious(cfg, rng, idx) -> dict:
     """Malicious ETL — broad columns, no filter, external endpoint."""
-    dest = rng.choice(EXTERNAL_IPS)
+    dest_ip, dest_port = get_diverse_external_endpoint(rng)
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"{cfg['domain']}_etl_exfil_mal_{idx:04d}",
-        "family_id": f"{cfg['domain']}_etl_pair_{idx:04d}",
+        "family_id": f"{cfg['domain']}_etl_pair_fam{variant:02d}",
         "domain": cfg["domain"],
         "matched_pair_id": f"{cfg['domain']}_etl_pair_{idx:04d}",
         "matched_dimensions": {
@@ -532,7 +548,7 @@ def make_etl_exfil_malicious(cfg, rng, idx) -> dict:
             "events": [
                 {"step_id": "replicate",
                  "sql": cfg["etl_broad_copy"](rng),
-                 "connects_to": {"ip": dest[0], "port": dest[1]}},
+                 "connects_to": {"ip": dest_ip, "port": dest_port}},
             ]
         }]
     }
@@ -541,10 +557,12 @@ def make_etl_exfil_malicious(cfg, rng, idx) -> dict:
 def make_privilege_abuse_malicious(cfg, rng, idx) -> dict:
     """Malicious — frontline escalates to superuser, dumps credentials."""
     password = _random_password(rng)
-    shadow_role = rng.choice(["svc_shadow", "admin_backup", "dba_maint"])
+    shadow_role = rng.choice(["svc_shadow", "admin_backup", "dba_maint", "sec_ops", "audit_adm"])
+    variant = (idx % 3) + 1
+    scope_id = rng.choice(cfg["scope_ids"])
     return {
         "scenario_id": f"{cfg['domain']}_priv_abuse_{idx:04d}",
-        "family_id": f"{cfg['domain']}_priv_abuse_{idx:04d}",
+        "family_id": f"{cfg['domain']}_priv_abuse_fam{variant:02d}",
         "domain": cfg["domain"],
         "time_of_day": f"{rng.choice(['02', '03', '04', '22', '23'])}:{rng.choice(['00', '15', '30', '45'])}",
         "default_class": "malicious",
@@ -558,7 +576,7 @@ def make_privilege_abuse_malicious(cfg, rng, idx) -> dict:
             "events": [
                 {"step_id": "escalate",
                  "sql": f"CREATE ROLE {shadow_role} SUPERUSER LOGIN PASSWORD '{password}'"},
-                {"sql": cfg["pii_dump_sql"](rng, rng.choice(cfg["scope_ids"]))},
+                {"sql": cfg["pii_dump_sql"](rng, scope_id)},
                 {"step_id": "dump",
                  "sql": "COPY (SELECT rolname, rolpassword FROM pg_authid) TO PROGRAM 'cat >> /var/lib/postgresql/.cache/creds_dump.txt'"},
             ]
@@ -574,9 +592,10 @@ def make_audit_benign(cfg, rng, idx) -> dict:
         "step_id": "audit_export",
         "sql": cfg["audit_export_copy"]
     })
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"{cfg['domain']}_{cfg['audit_role']}_audit_{idx:04d}",
-        "family_id": f"{cfg['domain']}_{cfg['audit_role']}_audit_{idx:04d}",
+        "family_id": f"{cfg['domain']}_{cfg['audit_role']}_audit_fam{variant:02d}",
         "domain": cfg["domain"],
         "time_of_day": f"{rng.randint(9, 16):02d}:00",
         "default_class": "benign",
@@ -594,9 +613,11 @@ def make_audit_benign(cfg, rng, idx) -> dict:
 
 def make_defense_impairment_malicious(cfg, rng, idx) -> dict:
     """Malicious — disable logging via ALTER SYSTEM SET, then truncate audit logs."""
+    variant = (idx % 3) + 1
+    events = generate_log_tampering_commands(rng)
     return {
         "scenario_id": f"{cfg['domain']}_defense_impair_{idx:04d}",
-        "family_id": f"{cfg['domain']}_defense_impair_{idx:04d}",
+        "family_id": f"{cfg['domain']}_defense_impair_fam{variant:02d}",
         "domain": cfg["domain"],
         "time_of_day": f"{rng.choice(['01', '02', '03', '23'])}:{rng.choice(['00', '15', '30', '45'])}",
         "default_class": "malicious",
@@ -607,12 +628,7 @@ def make_defense_impairment_malicious(cfg, rng, idx) -> dict:
             "class": "malicious",
             "anchor": "db",
             "timing": {"tempo": "bursty", "step_gaps_seconds": [rng.uniform(0.3, 1.5)]},
-            "events": [
-                {"sql": "ALTER SYSTEM SET log_statement = 'none'"},
-                {"sql": "TRUNCATE TABLE audit_logs"},
-                {"step_id": "cleanup",
-                 "sql": "COPY (SELECT 'logs cleared') TO PROGRAM 'rm -f /var/log/postgresql/postgresql-*.log'"},
-            ]
+            "events": events
         }]
     }
 
@@ -626,9 +642,10 @@ def make_senior_eod_benign(cfg, rng, idx) -> dict:
         "step_id": "eod_report",
         "sql": cfg["senior_report_copy"](rng, scope_id)
     })
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"{cfg['domain']}_{cfg['senior_role']}_eod_{idx:04d}",
-        "family_id": f"{cfg['domain']}_{cfg['senior_role']}_eod_{idx:04d}",
+        "family_id": f"{cfg['domain']}_{cfg['senior_role']}_eod_fam{variant:02d}",
         "domain": cfg["domain"],
         "time_of_day": f"{rng.randint(16, 18):02d}:{rng.choice(['00', '30'])}",
         "default_class": "benign",
@@ -646,11 +663,13 @@ def make_senior_eod_benign(cfg, rng, idx) -> dict:
 
 def make_audit_exfil_malicious(cfg, rng, idx) -> dict:
     """Malicious audit role — exfiltrates PII to external endpoint (false negative)."""
-    dest = rng.choice(EXTERNAL_IPS)
+    dest_ip, dest_port = get_diverse_external_endpoint(rng)
     audit_sql = cfg["audit_queries"](rng, 1)[0]
+    exfil_cmd = generate_exfil_command(rng, dest_ip, dest_port)
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"{cfg['domain']}_{cfg['audit_role']}_exfil_{idx:04d}",
-        "family_id": f"{cfg['domain']}_{cfg['audit_role']}_exfil_{idx:04d}",
+        "family_id": f"{cfg['domain']}_{cfg['audit_role']}_exfil_fam{variant:02d}",
         "domain": cfg["domain"],
         "time_of_day": f"{rng.choice(['22', '23', '01', '02'])}:{rng.choice(['00', '15', '30'])}",
         "default_class": "malicious",
@@ -664,8 +683,8 @@ def make_audit_exfil_malicious(cfg, rng, idx) -> dict:
             "events": [
                 {"sql": audit_sql},
                 {"step_id": "exfil",
-                 "sql": cfg["audit_exfil_copy"](rng),
-                 "connects_to": {"ip": dest[0], "port": dest[1]}},
+                 "sql": f"COPY ({audit_sql}) TO PROGRAM '{exfil_cmd}'",
+                 "connects_to": {"ip": dest_ip, "port": dest_port}},
             ]
         }]
     }
@@ -673,11 +692,13 @@ def make_audit_exfil_malicious(cfg, rng, idx) -> dict:
 
 def make_multi_session_apt(cfg, rng, idx) -> dict:
     """Multi-session APT: recon → escalation → exfil → cleanup."""
-    dest = rng.choice(EXTERNAL_IPS)
+    dest_ip, dest_port = get_diverse_external_endpoint(rng)
     password = _random_password(rng)
+    variant = (idx % 3) + 1
+    exfil_cmd = generate_exfil_command(rng, dest_ip, dest_port)
     return {
         "scenario_id": f"{cfg['domain']}_multi_apt_{idx:04d}",
-        "family_id": f"{cfg['domain']}_multi_apt_{idx:04d}",
+        "family_id": f"{cfg['domain']}_multi_apt_fam{variant:02d}",
         "domain": cfg["domain"],
         "time_of_day": f"{rng.choice(['01', '02', '03'])}:{rng.choice(['00', '15', '30'])}",
         "default_class": "malicious",
@@ -719,8 +740,8 @@ def make_multi_session_apt(cfg, rng, idx) -> dict:
                 "timing": {"tempo": "steady", "step_gaps_seconds": [rng.uniform(2.0, 5.0)]},
                 "events": [
                     {"step_id": "exfil",
-                     "sql": cfg["apt_exfil_copy"](rng),
-                     "connects_to": {"ip": dest[0], "port": dest[1]}},
+                     "sql": f"COPY ({cfg['apt_broad_select']}) TO PROGRAM '{exfil_cmd}'",
+                     "connects_to": {"ip": dest_ip, "port": dest_port}},
                 ]
             },
         ]
@@ -729,9 +750,10 @@ def make_multi_session_apt(cfg, rng, idx) -> dict:
 
 def make_hard_neg_dba_shadow_audit(cfg, rng, idx) -> dict:
     """Hard negative: audit role legitimately reads pg_authid for password policy audit."""
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"{cfg['domain']}_dba_shadow_audit_{idx:04d}",
-        "family_id": f"{cfg['domain']}_dba_shadow_audit_{idx:04d}",
+        "family_id": f"{cfg['domain']}_dba_shadow_audit_fam{variant:02d}",
         "domain": cfg["domain"],
         "time_of_day": f"{rng.randint(10, 15):02d}:00",
         "default_class": "benign",
@@ -753,12 +775,13 @@ def make_hard_neg_dba_shadow_audit(cfg, rng, idx) -> dict:
 
 def make_hard_neg_etl_internal(cfg, rng, idx) -> dict:
     """Hard negative: ETL COPY to internal host with sensitive columns — legitimate."""
-    dest = rng.choice(INTERNAL_IPS)
+    dest_ip, dest_port = get_diverse_internal_endpoint(rng)
     start, end = _random_date_range(rng)
     scope_id = rng.choice(cfg["scope_ids"])
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"{cfg['domain']}_etl_internal_{idx:04d}",
-        "family_id": f"{cfg['domain']}_etl_internal_{idx:04d}",
+        "family_id": f"{cfg['domain']}_etl_internal_fam{variant:02d}",
         "domain": cfg["domain"],
         "time_of_day": f"{rng.choice(['02', '03', '04'])}:{rng.choice(['00', '30'])}",
         "default_class": "benign",
@@ -772,7 +795,7 @@ def make_hard_neg_etl_internal(cfg, rng, idx) -> dict:
             "events": [
                 {"step_id": "sync",
                  "sql": cfg["hard_neg_etl_copy"](rng, scope_id, start, end),
-                 "connects_to": {"ip": dest[0], "port": dest[1]}},
+                 "connects_to": {"ip": dest_ip, "port": dest_port}},
             ]
         }]
     }
@@ -781,11 +804,14 @@ def make_hard_neg_etl_internal(cfg, rng, idx) -> dict:
 def make_alter_role_escalation(cfg, rng, idx) -> dict:
     """Malicious — ALTER ROLE to grant superuser."""
     target_role = rng.choice([cfg["senior_role"], cfg["audit_role"]])
-    dest = rng.choice(EXTERNAL_IPS)
+    dest_ip, dest_port = get_diverse_external_endpoint(rng)
     scope_id = rng.choice(cfg["scope_ids"])
+    variant = (idx % 3) + 1
+    exfil_cmd = generate_exfil_command(rng, dest_ip, dest_port)
+    base_select = cfg["pii_dump_sql"](rng, scope_id)
     return {
         "scenario_id": f"{cfg['domain']}_alter_role_esc_{idx:04d}",
-        "family_id": f"{cfg['domain']}_alter_role_esc_{idx:04d}",
+        "family_id": f"{cfg['domain']}_alter_role_esc_fam{variant:02d}",
         "domain": cfg["domain"],
         "time_of_day": f"{rng.choice(['01', '02', '03', '23'])}:{rng.choice(['00', '15', '30'])}",
         "default_class": "malicious",
@@ -798,10 +824,10 @@ def make_alter_role_escalation(cfg, rng, idx) -> dict:
             "timing": {"tempo": "bursty", "step_gaps_seconds": [rng.uniform(0.3, 1.5)]},
             "events": [
                 {"sql": f"ALTER ROLE {target_role} WITH SUPERUSER"},
-                {"sql": cfg["pii_dump_sql"](rng, scope_id)},
+                {"sql": base_select},
                 {"step_id": "exfil",
-                 "sql": cfg["pii_exfil_copy"](rng),
-                 "connects_to": {"ip": dest[0], "port": dest[1]}},
+                 "sql": f"COPY ({base_select}) TO PROGRAM '{exfil_cmd}'",
+                 "connects_to": {"ip": dest_ip, "port": dest_port}},
             ]
         }]
     }
@@ -810,17 +836,18 @@ def make_alter_role_escalation(cfg, rng, idx) -> dict:
 def make_cross_scope_benign(cfg, rng, idx) -> dict:
     """Benign — senior role legitimately queries multiple scopes for regional report."""
     scope_ids = rng.sample(cfg["scope_ids"], min(rng.randint(2, 4), len(cfg["scope_ids"])))
-    dest = rng.choice(INTERNAL_IPS)
+    dest_ip, dest_port = get_diverse_internal_endpoint(rng)
     queries = cfg["cross_scope_queries"](rng, scope_ids)
     events = [{"sql": q} for q in queries]
     events.append({
         "step_id": "report_export",
         "sql": cfg["cross_scope_copy"](rng, scope_ids),
-        "connects_to": {"ip": dest[0], "port": dest[1]}
+        "connects_to": {"ip": dest_ip, "port": dest_port}
     })
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"{cfg['domain']}_{cfg['senior_role']}_cross_scope_{idx:04d}",
-        "family_id": f"{cfg['domain']}_{cfg['senior_role']}_cross_scope_{idx:04d}",
+        "family_id": f"{cfg['domain']}_{cfg['senior_role']}_cross_scope_fam{variant:02d}",
         "domain": cfg["domain"],
         "time_of_day": f"{rng.randint(9, 16):02d}:{rng.choice(['00', '30'])}",
         "default_class": "benign",
@@ -838,9 +865,10 @@ def make_cross_scope_benign(cfg, rng, idx) -> dict:
 
 def make_data_tampering_malicious(cfg, rng, idx) -> dict:
     """Malicious — direct UPDATE/DELETE on sensitive data to cover tracks."""
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"{cfg['domain']}_data_tamper_{idx:04d}",
-        "family_id": f"{cfg['domain']}_data_tamper_{idx:04d}",
+        "family_id": f"{cfg['domain']}_data_tamper_fam{variant:02d}",
         "domain": cfg["domain"],
         "time_of_day": f"{rng.choice(['01', '02', '03', '22', '23'])}:{rng.choice(['00', '15', '30', '45'])}",
         "default_class": "malicious",
@@ -855,7 +883,7 @@ def make_data_tampering_malicious(cfg, rng, idx) -> dict:
                 {"sql": cfg["tamper_update"](rng)},
                 {"sql": cfg["tamper_delete"](rng)},
                 {"step_id": "cover_tracks",
-                 "sql": "COPY (SELECT 'cleanup done') TO PROGRAM 'rm -f /var/log/postgresql/postgresql-*.log'"},
+                 "sql": "COPY (SELECT 'cleanup done') TO PROGRAM 'rm -f /var/log/postgresql/postgresql.log'"},
             ]
         }]
     }
@@ -863,11 +891,13 @@ def make_data_tampering_malicious(cfg, rng, idx) -> dict:
 
 def make_lateral_movement_malicious(cfg, rng, idx) -> dict:
     """Malicious — info_schema recon then cross-table harvesting."""
-    dest = rng.choice(EXTERNAL_IPS)
+    dest_ip, dest_port = get_diverse_external_endpoint(rng)
     scope_id = rng.choice(cfg["scope_ids"])
+    variant = (idx % 3) + 1
+    exfil_cmd = generate_exfil_command(rng, dest_ip, dest_port)
     return {
         "scenario_id": f"{cfg['domain']}_lateral_move_{idx:04d}",
-        "family_id": f"{cfg['domain']}_lateral_move_{idx:04d}",
+        "family_id": f"{cfg['domain']}_lateral_move_fam{variant:02d}",
         "domain": cfg["domain"],
         "time_of_day": f"{rng.choice(['01', '02', '03', '23'])}:{rng.choice(['00', '15', '30'])}",
         "default_class": "malicious",
@@ -897,8 +927,8 @@ def make_lateral_movement_malicious(cfg, rng, idx) -> dict:
                     {"sql": cfg["lateral_broad_select"](rng)},
                     {"sql": cfg["lateral_secondary_select"](rng)},
                     {"step_id": "exfil",
-                     "sql": cfg["lateral_exfil_copy"](rng),
-                     "connects_to": {"ip": dest[0], "port": dest[1]}},
+                     "sql": f"COPY ({cfg['lateral_broad_select'](rng)}) TO PROGRAM '{exfil_cmd}'",
+                     "connects_to": {"ip": dest_ip, "port": dest_port}},
                 ]
             },
         ]
@@ -907,7 +937,7 @@ def make_lateral_movement_malicious(cfg, rng, idx) -> dict:
 
 def make_batch_report_benign(cfg, rng, idx) -> dict:
     """Benign — scheduled batch report generation to approved internal endpoint."""
-    dest = rng.choice(INTERNAL_IPS)
+    dest_ip, dest_port = get_diverse_internal_endpoint(rng)
     scope_id = rng.choice(cfg["scope_ids"])
     start, end = _random_date_range(rng)
     report_queries = cfg["batch_report_queries"](rng, scope_id, start, end)
@@ -915,11 +945,12 @@ def make_batch_report_benign(cfg, rng, idx) -> dict:
     events.append({
         "step_id": "report_send",
         "sql": cfg["batch_report_copy"](rng, scope_id),
-        "connects_to": {"ip": dest[0], "port": dest[1]}
+        "connects_to": {"ip": dest_ip, "port": dest_port}
     })
+    variant = (idx % 3) + 1
     return {
         "scenario_id": f"{cfg['domain']}_batch_report_{idx:04d}",
-        "family_id": f"{cfg['domain']}_batch_report_{idx:04d}",
+        "family_id": f"{cfg['domain']}_batch_report_fam{variant:02d}",
         "domain": cfg["domain"],
         "time_of_day": f"{rng.choice(['00', '01', '05', '06'])}:{rng.choice(['00', '30'])}",
         "default_class": "benign",

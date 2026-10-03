@@ -49,7 +49,11 @@ def sanitize_for_graphml(G: nx.MultiDiGraph) -> nx.MultiDiGraph:
 
 def main() -> None:
     if len(sys.argv) > 1:
-        run_dirs = [Path(sys.argv[1]).resolve()]
+        target = Path(sys.argv[1]).resolve()
+        if target.is_dir() and any(target.glob("run_*")):
+            run_dirs = sorted([d for d in target.glob("run_*") if d.is_dir()])
+        else:
+            run_dirs = [target]
     else:
         run_dirs = sorted(DATASET_DEV.glob("run_*")) + sorted(DATASET_TEST.glob("run_*"))
 
