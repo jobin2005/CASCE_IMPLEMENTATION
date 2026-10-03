@@ -1,0 +1,273 @@
+{
+  "fold": "priv_abuse",
+  "test_templates": [
+    "banking_priv_abuse",
+    "banking_teller_routine"
+  ],
+  "val_templates": [
+    "banking_teller_pii_dump",
+    "banking_compliance_audit"
+  ],
+  "model": "loto_v2_fpr/priv_abuse_s1.pt",
+  "theta": 0.25,
+  "unseen": {
+    "n": 226,
+    "n_malicious": 84,
+    "tp": 84,
+    "fp": 14,
+    "fn": 0,
+    "tn": 128,
+    "precision": 0.8571,
+    "recall": 1.0,
+    "f1": 0.9231,
+    "accuracy": 0.9381,
+    "fpr": 0.0986,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "min_malicious_score": 0.75,
+    "max_benign_score": 0.6685,
+    "margin": 0.0815
+  },
+  "unseen_gat_only": {
+    "n": 226,
+    "n_malicious": 84,
+    "tp": 84,
+    "fp": 17,
+    "fn": 0,
+    "tn": 125,
+    "precision": 0.8317,
+    "recall": 1.0,
+    "f1": 0.9081,
+    "accuracy": 0.9248,
+    "fpr": 0.1197,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "min_malicious_score": 1.0,
+    "max_benign_score": 0.8913,
+    "margin": 0.1087
+  },
+  "seen_test": {
+    "n": 133,
+    "n_malicious": 63,
+    "tp": 63,
+    "fp": 29,
+    "fn": 0,
+    "tn": 41,
+    "precision": 0.6848,
+    "recall": 1.0,
+    "f1": 0.8129,
+    "accuracy": 0.782,
+    "fpr": 0.4143,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "min_malicious_score": 0.75,
+    "max_benign_score": 0.3122,
+    "margin": 0.4378
+  },
+  "per_template_unseen": {
+    "banking_priv_abuse": {
+      "n": 84,
+      "label": 1,
+      "detected": 84,
+      "risk_min": 0.75,
+      "risk_median": 0.75,
+      "risk_max": 0.75
+    },
+    "banking_teller_routine": {
+      "n": 142,
+      "label": 0,
+      "false_alarms": 14,
+      "risk_min": 0.0,
+      "risk_median": 0.0012,
+      "risk_max": 0.6685
+    }
+  },
+  "per_template_seen_test": {
+    "banking_alter_role_esc": {
+      "n": 3,
+      "label": 1,
+      "detected": 3,
+      "risk_min": 0.8217,
+      "risk_median": 0.8217,
+      "risk_max": 0.8217
+    },
+    "banking_compliance_exfil": {
+      "n": 16,
+      "label": 1,
+      "detected": 16,
+      "risk_min": 0.8232,
+      "risk_median": 0.8232,
+      "risk_max": 0.8232
+    },
+    "banking_dba_shadow_audit": {
+      "n": 13,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0
+    },
+    "banking_defense_impair": {
+      "n": 12,
+      "label": 1,
+      "detected": 12,
+      "risk_min": 0.8023,
+      "risk_median": 0.8023,
+      "risk_max": 0.8023
+    },
+    "banking_etl_exfil_mal": {
+      "n": 14,
+      "label": 1,
+      "detected": 14,
+      "risk_min": 0.8206,
+      "risk_median": 0.82275,
+      "risk_max": 0.8228
+    },
+    "banking_etl_internal": {
+      "n": 15,
+      "label": 0,
+      "false_alarms": 15,
+      "risk_min": 0.2942,
+      "risk_median": 0.2967,
+      "risk_max": 0.3122
+    },
+    "banking_etl_repl_ben": {
+      "n": 14,
+      "label": 0,
+      "false_alarms": 14,
+      "risk_min": 0.2962,
+      "risk_median": 0.2962,
+      "risk_max": 0.2962
+    },
+    "banking_manager_eod": {
+      "n": 28,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0
+    },
+    "banking_multi_apt": {
+      "n": 18,
+      "label": 1,
+      "detected": 18,
+      "risk_min": 0.75,
+      "risk_median": 0.75,
+      "risk_max": 0.8232
+    }
+  },
+  "unseen_errors": [
+    {
+      "graph": "enriched_run_001_20048_Benign.graphml",
+      "template": "banking_teller_routine",
+      "source": "dataset_dev",
+      "risk": 0.4149,
+      "gat": 0.5533,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_003_20038_Benign.graphml",
+      "template": "banking_teller_routine",
+      "source": "dataset_dev",
+      "risk": 0.6078,
+      "gat": 0.8104,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_010_20042_Benign.graphml",
+      "template": "banking_teller_routine",
+      "source": "dataset_dev",
+      "risk": 0.5714,
+      "gat": 0.7619,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_017_20040_Benign.graphml",
+      "template": "banking_teller_routine",
+      "source": "dataset_dev",
+      "risk": 0.6685,
+      "gat": 0.8913,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_022_20056_Benign.graphml",
+      "template": "banking_teller_routine",
+      "source": "dataset_dev",
+      "risk": 0.432,
+      "gat": 0.5761,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_028_20044_Benign.graphml",
+      "template": "banking_teller_routine",
+      "source": "dataset_dev",
+      "risk": 0.2923,
+      "gat": 0.3898,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_030_20038_Benign.graphml",
+      "template": "banking_teller_routine",
+      "source": "dataset_dev",
+      "risk": 0.562,
+      "gat": 0.7494,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_032_20036_Benign.graphml",
+      "template": "banking_teller_routine",
+      "source": "dataset_dev",
+      "risk": 0.3869,
+      "gat": 0.5159,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_032_20042_Benign.graphml",
+      "template": "banking_teller_routine",
+      "source": "dataset_dev",
+      "risk": 0.631,
+      "gat": 0.8413,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_032_20044_Benign.graphml",
+      "template": "banking_teller_routine",
+      "source": "dataset_dev",
+      "risk": 0.4314,
+      "gat": 0.5752,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_034_20036_Benign.graphml",
+      "template": "banking_teller_routine",
+      "source": "dataset_dev",
+      "risk": 0.5313,
+      "gat": 0.7083,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_036_20040_Benign.graphml",
+      "template": "banking_teller_routine",
+      "source": "dataset_dev",
+      "risk": 0.4543,
+      "gat": 0.6057,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_001_20036_Benign.graphml",
+      "template": "banking_teller_routine",
+      "source": "dataset_test",
+      "risk": 0.2681,
+      "gat": 0.3574,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_009_20042_Benign.graphml",
+      "template": "banking_teller_routine",
+      "source": "dataset_test",
+      "risk": 0.2745,
+      "gat": 0.3661,
+      "rule": 0.0
+    }
+  ]
+}

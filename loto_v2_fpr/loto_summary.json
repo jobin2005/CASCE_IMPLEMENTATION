@@ -1,0 +1,448 @@
+{
+  "n_folds": 7,
+  "seeds": [
+    1
+  ],
+  "macro_over_folds": {
+    "recall": [
+      0.5714,
+      0.0
+    ],
+    "fpr": [
+      0.2998,
+      0.0
+    ],
+    "precision": [
+      0.3879,
+      0.0
+    ],
+    "f1": [
+      0.4454,
+      0.0
+    ],
+    "roc_auc": [
+      0.5238,
+      0.0
+    ],
+    "pr_auc": [
+      0.6843,
+      0.0
+    ]
+  },
+  "pooled_confusion_per_seed": {
+    "1": {
+      "tp": 262,
+      "fp": 221,
+      "fn": 246,
+      "tn": 542
+    }
+  },
+  "folds": {
+    "alter_role_esc": {
+      "test_templates": [
+        "banking_alter_role_esc",
+        "banking_compliance_audit"
+      ],
+      "val_templates": [
+        "banking_compliance_exfil",
+        "banking_dba_shadow_audit"
+      ],
+      "seeds": [
+        1
+      ],
+      "theta": {
+        "1": 0.55
+      },
+      "unseen": {
+        "recall": [
+          1.0,
+          0.0
+        ],
+        "fpr": [
+          0.0,
+          0.0
+        ],
+        "precision": [
+          1.0,
+          0.0
+        ],
+        "f1": [
+          1.0,
+          0.0
+        ],
+        "roc_auc": [
+          1.0,
+          0.0
+        ],
+        "pr_auc": [
+          1.0,
+          0.0
+        ]
+      },
+      "unseen_gat_only_roc_auc": [
+        1.0,
+        0.0
+      ],
+      "seen_test_f1": [
+        0.7667,
+        0.0
+      ],
+      "per_seed_cm": {
+        "1": {
+          "tp": 35,
+          "fp": 0,
+          "fn": 0,
+          "tn": 145
+        }
+      }
+    },
+    "compliance_exfil": {
+      "test_templates": [
+        "banking_compliance_exfil",
+        "banking_dba_shadow_audit"
+      ],
+      "val_templates": [
+        "banking_defense_impair",
+        "banking_etl_internal"
+      ],
+      "seeds": [
+        1
+      ],
+      "theta": {
+        "1": 0.6
+      },
+      "unseen": {
+        "recall": [
+          0.0,
+          0.0
+        ],
+        "fpr": [
+          0.0,
+          0.0
+        ],
+        "precision": [
+          0.0,
+          0.0
+        ],
+        "f1": [
+          0.0,
+          0.0
+        ],
+        "roc_auc": [
+          1.0,
+          0.0
+        ],
+        "pr_auc": [
+          1.0,
+          0.0
+        ]
+      },
+      "unseen_gat_only_roc_auc": [
+        1.0,
+        0.0
+      ],
+      "seen_test_f1": [
+        0.9844,
+        0.0
+      ],
+      "per_seed_cm": {
+        "1": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 78,
+          "tn": 40
+        }
+      }
+    },
+    "defense_impair": {
+      "test_templates": [
+        "banking_defense_impair",
+        "banking_etl_internal"
+      ],
+      "val_templates": [
+        "banking_etl_exfil_mal",
+        "banking_etl_repl_ben"
+      ],
+      "seeds": [
+        1
+      ],
+      "theta": {
+        "1": 0.85
+      },
+      "unseen": {
+        "recall": [
+          0.0,
+          0.0
+        ],
+        "fpr": [
+          0.0,
+          0.0
+        ],
+        "precision": [
+          0.0,
+          0.0
+        ],
+        "f1": [
+          0.0,
+          0.0
+        ],
+        "roc_auc": [
+          0.0,
+          0.0
+        ],
+        "pr_auc": [
+          0.4865,
+          0.0
+        ]
+      },
+      "unseen_gat_only_roc_auc": [
+        0.0,
+        0.0
+      ],
+      "seen_test_f1": [
+        0.0,
+        0.0
+      ],
+      "per_seed_cm": {
+        "1": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 72,
+          "tn": 76
+        }
+      }
+    },
+    "etl_exfil_mal": {
+      "test_templates": [
+        "banking_etl_exfil_mal",
+        "banking_etl_repl_ben"
+      ],
+      "val_templates": [
+        "banking_multi_apt",
+        "banking_manager_eod"
+      ],
+      "seeds": [
+        1
+      ],
+      "theta": {
+        "1": 0.05
+      },
+      "unseen": {
+        "recall": [
+          1.0,
+          0.0
+        ],
+        "fpr": [
+          1.0,
+          0.0
+        ],
+        "precision": [
+          0.5,
+          0.0
+        ],
+        "f1": [
+          0.6667,
+          0.0
+        ],
+        "roc_auc": [
+          0.0,
+          0.0
+        ],
+        "pr_auc": [
+          0.5,
+          0.0
+        ]
+      },
+      "unseen_gat_only_roc_auc": [
+        0.5,
+        0.0
+      ],
+      "seen_test_f1": [
+        0.8905,
+        0.0
+      ],
+      "per_seed_cm": {
+        "1": {
+          "tp": 62,
+          "fp": 62,
+          "fn": 0,
+          "tn": 0
+        }
+      }
+    },
+    "multi_apt": {
+      "test_templates": [
+        "banking_multi_apt",
+        "banking_manager_eod"
+      ],
+      "val_templates": [
+        "banking_priv_abuse",
+        "banking_teller_routine"
+      ],
+      "seeds": [
+        1
+      ],
+      "theta": {
+        "1": 0.8
+      },
+      "unseen": {
+        "recall": [
+          0.0,
+          0.0
+        ],
+        "fpr": [
+          0.0,
+          0.0
+        ],
+        "precision": [
+          0.0,
+          0.0
+        ],
+        "f1": [
+          0.0,
+          0.0
+        ],
+        "roc_auc": [
+          0.6667,
+          0.0
+        ],
+        "pr_auc": [
+          0.5904,
+          0.0
+        ]
+      },
+      "unseen_gat_only_roc_auc": [
+        0.6667,
+        0.0
+      ],
+      "seen_test_f1": [
+        0.8654,
+        0.0
+      ],
+      "per_seed_cm": {
+        "1": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 96,
+          "tn": 153
+        }
+      }
+    },
+    "priv_abuse": {
+      "test_templates": [
+        "banking_priv_abuse",
+        "banking_teller_routine"
+      ],
+      "val_templates": [
+        "banking_teller_pii_dump",
+        "banking_compliance_audit"
+      ],
+      "seeds": [
+        1
+      ],
+      "theta": {
+        "1": 0.25
+      },
+      "unseen": {
+        "recall": [
+          1.0,
+          0.0
+        ],
+        "fpr": [
+          0.0986,
+          0.0
+        ],
+        "precision": [
+          0.8571,
+          0.0
+        ],
+        "f1": [
+          0.9231,
+          0.0
+        ],
+        "roc_auc": [
+          1.0,
+          0.0
+        ],
+        "pr_auc": [
+          1.0,
+          0.0
+        ]
+      },
+      "unseen_gat_only_roc_auc": [
+        1.0,
+        0.0
+      ],
+      "seen_test_f1": [
+        0.8129,
+        0.0
+      ],
+      "per_seed_cm": {
+        "1": {
+          "tp": 84,
+          "fp": 14,
+          "fn": 0,
+          "tn": 128
+        }
+      }
+    },
+    "teller_pii_dump": {
+      "test_templates": [
+        "banking_teller_pii_dump",
+        "banking_compliance_audit"
+      ],
+      "val_templates": [
+        "banking_alter_role_esc",
+        "banking_dba_shadow_audit"
+      ],
+      "seeds": [
+        1
+      ],
+      "theta": {
+        "1": 0.5
+      },
+      "unseen": {
+        "recall": [
+          1.0,
+          0.0
+        ],
+        "fpr": [
+          1.0,
+          0.0
+        ],
+        "precision": [
+          0.3584,
+          0.0
+        ],
+        "f1": [
+          0.5277,
+          0.0
+        ],
+        "roc_auc": [
+          0.0,
+          0.0
+        ],
+        "pr_auc": [
+          0.2131,
+          0.0
+        ]
+      },
+      "unseen_gat_only_roc_auc": [
+        0.0,
+        0.0
+      ],
+      "seen_test_f1": [
+        1.0,
+        0.0
+      ],
+      "per_seed_cm": {
+        "1": {
+          "tp": 81,
+          "fp": 145,
+          "fn": 0,
+          "tn": 0
+        }
+      }
+    }
+  }
+}

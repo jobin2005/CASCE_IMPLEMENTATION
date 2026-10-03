@@ -1,0 +1,737 @@
+{
+  "fold": "defense_impair",
+  "test_templates": [
+    "banking_defense_impair",
+    "banking_etl_internal"
+  ],
+  "val_templates": [
+    "banking_etl_exfil_mal",
+    "banking_etl_repl_ben"
+  ],
+  "model": "loto_v2_fpr/defense_impair_s1.pt",
+  "theta": 0.85,
+  "unseen": {
+    "n": 148,
+    "n_malicious": 72,
+    "tp": 0,
+    "fp": 0,
+    "fn": 72,
+    "tn": 76,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "accuracy": 0.5135,
+    "fpr": 0.0,
+    "roc_auc": 0.0,
+    "pr_auc": 0.4865,
+    "min_malicious_score": 0.8017,
+    "max_benign_score": 0.8232,
+    "margin": -0.0215
+  },
+  "unseen_gat_only": {
+    "n": 148,
+    "n_malicious": 72,
+    "tp": 72,
+    "fp": 76,
+    "fn": 0,
+    "tn": 0,
+    "precision": 0.4865,
+    "recall": 1.0,
+    "f1": 0.6545,
+    "accuracy": 0.4865,
+    "fpr": 1.0,
+    "roc_auc": 0.0,
+    "pr_auc": 0.4865,
+    "min_malicious_score": 0.9989,
+    "max_benign_score": 1.0,
+    "margin": -0.0011
+  },
+  "seen_test": {
+    "n": 171,
+    "n_malicious": 67,
+    "tp": 0,
+    "fp": 0,
+    "fn": 67,
+    "tn": 104,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "accuracy": 0.6082,
+    "fpr": 0.0,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "min_malicious_score": 0.75,
+    "max_benign_score": 0.0027,
+    "margin": 0.7473
+  },
+  "per_template_unseen": {
+    "banking_defense_impair": {
+      "n": 72,
+      "label": 1,
+      "detected": 0,
+      "risk_min": 0.8017,
+      "risk_median": 0.8017,
+      "risk_max": 0.8017
+    },
+    "banking_etl_internal": {
+      "n": 76,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.8232,
+      "risk_median": 0.8232,
+      "risk_max": 0.8232
+    }
+  },
+  "per_template_seen_test": {
+    "banking_alter_role_esc": {
+      "n": 3,
+      "label": 1,
+      "detected": 0,
+      "risk_min": 0.8217,
+      "risk_median": 0.8217,
+      "risk_max": 0.8217
+    },
+    "banking_compliance_audit": {
+      "n": 32,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0
+    },
+    "banking_compliance_exfil": {
+      "n": 16,
+      "label": 1,
+      "detected": 0,
+      "risk_min": 0.8232,
+      "risk_median": 0.8232,
+      "risk_max": 0.8232
+    },
+    "banking_dba_shadow_audit": {
+      "n": 13,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0
+    },
+    "banking_manager_eod": {
+      "n": 28,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0
+    },
+    "banking_multi_apt": {
+      "n": 18,
+      "label": 1,
+      "detected": 0,
+      "risk_min": 0.75,
+      "risk_median": 0.75,
+      "risk_max": 0.8232
+    },
+    "banking_priv_abuse": {
+      "n": 16,
+      "label": 1,
+      "detected": 0,
+      "risk_min": 0.75,
+      "risk_median": 0.75,
+      "risk_max": 0.75
+    },
+    "banking_teller_pii_dump": {
+      "n": 14,
+      "label": 1,
+      "detected": 0,
+      "risk_min": 0.8217,
+      "risk_median": 0.8217,
+      "risk_max": 0.8217
+    },
+    "banking_teller_routine": {
+      "n": 31,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0027
+    }
+  },
+  "unseen_errors": [
+    {
+      "graph": "enriched_run_001_20006_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_001_20008_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_002_20008_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_002_20010_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_002_20012_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_002_20014_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_002_20016_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_004_20012_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_006_20018_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_007_20010_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_007_20012_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_007_20014_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_007_20016_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_008_20008_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_008_20010_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_009_20012_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_009_20014_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_009_20016_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_010_20018_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_010_20020_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_011_20012_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_012_20016_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_014_20010_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_014_20012_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_014_20014_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_015_20016_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_015_20018_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_015_20020_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_016_20014_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_017_20012_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_017_20014_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_017_20016_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_019_20008_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_019_20010_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_019_20012_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_021_20012_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_021_20014_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_023_20012_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_023_20014_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_024_20014_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_024_20016_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_024_20018_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_026_20008_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_026_20010_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_027_20012_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_028_20018_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_028_20020_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_029_20016_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_030_20006_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_030_20008_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_031_20006_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_032_20010_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_033_20012_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_034_20012_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_035_20012_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_035_20014_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_036_20012_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_037_20012_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_039_20016_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_040_20006_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_dev",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_001_20012_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_test",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_003_20010_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_test",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_003_20012_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_test",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_003_20014_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_test",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_005_20010_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_test",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_005_20012_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_test",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_008_20012_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_test",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_008_20014_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_test",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_008_20016_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_test",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_009_20016_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_test",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_009_20018_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_test",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    },
+    {
+      "graph": "enriched_run_010_20012_Malicious.graphml",
+      "template": "banking_defense_impair",
+      "source": "dataset_test",
+      "risk": 0.8017,
+      "gat": 0.9989,
+      "rule": 0.279
+    }
+  ]
+}
