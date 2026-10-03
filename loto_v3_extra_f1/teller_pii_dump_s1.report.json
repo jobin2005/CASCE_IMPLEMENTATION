@@ -1,0 +1,553 @@
+{
+  "fold": "teller_pii_dump",
+  "test_templates": [
+    "banking_teller_pii_dump",
+    "banking_compliance_audit"
+  ],
+  "val_templates": [
+    "banking_alter_role_esc",
+    "banking_dba_shadow_audit"
+  ],
+  "model": "loto_v3_extra_f1/teller_pii_dump_s1.pt",
+  "theta": 0.4,
+  "unseen": {
+    "n": 226,
+    "n_malicious": 81,
+    "tp": 81,
+    "fp": 49,
+    "fn": 0,
+    "tn": 96,
+    "precision": 0.6231,
+    "recall": 1.0,
+    "f1": 0.7678,
+    "accuracy": 0.7832,
+    "fpr": 0.3379,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "min_malicious_score": 0.8217,
+    "max_benign_score": 0.7102,
+    "margin": 0.1115
+  },
+  "unseen_gat_only": {
+    "n": 226,
+    "n_malicious": 81,
+    "tp": 81,
+    "fp": 64,
+    "fn": 0,
+    "tn": 81,
+    "precision": 0.5586,
+    "recall": 1.0,
+    "f1": 0.7168,
+    "accuracy": 0.7168,
+    "fpr": 0.4414,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "min_malicious_score": 1.0,
+    "max_benign_score": 0.9469,
+    "margin": 0.0531
+  },
+  "seen_test": {
+    "n": 164,
+    "n_malicious": 76,
+    "tp": 76,
+    "fp": 0,
+    "fn": 0,
+    "tn": 88,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "accuracy": 1.0,
+    "fpr": 0.0,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "min_malicious_score": 0.75,
+    "max_benign_score": 0.2962,
+    "margin": 0.4538
+  },
+  "per_template_unseen": {
+    "banking_compliance_audit": {
+      "n": 145,
+      "label": 0,
+      "false_alarms": 49,
+      "risk_min": 0.0001,
+      "risk_median": 0.2728,
+      "risk_max": 0.7102
+    },
+    "banking_teller_pii_dump": {
+      "n": 81,
+      "label": 1,
+      "detected": 81,
+      "risk_min": 0.8217,
+      "risk_median": 0.8217,
+      "risk_max": 0.8217
+    }
+  },
+  "per_template_seen_test": {
+    "banking_compliance_exfil": {
+      "n": 16,
+      "label": 1,
+      "detected": 16,
+      "risk_min": 0.8232,
+      "risk_median": 0.8232,
+      "risk_max": 0.8232
+    },
+    "banking_defense_impair": {
+      "n": 12,
+      "label": 1,
+      "detected": 12,
+      "risk_min": 0.8023,
+      "risk_median": 0.8023,
+      "risk_max": 0.8023
+    },
+    "banking_etl_exfil_mal": {
+      "n": 14,
+      "label": 1,
+      "detected": 14,
+      "risk_min": 0.8232,
+      "risk_median": 0.8232,
+      "risk_max": 0.8232
+    },
+    "banking_etl_internal": {
+      "n": 15,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.2927,
+      "risk_median": 0.2927,
+      "risk_max": 0.2927
+    },
+    "banking_etl_repl_ben": {
+      "n": 14,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.2962,
+      "risk_median": 0.2962,
+      "risk_max": 0.2962
+    },
+    "banking_manager_eod": {
+      "n": 28,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0
+    },
+    "banking_multi_apt": {
+      "n": 18,
+      "label": 1,
+      "detected": 18,
+      "risk_min": 0.75,
+      "risk_median": 0.75,
+      "risk_max": 0.8232
+    },
+    "banking_priv_abuse": {
+      "n": 16,
+      "label": 1,
+      "detected": 16,
+      "risk_min": 0.75,
+      "risk_median": 0.75,
+      "risk_max": 0.75
+    },
+    "banking_teller_routine": {
+      "n": 31,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0
+    }
+  },
+  "unseen_errors": [
+    {
+      "graph": "enriched_run_003_20002_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.6876,
+      "gat": 0.9168,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_005_20000_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.5278,
+      "gat": 0.7037,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_006_20008_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.5642,
+      "gat": 0.7523,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_006_20010_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.5263,
+      "gat": 0.7017,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_009_20002_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.5263,
+      "gat": 0.7017,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_009_20006_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.7074,
+      "gat": 0.9432,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_010_20004_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.414,
+      "gat": 0.552,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_010_20010_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.4671,
+      "gat": 0.6228,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_012_20006_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.7074,
+      "gat": 0.9432,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_015_20004_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.4391,
+      "gat": 0.5855,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_015_20008_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.4671,
+      "gat": 0.6228,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_016_20006_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.5353,
+      "gat": 0.7137,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_017_20002_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.5278,
+      "gat": 0.7037,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_018_20002_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.6606,
+      "gat": 0.8809,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_018_20004_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.4671,
+      "gat": 0.6228,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_020_20004_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.7074,
+      "gat": 0.9432,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_021_20000_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.7101,
+      "gat": 0.9469,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_021_20004_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.7074,
+      "gat": 0.9432,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_023_20002_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.4472,
+      "gat": 0.5962,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_024_20002_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.6511,
+      "gat": 0.8681,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_026_20002_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.5353,
+      "gat": 0.7137,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_028_20002_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.4671,
+      "gat": 0.6228,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_028_20006_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.5278,
+      "gat": 0.7037,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_029_20000_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.6606,
+      "gat": 0.8809,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_029_20002_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.5278,
+      "gat": 0.7037,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_030_20000_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.5471,
+      "gat": 0.7295,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_031_20000_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.414,
+      "gat": 0.552,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_032_20002_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.6318,
+      "gat": 0.8424,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_033_20004_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.6511,
+      "gat": 0.8681,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_033_20008_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.7102,
+      "gat": 0.9469,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_034_20002_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.4372,
+      "gat": 0.5829,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_036_20002_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.4512,
+      "gat": 0.6016,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_036_20004_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.7074,
+      "gat": 0.9432,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_037_20002_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.7074,
+      "gat": 0.9432,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_037_20004_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.5278,
+      "gat": 0.7037,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_037_20008_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.4671,
+      "gat": 0.6228,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_039_20002_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.6125,
+      "gat": 0.8166,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_039_20008_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_dev",
+      "risk": 0.4655,
+      "gat": 0.6207,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_001_20002_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_test",
+      "risk": 0.4671,
+      "gat": 0.6228,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_001_20008_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_test",
+      "risk": 0.4671,
+      "gat": 0.6228,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_002_20004_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_test",
+      "risk": 0.5857,
+      "gat": 0.7809,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_003_20000_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_test",
+      "risk": 0.7074,
+      "gat": 0.9432,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_006_20000_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_test",
+      "risk": 0.6511,
+      "gat": 0.8681,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_006_20006_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_test",
+      "risk": 0.6876,
+      "gat": 0.9168,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_006_20008_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_test",
+      "risk": 0.4391,
+      "gat": 0.5855,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_009_20004_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_test",
+      "risk": 0.5278,
+      "gat": 0.7037,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_009_20006_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_test",
+      "risk": 0.7102,
+      "gat": 0.9469,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_009_20010_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_test",
+      "risk": 0.6125,
+      "gat": 0.8167,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_010_20000_Benign.graphml",
+      "template": "banking_compliance_audit",
+      "source": "dataset_test",
+      "risk": 0.6606,
+      "gat": 0.8809,
+      "rule": 0.0
+    }
+  ]
+}

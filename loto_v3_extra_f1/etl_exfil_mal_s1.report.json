@@ -1,0 +1,657 @@
+{
+  "fold": "etl_exfil_mal",
+  "test_templates": [
+    "banking_etl_exfil_mal",
+    "banking_etl_repl_ben"
+  ],
+  "val_templates": [
+    "banking_multi_apt",
+    "banking_manager_eod"
+  ],
+  "model": "loto_v3_extra_f1/etl_exfil_mal_s1.pt",
+  "theta": 0.15,
+  "unseen": {
+    "n": 124,
+    "n_malicious": 62,
+    "tp": 62,
+    "fp": 62,
+    "fn": 0,
+    "tn": 0,
+    "precision": 0.5,
+    "recall": 1.0,
+    "f1": 0.6667,
+    "accuracy": 0.5,
+    "fpr": 1.0,
+    "roc_auc": 0.0,
+    "pr_auc": 0.5,
+    "min_malicious_score": 0.2927,
+    "max_benign_score": 0.2962,
+    "margin": -0.0035
+  },
+  "unseen_gat_only": {
+    "n": 124,
+    "n_malicious": 62,
+    "tp": 0,
+    "fp": 0,
+    "fn": 62,
+    "tn": 62,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "accuracy": 0.5,
+    "fpr": 0.0,
+    "roc_auc": 0.5,
+    "pr_auc": 0.5,
+    "min_malicious_score": 0.0,
+    "max_benign_score": 0.0,
+    "margin": 0.0
+  },
+  "seen_test": {
+    "n": 152,
+    "n_malicious": 61,
+    "tp": 61,
+    "fp": 15,
+    "fn": 0,
+    "tn": 76,
+    "precision": 0.8026,
+    "recall": 1.0,
+    "f1": 0.8905,
+    "accuracy": 0.9013,
+    "fpr": 0.1648,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "min_malicious_score": 0.75,
+    "max_benign_score": 0.2927,
+    "margin": 0.4573
+  },
+  "per_template_unseen": {
+    "banking_etl_exfil_mal": {
+      "n": 62,
+      "label": 1,
+      "detected": 62,
+      "risk_min": 0.2927,
+      "risk_median": 0.2927,
+      "risk_max": 0.2927
+    },
+    "banking_etl_repl_ben": {
+      "n": 62,
+      "label": 0,
+      "false_alarms": 62,
+      "risk_min": 0.2962,
+      "risk_median": 0.2962,
+      "risk_max": 0.2962
+    }
+  },
+  "per_template_seen_test": {
+    "banking_alter_role_esc": {
+      "n": 3,
+      "label": 1,
+      "detected": 3,
+      "risk_min": 0.8217,
+      "risk_median": 0.8217,
+      "risk_max": 0.8217
+    },
+    "banking_compliance_audit": {
+      "n": 32,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0
+    },
+    "banking_compliance_exfil": {
+      "n": 16,
+      "label": 1,
+      "detected": 16,
+      "risk_min": 0.8232,
+      "risk_median": 0.8232,
+      "risk_max": 0.8232
+    },
+    "banking_dba_shadow_audit": {
+      "n": 13,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0078,
+      "risk_median": 0.0078,
+      "risk_max": 0.0078
+    },
+    "banking_defense_impair": {
+      "n": 12,
+      "label": 1,
+      "detected": 12,
+      "risk_min": 0.8023,
+      "risk_median": 0.8023,
+      "risk_max": 0.8023
+    },
+    "banking_etl_internal": {
+      "n": 15,
+      "label": 0,
+      "false_alarms": 15,
+      "risk_min": 0.2927,
+      "risk_median": 0.2927,
+      "risk_max": 0.2927
+    },
+    "banking_priv_abuse": {
+      "n": 16,
+      "label": 1,
+      "detected": 16,
+      "risk_min": 0.75,
+      "risk_median": 0.75,
+      "risk_max": 0.75
+    },
+    "banking_teller_pii_dump": {
+      "n": 14,
+      "label": 1,
+      "detected": 14,
+      "risk_min": 0.8217,
+      "risk_median": 0.8217,
+      "risk_max": 0.8217
+    },
+    "banking_teller_routine": {
+      "n": 31,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0138
+    }
+  },
+  "unseen_errors": [
+    {
+      "graph": "enriched_run_001_20020_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_001_20022_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_001_20024_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_001_20026_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_002_20026_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_002_20028_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_005_20018_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_007_20022_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_010_20028_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_010_20030_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_012_20022_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_013_20022_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_013_20024_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_014_20022_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_017_20022_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_018_20012_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_019_20018_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_020_20020_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_020_20022_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_022_20014_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_022_20016_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_022_20018_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_022_20020_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_023_20024_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_023_20026_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_025_20024_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_025_20026_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_025_20028_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_026_20018_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_026_20020_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_027_20020_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_027_20022_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_029_20026_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_029_20028_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_030_20012_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_031_20022_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_031_20024_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_031_20026_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_032_20022_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_032_20024_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_032_20026_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_033_20018_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_035_20018_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_036_20022_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_036_20024_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_036_20026_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_039_20022_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_040_20020_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_dev",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_001_20018_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_test",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_002_20026_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_test",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_003_20018_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_test",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_004_20024_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_test",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_004_20026_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_test",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_005_20020_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_test",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_005_20022_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_test",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_006_20022_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_test",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_006_20024_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_test",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_007_20016_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_test",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_008_20026_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_test",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_008_20028_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_test",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_008_20030_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_test",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    },
+    {
+      "graph": "enriched_run_009_20022_Benign.graphml",
+      "template": "banking_etl_repl_ben",
+      "source": "dataset_test",
+      "risk": 0.2962,
+      "gat": 0.0,
+      "rule": 0.3949
+    }
+  ]
+}

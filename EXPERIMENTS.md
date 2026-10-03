@@ -299,3 +299,26 @@ Training sets grow by 960 graphs (~+33%), so runs take about a third longer.
 | C | v3 + `dataset_benign_extra`, θ mode fpr | fixes 1–4 |
 
 Each stage's results are in `loto_<config>/loto_summary.txt`.
+
+### Results: A0/A/B/C plus re-scoring with the original θ rule (seed 1, Oct 3)
+`loto/rescore_f1.sh <src> <dst>` re-tunes θ with `--theta-mode f1` on already-trained models (no retraining). This separates the v3 features from the benign-FPR θ rule.
+
+| Config | Features | Extra benign | θ rule | Recall | FPR | F1 | ROC-AUC | Pooled TN/FP/FN/TP |
+|---|---|---|---|---|---|---|---|---|
+| v2 (3 seeds, mean) | v2 | – | f1 | 0.818 | 0.403 | 0.673 | 0.614 | (seed 1: 475/288/182/326) |
+| A0 | v2 | – | fpr | 0.571 | 0.300 | 0.445 | 0.524 | 542/221/246/262 |
+| A | v2 | yes | f1 | 0.847 | 0.502 | 0.696 | 0.729 | 407/356/97/411 |
+| B | v3 | – | fpr | 0.619 | **0.143** | 0.595 | 0.667 | 701/62/214/294 |
+| **B′ (`loto_v3_f1`)** | **v3** | – | **f1** | **0.905** | 0.286 | **0.832** | 0.667 | 625/138/64/444 |
+| C | v3 | yes | fpr | 0.619 | 0.242 | 0.540 | 0.667 | 600/163/214/294 |
+| C′ (`loto_v3_extra_f1`) | v3 | yes | f1 | 0.619 | 0.334 | 0.562 | 0.667 | 576/187/214/294 |
+
+**Reading (one seed, so provisional):**
+- **v3 features with the original θ rule (B′) are the best configuration.** Macro F1 is 0.832, against v2's 0.673 ± 0.128 over 3 seeds.
+  - 4 of 7 unseen attack templates are perfect, with recall 1 and FPR 0: alter_role_esc, compliance_exfil, priv_abuse and teller_pii_dump.
+  - multi_apt is 0.33 recall with 0 FPR.
+- **Two folds still fail: etl_exfil_mal and defense_impair.** In both, the unseen benign template is ETL replication (`etl_repl_ben` / `etl_internal`). It is flagged 100%, and the ranking is inverted or degenerate (AUC 0).
+  - The ETL pair differs mainly in destination and query breadth. With the ETL templates absent from training, no configuration separates them.
+- **The benign-FPR θ rule (fix 3) hurts in every configuration.** It often picks θ ≥ 0.75, above the 0.75 risk cap that applies when no rule fires, so attacks the model ranks correctly are missed. Recommendation: drop it and keep the original f1 rule.
+- **Extra benign corpus (fix 4):** it helps v2 (F1 0.54 → 0.70 on seed 1, AUC 0.52 → 0.73), but it does **not** help v3 (0.832 → 0.562). Its six templates may resemble the unseen ETL/compliance traffic in ways that shift the scale. This needs more seeds before drawing a conclusion.
+- **Caveat on selection.** B′ was chosen *after* seeing these test folds: the v3 design was fixed beforehand, but the choice of θ rule was not. Its numbers must be confirmed on seeds 2–3 and on data not used for this choice, ideally the live 4D run, before being reported as the final result.
