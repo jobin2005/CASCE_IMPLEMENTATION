@@ -317,3 +317,18 @@ Each stage's results are in `loto_<config>/loto_summary.txt`.
 - **The benign-FPR θ rule (fix 3) hurts in every configuration.** It often picks θ ≥ 0.75, above the 0.75 risk cap that applies when no rule fires, so attacks the model ranks correctly are missed. Recommendation: drop it and keep the original f1 rule.
 - **Extra benign corpus (fix 4):** it helps v2 (F1 0.54 → 0.70 on seed 1, AUC 0.52 → 0.73), but it does **not** help v3 (0.832 → 0.562). Its six templates may resemble the unseen ETL/compliance traffic in ways that shift the scale. This needs more seeds before drawing a conclusion.
 - **Caveat on selection.** B′ was chosen *after* seeing these test folds: the v3 design was fixed beforehand, but the choice of θ rule was not. Its numbers must be confirmed on seeds 2–3 and on data not used for this choice, ideally the live 4D run, before being reported as the final result.
+
+## 4D: plan (decided Oct 3; not run yet)
+- **Database: `casce_banking`**, the same schema as all training data and the earlier live runs (4a–5b), so only the attack techniques are unseen. It was set up in this machine's container on Oct 3 with `setup_banking_db.sh`: 10,000 customers, 100,000 accounts, 300,000 transactions, the 5 banking roles incl. `dba`, and the CASCE hook enabled. `run_live_scenarios.py --check-sql --class all` passes, apart from 2 attack statements the database correctly denies.
+- **Attacks.** The legacy `workload_simulation/attack_workload/*.sh` scripts (added Sep 7, from the project's early phase) target the old pgbench database `casce_tpcb` as superuser. They must be **adapted to the banking tables and roles** before use. That adaptation is done by the team (see below).
+  - Each group is flagged *new technique* or *similar to training*. Backdoor `CREATE ROLE` and `curl` exfiltration count as similar to training.
+  - OS-only scripts are excluded and their exclusion reported.
+- **Benign workload:** backup, maintenance, a temporary reporting role, everyday teller/manager traffic, plus pgbench background load.
+- **Labels:** every `psql` call is one session with `PGAPPNAME=casce_label=<Benign|Malicious>:<group>_<name>_r<repeat>`.
+  - The runner also writes a manifest (`key, class, group, new_technique, source, role, repeat`, one JSON line per session).
+  - Destructive attacks run last, after pgbench stops. The database is reset between repeats.
+- **3 repeats.** Models: v2 and a single v3 model, each at its validation-tuned θ, with nothing tuned on 4D.
+- **Reporting:** per attack group (main table), overall, and per script (appendix), as mean ± spread over repeats. Results go into the 4D column of `results_per_attack.md`.
+
+## Results per attack type
+`python3 per_attack_table.py` → `results_per_attack.md`. It gives one row per scenario template: detection rate for attacks and false-alarm rate for benign workloads. Columns: seen offline (E1, v2, 3 seeds); seen live (5b, v2, with alert latency); unseen offline (template-disjoint, v2 with 3 seeds and v3 with 1 seed); and 4D (pending). It is built from existing result files only.
