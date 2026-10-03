@@ -1,0 +1,44 @@
+[algo4] using θ_A = 0.55 tuned for casce_gat_v3.pt
+== Coverage
+  daemon scored 133 sessions: 133 labelled, 0 unlabelled
+  runner planned 133 scenario sessions: 133 scored, 0 never scored, 29 had SQL errors
+    SQL error in s0006_0 banking_etl_internal_0005: ERROR:  program "curl -sX POST https://replica.internal.example/sync -d @-" failed
+    SQL error in s0007_0 banking_etl_repl_ben_0001: ERROR:  program "curl -sX POST https://warehouse.internal.example/replicate -d @-" failed
+    SQL error in s0022_0 banking_etl_internal_0003: ERROR:  program "curl -sX POST https://replica.internal.example/sync -d @-" failed
+    SQL error in s0024_0 banking_etl_internal_0015: ERROR:  program "curl -sX POST https://replica.internal.example/sync -d @-" failed
+    SQL error in s0025_0 banking_etl_internal_0019: ERROR:  program "curl -sX POST https://replica.internal.example/sync -d @-" failed
+
+== Final verdict per session (score once the session has ended), theta_A = 0.55
+  ALL        n= 133  FP=  0  TN= 133  FPR=0.000
+  scenario   n= 133  FP=  0  TN= 133  FPR=0.000
+
+== Per scenario family (theta_A = 0.55)
+  Benign    banking_compliance_audit         n=  32  FP=  0  TN=  32  FPR=0.000  risk median=0.000 max=0.000
+  Benign    banking_dba_shadow_audit         n=  13  FP=  0  TN=  13  FPR=0.000  risk median=0.000 max=0.000
+  Benign    banking_etl_internal             n=  15  FP=  0  TN=  15  FPR=0.000  risk median=0.293 max=0.293
+  Benign    banking_etl_repl_ben             n=  14  FP=  0  TN=  14  FPR=0.000  risk median=0.296 max=0.296
+  Benign    banking_manager_eod              n=  28  FP=  0  TN=  28  FPR=0.000  risk median=0.000 max=0.000
+  Benign    banking_teller_routine           n=  31  FP=  0  TN=  31  FPR=0.000  risk median=0.000 max=0.000
+
+== Threshold sweep (all labelled sessions)
+  theta=0.2  n= 133  FP= 29  TN= 104  FPR=0.218
+  theta=0.3  n= 133  FP=  0  TN= 133  FPR=0.000
+  theta=0.4  n= 133  FP=  0  TN= 133  FPR=0.000
+  theta=0.5  n= 133  FP=  0  TN= 133  FPR=0.000
+  theta=0.6  n= 133  FP=  0  TN= 133  FPR=0.000
+  theta=0.7  n= 133  FP=  0  TN= 133  FPR=0.000
+  theta=0.8  n= 133  FP=  0  TN= 133  FPR=0.000
+  theta=0.9  n= 133  FP=  0  TN= 133  FPR=0.000
+[algo4] Loaded trained GAT weights from casce_gat_v3.pt (feature version 3)
+
+== Same sessions: synthetic corpus vs live (same model, same theta)
+  133 sessions matched to their synthetic twin
+  same verdict: 133/133   live-synthetic risk: mean +0.000, mean |diff| 0.000
+  synthetic: n= 133  FP=  0  TN= 133  FPR=0.000
+  live     : n= 133  FP=  0  TN= 133  FPR=0.000
+    banking_compliance_audit         n= 32  synthetic median=0.000  live median=0.000
+    banking_dba_shadow_audit         n= 13  synthetic median=0.000  live median=0.000
+    banking_etl_internal             n= 15  synthetic median=0.293  live median=0.293
+    banking_etl_repl_ben             n= 14  synthetic median=0.296  live median=0.296
+    banking_manager_eod              n= 28  synthetic median=0.000  live median=0.000
+    banking_teller_routine           n= 31  synthetic median=0.000  live median=0.000
