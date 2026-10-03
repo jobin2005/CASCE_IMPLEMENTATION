@@ -1,0 +1,785 @@
+{
+  "fold": "compliance_exfil",
+  "test_templates": [
+    "banking_compliance_exfil",
+    "banking_dba_shadow_audit"
+  ],
+  "val_templates": [
+    "banking_defense_impair",
+    "banking_etl_internal"
+  ],
+  "model": "loto_v3/compliance_exfil_s1.pt",
+  "theta": 0.85,
+  "unseen": {
+    "n": 118,
+    "n_malicious": 78,
+    "tp": 0,
+    "fp": 0,
+    "fn": 78,
+    "tn": 40,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "accuracy": 0.339,
+    "fpr": 0.0,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "min_malicious_score": 0.7928,
+    "max_benign_score": 0.002,
+    "margin": 0.7908
+  },
+  "unseen_gat_only": {
+    "n": 118,
+    "n_malicious": 78,
+    "tp": 78,
+    "fp": 0,
+    "fn": 0,
+    "tn": 40,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "accuracy": 1.0,
+    "fpr": 0.0,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "min_malicious_score": 0.9426,
+    "max_benign_score": 0.0026,
+    "margin": 0.94
+  },
+  "seen_test": {
+    "n": 170,
+    "n_malicious": 65,
+    "tp": 0,
+    "fp": 0,
+    "fn": 65,
+    "tn": 105,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "accuracy": 0.6176,
+    "fpr": 0.0,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "min_malicious_score": 0.75,
+    "max_benign_score": 0.3388,
+    "margin": 0.4112
+  },
+  "per_template_unseen": {
+    "banking_compliance_exfil": {
+      "n": 78,
+      "label": 1,
+      "detected": 0,
+      "risk_min": 0.7928,
+      "risk_median": 0.8183,
+      "risk_max": 0.8183
+    },
+    "banking_dba_shadow_audit": {
+      "n": 40,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.002,
+      "risk_median": 0.002,
+      "risk_max": 0.002
+    }
+  },
+  "per_template_seen_test": {
+    "banking_alter_role_esc": {
+      "n": 3,
+      "label": 1,
+      "detected": 0,
+      "risk_min": 0.8217,
+      "risk_median": 0.8217,
+      "risk_max": 0.8217
+    },
+    "banking_compliance_audit": {
+      "n": 32,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0
+    },
+    "banking_etl_exfil_mal": {
+      "n": 14,
+      "label": 1,
+      "detected": 0,
+      "risk_min": 0.8141,
+      "risk_median": 0.8212,
+      "risk_max": 0.8212
+    },
+    "banking_etl_repl_ben": {
+      "n": 14,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.3028,
+      "risk_median": 0.3028,
+      "risk_max": 0.3388
+    },
+    "banking_manager_eod": {
+      "n": 28,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0001
+    },
+    "banking_multi_apt": {
+      "n": 18,
+      "label": 1,
+      "detected": 0,
+      "risk_min": 0.75,
+      "risk_median": 0.75,
+      "risk_max": 0.8199
+    },
+    "banking_priv_abuse": {
+      "n": 16,
+      "label": 1,
+      "detected": 0,
+      "risk_min": 0.75,
+      "risk_median": 0.75,
+      "risk_max": 0.75
+    },
+    "banking_teller_pii_dump": {
+      "n": 14,
+      "label": 1,
+      "detected": 0,
+      "risk_min": 0.8211,
+      "risk_median": 0.8215,
+      "risk_max": 0.8215
+    },
+    "banking_teller_routine": {
+      "n": 31,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0109
+    }
+  },
+  "unseen_errors": [
+    {
+      "graph": "enriched_run_001_20004_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_002_20004_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_003_20006_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_004_20010_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_005_20008_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_005_20010_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_006_20012_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_006_20014_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_007_20004_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_007_20006_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_008_20004_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_009_20008_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_010_20014_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_012_20010_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_012_20012_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_013_20010_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_015_20010_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_015_20012_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_015_20014_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_016_20010_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.7928,
+      "gat": 0.9426,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_016_20012_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_017_20004_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_018_20006_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.7928,
+      "gat": 0.9426,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_019_20002_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_020_20008_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_020_20010_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.7928,
+      "gat": 0.9426,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_020_20012_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_021_20006_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_021_20008_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.7928,
+      "gat": 0.9426,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_021_20010_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_022_20002_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.7928,
+      "gat": 0.9426,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_023_20008_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_024_20006_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_024_20008_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.7928,
+      "gat": 0.9426,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_024_20010_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.7928,
+      "gat": 0.9427,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_025_20006_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_025_20008_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_025_20010_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_026_20004_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_027_20008_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_027_20010_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_028_20016_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.7928,
+      "gat": 0.9426,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_029_20008_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_029_20010_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_029_20012_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_031_20004_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.7928,
+      "gat": 0.9426,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_032_20008_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.7928,
+      "gat": 0.9426,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_033_20010_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_034_20004_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.7928,
+      "gat": 0.9426,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_034_20006_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_035_20008_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_035_20010_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_036_20006_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_036_20008_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_036_20010_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_037_20010_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.7928,
+      "gat": 0.9426,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_038_20006_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.7928,
+      "gat": 0.9426,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_038_20008_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_039_20010_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_039_20012_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_039_20014_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_040_20004_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_dev",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_002_20008_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_test",
+      "risk": 0.7928,
+      "gat": 0.9426,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_003_20002_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_test",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_003_20004_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_test",
+      "risk": 0.7928,
+      "gat": 0.9426,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_004_20012_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_test",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_004_20014_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_test",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_005_20004_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_test",
+      "risk": 0.7928,
+      "gat": 0.9427,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_005_20006_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_test",
+      "risk": 0.7928,
+      "gat": 0.9426,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_005_20008_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_test",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_006_20010_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_test",
+      "risk": 0.7928,
+      "gat": 0.9426,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_007_20002_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_test",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_008_20004_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_test",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_008_20006_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_test",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_008_20008_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_test",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_008_20010_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_test",
+      "risk": 0.7928,
+      "gat": 0.9426,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_009_20012_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_test",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    },
+    {
+      "graph": "enriched_run_010_20006_Malicious.graphml",
+      "template": "banking_compliance_exfil",
+      "source": "dataset_test",
+      "risk": 0.8183,
+      "gat": 0.9907,
+      "rule": 0.3903
+    }
+  ]
+}
