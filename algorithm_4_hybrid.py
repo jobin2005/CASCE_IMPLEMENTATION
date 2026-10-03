@@ -201,7 +201,7 @@ FEATURE_HASH_DIM = 16
 #      (ports in the synthetic corpus were not the ports actually used);
 #      Table/Role: their name (v1 hashed the first query that touched them).
 #   3: behaviour, not identifiers -- Query: SQL with literals/numbers/role names
-#      masked; Process: program name; Endpoint: internal/external/loopback;
+#      masked; Process: program name; Endpoint: approved/internal/external/loopback;
 #      File: top directory + hidden-dir flag + extension; Role: constant.
 #      Also adds the Query->Process and Query->Role edges and fixes recency to
 #      one clock (timestamp_unix). See EXPERIMENTS.md, "v3".
@@ -409,7 +409,20 @@ def _mask_sql(q):
     return re.sub(r"\b(create|alter|drop)\s+(role|user)\s+(if\s+exists\s+)?\w+", r"\1 \2 r", q)
 
 
+# The bank's documented integration endpoints (data warehouse, DB replica,
+# internal API) -- configuration a deployment knows, like a firewall allow-list.
+# Defaults are the banking domain's approved destinations (datagen
+# INTERNAL_IPS); override with CASCE_APPROVED_DESTINATIONS="ip,ip,...".
+# Not a label: the generator sends ~30% of each class to the other pool.
+APPROVED_DESTINATIONS = set(
+    filter(None, os.environ.get("CASCE_APPROVED_DESTINATIONS",
+                                "198.51.100.20,10.0.1.50,10.0.1.100").split(",")))
+
+
 def _endpoint_class(ip):
+    """approved (allow-listed) / internal (private, not allow-listed) / loopback / external."""
+    if str(ip) in APPROVED_DESTINATIONS:
+        return "approved"
     try:
         addr = ipaddress.ip_address(str(ip))
     except ValueError:

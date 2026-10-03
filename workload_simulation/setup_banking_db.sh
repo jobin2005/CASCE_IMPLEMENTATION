@@ -100,7 +100,7 @@ CREATE INDEX ON transactions (transaction_time);
 ANALYZE;
 SQL
 
-echo "[4/5] roles (the four roles of the banking domain)"
+echo "[4/5] roles (the banking domain's roles, incl. dba for the benign_extra templates)"
 $PSQL -d $DB <<'SQL'
 DO $$
 DECLARE r text;
@@ -121,10 +121,24 @@ GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO teller, batch_etl_service;
 GRANT pg_execute_server_program TO teller, branch_manager, compliance_officer, batch_etl_service;
 -- the compliance password-policy audit reads pg_authid
 GRANT SELECT ON pg_catalog.pg_authid TO compliance_officer;
+
+-- dba (benign_extra templates): provisions ordinary logins, runs audit-log retention
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'dba') THEN
+        CREATE ROLE dba LOGIN CREATEROLE;
+    END IF;
+END $$;
+GRANT CONNECT ON DATABASE casce_banking TO dba;
+GRANT USAGE ON SCHEMA public TO dba;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO dba;
+GRANT DELETE ON audit_logs TO dba;
+GRANT pg_execute_server_program, pg_read_all_stats TO dba;
 SQL
 
 echo "[5/5] folders the scenarios write into"
-for d in /var/lib/postgresql/reports /var/lib/postgresql/audit /var/lib/postgresql/.cache /tmp/.cache; do
+for d in /var/lib/postgresql/reports /var/lib/postgresql/audit /var/lib/postgresql/.cache /tmp/.cache \
+         /var/lib/postgresql/kyc /var/backups/postgresql /var/backups/audit; do
     mkdir -p "$d" && chown postgres:postgres "$d"
 done
 

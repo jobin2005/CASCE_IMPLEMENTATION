@@ -237,12 +237,14 @@ Pooled confusion matrices (unseen test, all folds):
    |---|---|
    | Query | SQL with quoted literals → `s`, numbers → `n`, and the role name in CREATE/ALTER/DROP ROLE → `r`; statement type, clauses and table/column names are kept |
    | Process | program name only (`curl`, `cat`, …), not the full command line |
-   | Endpoint | `internal` / `external` / `loopback` instead of the IP |
+   | Endpoint | `approved` (the bank's allow-listed integration endpoints) / `internal` (other private address) / `external` / `loopback`, instead of the IP |
    | File | top-level directory + hidden-directory flag + extension, instead of the full path |
    | Role | constant `role`, without its name |
 
    Session, Table and Behavior are as in v2.
 3. **Threshold from benign traffic.** `--mode tune --theta-mode fpr --target-fpr 0.01` picks the lowest θ whose false-positive rate on the *benign* validation sessions is ≤ 1%. It needs no attack examples, so it does not depend on which unseen attack validation holds. The default `--theta-mode f1` is unchanged, and the chosen mode is recorded in the model sidecar.
+
+**Approved destinations (changed Oct 3, before any v3 run).** The first draft split endpoints only by private vs public address. That put the bank's documented warehouse `198.51.100.20` in the same "external" class as the attacker's look-alike `198.51.100.77`. v3 now takes an explicit allow-list, as a bank configures for its firewall: `APPROVED_DESTINATIONS`, which defaults to the domain's approved endpoints `198.51.100.20`, `10.0.1.50` and `10.0.1.100` (datagen `INTERNAL_IPS`) and can be overridden with `CASCE_APPROVED_DESTINATIONS`. This is not a label: the generator deliberately sends about 30% of each class to the other pool.
 
 **Planned evaluation** uses the same 7 template-disjoint folds:
 ```
@@ -284,4 +286,16 @@ EXTRA=1 OUT=loto_v2_extra SEEDS="1 2 3" setsid nohup bash loto/run_all.sh > loto
 ```
 Training sets grow by 960 graphs (~+33%), so runs take about a third longer.
 
-**Live 4D.** `workload_simulation/setup_banking_db.sh` does not create the `dba` role yet. That is only needed to replay these templates live.
+**Live 4D.** `workload_simulation/setup_banking_db.sh` now creates the `dba` role (CREATEROLE, DELETE on audit_logs, pg_execute_server_program) and the folders the new templates write into.
+
+## Comparison runs A0/A/B/C (started Oct 3)
+`loto/run_abc.sh` runs one seed per configuration on the same 7 folds, then commits and pushes each stage's results:
+
+| Stage | Config | Isolates |
+|---|---|---|
+| A0 | v2 models from `loto/`, θ re-tuned with `--theta-mode fpr` (no retraining) | fix 3 |
+| A | v2 + `dataset_benign_extra` in training, θ mode f1 | fix 4 |
+| B | v3, θ mode fpr | fixes 1–3 |
+| C | v3 + `dataset_benign_extra`, θ mode fpr | fixes 1–4 |
+
+Each stage's results are in `loto_<config>/loto_summary.txt`.
