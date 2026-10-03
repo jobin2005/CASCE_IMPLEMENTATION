@@ -699,6 +699,26 @@ def _meta_path(model_path):
     return os.path.splitext(model_path)[0] + ".json"
 
 
+def tuned_theta(model_path):
+    """θ_A that --mode tune recorded next to this model (tuned on validation), or None."""
+    if model_path and os.path.exists(_meta_path(model_path)):
+        with open(_meta_path(model_path)) as f:
+            return json.load(f).get("theta_a")
+    return None
+
+
+def resolve_theta(theta_a, model_path):
+    """Explicit --theta-a wins; otherwise the model's tuned θ_A. Never a silent default."""
+    if theta_a is not None:
+        return theta_a
+    theta = tuned_theta(model_path)
+    if theta is None:
+        raise SystemExit(f"no tuned θ_A recorded for {model_path} -- run --mode tune on validation "
+                         f"data or pass the threshold explicitly")
+    print(f"[algo4] using θ_A = {theta} tuned for {model_path}")
+    return theta
+
+
 def load_model(model_path):
     global FEATURE_VERSION
     if not TORCH_AVAILABLE:
@@ -906,8 +926,16 @@ def evaluate_model(args):
         'recall': round(recall, 4),
         'f1_score': round(f1, 4),
         'accuracy': round(accuracy, 4),
+        'fpr': round(fp / max(1, fp + tn), 4),
+        'fnr': round(fn / max(1, fn + tp), 4),
         'confusion_matrix': [[tn, fp], [fn, tp]],
     }
+    # Threshold-free metrics on the fused risk and on the GAT probability alone
+    if 0 < sum(y_true) < len(y_true):
+        from sklearn.metrics import roc_auc_score, average_precision_score
+        results['roc_auc'] = round(roc_auc_score(y_true, y_scores), 4)
+        results['pr_auc'] = round(average_precision_score(y_true, y_scores), 4)
+        results['roc_auc_gat_only'] = round(roc_auc_score(y_true, y_gat), 4)
 
     print(f"\n{'='*60}")
     print(f"  EVALUATION RESULTS (θ_A = {args.theta_a})")
@@ -917,6 +945,10 @@ def evaluate_model(args):
     print(f"  Precision: {precision:.4f}")
     print(f"  Recall:    {recall:.4f}")
     print(f"  F1-Score:  {f1:.4f}")
+    print(f"  FPR / FNR: {results['fpr']:.4f} / {results['fnr']:.4f}")
+    if 'roc_auc' in results:
+        print(f"  ROC-AUC:   {results['roc_auc']:.4f}   PR-AUC: {results['pr_auc']:.4f}   "
+              f"(GAT alone ROC-AUC {results['roc_auc_gat_only']:.4f})")
     print(f"\n  Confusion Matrix:")
     print(f"              Pred Normal  Pred Malicious")
     print(f"  True Normal     {tn:5d}       {fp:5d}")
@@ -996,7 +1028,19 @@ def tune_thresholds(args):
         print(f"\n  Best F1 reached at {len(tied)} thresholds, θ_A = {tied[0]:.2f} … {tied[-1]:.2f}; "
               f"using the middle one")
     print(f"\n  ★ Best F1 = {best_f1:.4f} at θ_A = {best_theta:.2f}")
-    print(f"    Recommended: update THETA_A = {best_theta}")
+
+    # Record θ_A with the model so detection/evaluation tools use the threshold
+    # tuned for THIS model instead of a hard-coded default.
+    meta_path = _meta_path(args.model_path)
+    meta = {}
+    if os.path.exists(meta_path):
+        with open(meta_path) as f:
+            meta = json.load(f)
+    meta.update({"theta_a": best_theta, "theta_tuned_on": args.labels,
+                 "theta_tied_range": [tied[0], tied[-1]]})
+    with open(meta_path, "w") as f:
+        json.dump(meta, f, indent=2)
+    print(f"    Recorded θ_A = {best_theta} in {meta_path}")
 
     out_path = os.path.join(args.outdir, "threshold_sweep.json")
     os.makedirs(args.outdir, exist_ok=True)
@@ -1016,7 +1060,8 @@ def parse_args():
     p.add_argument("--model-path", default="./casce_gat.pt")
     p.add_argument("--labels", default=None,
                    help="Comma-separated label JSON files (evaluate/tune)")
-    p.add_argument("--theta-a", type=float, default=THETA_A)
+    p.add_argument("--theta-a", type=float, default=None,
+                   help="alert threshold; default: the θ_A --mode tune recorded for --model-path")
     p.add_argument("--theta-r", type=float, default=THETA_R)
 
     # Train-specific
@@ -1041,7 +1086,8 @@ def main():
     if args.mode == "detect":
         if not args.input_dir:
             raise SystemExit("--input-dir is required for --mode detect")
-        run_detection(args.input_dir, args.outdir, args.model_path, args.theta_a, args.theta_r)
+        theta = args.theta_a if args.theta_a is not None else (tuned_theta(args.model_path) or THETA_A)
+        run_detection(args.input_dir, args.outdir, args.model_path, theta, args.theta_r)
     elif args.mode == "train":
         if not args.train_dir or not args.train_labels:
             raise SystemExit("--train-dir and --train-labels are required for --mode train")
@@ -1049,6 +1095,7 @@ def main():
     elif args.mode == "evaluate":
         if not args.input_dir or not args.labels:
             raise SystemExit("--input-dir and --labels are required for --mode evaluate")
+        args.theta_a = resolve_theta(args.theta_a, args.model_path)
         evaluate_model(args)
     elif args.mode == "tune":
         if not args.input_dir or not args.labels:

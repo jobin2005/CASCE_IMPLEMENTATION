@@ -63,6 +63,12 @@ import json
 import random
 from pathlib import Path
 from collections import defaultdict
+import re
+
+
+def _template(family_id):
+    """Scenario template of a family (instance) id: banking_priv_abuse_0003 -> banking_priv_abuse."""
+    return re.sub(r"_\d+$", "", family_id)
 
 
 # ============================================================
@@ -613,8 +619,27 @@ def prepare_splits(
                     val_families &
                     test_family_ids
                 )
+        },
+
+        # family ids are scenario INSTANCES (<template>_<NNNN>), numbered per
+        # generator run, so equal ids across dev and test (different seeds) do
+        # not mean shared data, and distinct ids do not mean unseen behaviour.
+        # This is the overlap that matters for generalization: the same
+        # scenario TEMPLATE in several splits. This split does not prevent it;
+        # use make_template_folds.py for a template-disjoint evaluation.
+        "template_overlap_after_split": {
+            name: sorted({_template(f) for f in a} & {_template(f) for f in b})
+            for name, (a, b) in {
+                "train_val": (train_families, val_families),
+                "train_test": (train_families, test_family_ids),
+                "val_test": (val_families, test_family_ids),
+            }.items()
         }
     }
+    if metadata["template_overlap_after_split"]["train_test"]:
+        print(f"WARNING: {len(metadata['template_overlap_after_split']['train_test'])} scenario "
+              f"templates occur in both train and test -- this split measures in-distribution "
+              f"performance (new instances of seen templates), not unseen-attack generalization.")
 
     (dev_split_dir / "split_metadata.json").write_text(
         json.dumps(

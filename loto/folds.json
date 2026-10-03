@@ -1,0 +1,357 @@
+{
+  "malicious_templates": [
+    "banking_alter_role_esc",
+    "banking_compliance_exfil",
+    "banking_defense_impair",
+    "banking_etl_exfil_mal",
+    "banking_multi_apt",
+    "banking_priv_abuse",
+    "banking_teller_pii_dump"
+  ],
+  "benign_templates": [
+    "banking_compliance_audit",
+    "banking_dba_shadow_audit",
+    "banking_etl_internal",
+    "banking_etl_repl_ben",
+    "banking_manager_eod",
+    "banking_teller_routine"
+  ],
+  "folds": [
+    {
+      "fold": "alter_role_esc",
+      "test": [
+        "banking_alter_role_esc",
+        "banking_compliance_audit"
+      ],
+      "val": [
+        "banking_compliance_exfil",
+        "banking_dba_shadow_audit"
+      ],
+      "train": [
+        "banking_defense_impair",
+        "banking_etl_exfil_mal",
+        "banking_etl_internal",
+        "banking_etl_repl_ben",
+        "banking_manager_eod",
+        "banking_multi_apt",
+        "banking_priv_abuse",
+        "banking_teller_pii_dump",
+        "banking_teller_routine"
+      ],
+      "counts": {
+        "train_full": [
+          666,
+          321
+        ],
+        "train_prefixes": [
+          1998,
+          321
+        ],
+        "val_full": [
+          89,
+          62
+        ],
+        "val_prefixes": [
+          267,
+          62
+        ],
+        "test_dev": [
+          145,
+          32
+        ],
+        "test_test": [
+          35,
+          3
+        ]
+      }
+    },
+    {
+      "fold": "compliance_exfil",
+      "test": [
+        "banking_compliance_exfil",
+        "banking_dba_shadow_audit"
+      ],
+      "val": [
+        "banking_defense_impair",
+        "banking_etl_internal"
+      ],
+      "train": [
+        "banking_alter_role_esc",
+        "banking_compliance_audit",
+        "banking_etl_exfil_mal",
+        "banking_etl_repl_ben",
+        "banking_manager_eod",
+        "banking_multi_apt",
+        "banking_priv_abuse",
+        "banking_teller_pii_dump",
+        "banking_teller_routine"
+      ],
+      "counts": {
+        "train_full": [
+          690,
+          293
+        ],
+        "train_prefixes": [
+          2070,
+          293
+        ],
+        "val_full": [
+          121,
+          60
+        ],
+        "val_prefixes": [
+          363,
+          60
+        ],
+        "test_dev": [
+          89,
+          62
+        ],
+        "test_test": [
+          29,
+          16
+        ]
+      }
+    },
+    {
+      "fold": "defense_impair",
+      "test": [
+        "banking_defense_impair",
+        "banking_etl_internal"
+      ],
+      "val": [
+        "banking_etl_exfil_mal",
+        "banking_etl_repl_ben"
+      ],
+      "train": [
+        "banking_alter_role_esc",
+        "banking_compliance_audit",
+        "banking_compliance_exfil",
+        "banking_dba_shadow_audit",
+        "banking_manager_eod",
+        "banking_multi_apt",
+        "banking_priv_abuse",
+        "banking_teller_pii_dump",
+        "banking_teller_routine"
+      ],
+      "counts": {
+        "train_full": [
+          683,
+          307
+        ],
+        "train_prefixes": [
+          2049,
+          307
+        ],
+        "val_full": [
+          96,
+          48
+        ],
+        "val_prefixes": [
+          288,
+          48
+        ],
+        "test_dev": [
+          121,
+          60
+        ],
+        "test_test": [
+          27,
+          12
+        ]
+      }
+    },
+    {
+      "fold": "etl_exfil_mal",
+      "test": [
+        "banking_etl_exfil_mal",
+        "banking_etl_repl_ben"
+      ],
+      "val": [
+        "banking_multi_apt",
+        "banking_manager_eod"
+      ],
+      "train": [
+        "banking_alter_role_esc",
+        "banking_compliance_audit",
+        "banking_compliance_exfil",
+        "banking_dba_shadow_audit",
+        "banking_defense_impair",
+        "banking_etl_internal",
+        "banking_priv_abuse",
+        "banking_teller_pii_dump",
+        "banking_teller_routine"
+      ],
+      "counts": {
+        "train_full": [
+          601,
+          289
+        ],
+        "train_prefixes": [
+          1803,
+          289
+        ],
+        "val_full": [
+          203,
+          78
+        ],
+        "val_prefixes": [
+          609,
+          78
+        ],
+        "test_dev": [
+          96,
+          48
+        ],
+        "test_test": [
+          28,
+          14
+        ]
+      }
+    },
+    {
+      "fold": "multi_apt",
+      "test": [
+        "banking_multi_apt",
+        "banking_manager_eod"
+      ],
+      "val": [
+        "banking_priv_abuse",
+        "banking_teller_routine"
+      ],
+      "train": [
+        "banking_alter_role_esc",
+        "banking_compliance_audit",
+        "banking_compliance_exfil",
+        "banking_dba_shadow_audit",
+        "banking_defense_impair",
+        "banking_etl_exfil_mal",
+        "banking_etl_internal",
+        "banking_etl_repl_ben",
+        "banking_teller_pii_dump"
+      ],
+      "counts": {
+        "train_full": [
+          518,
+          269
+        ],
+        "train_prefixes": [
+          1554,
+          269
+        ],
+        "val_full": [
+          179,
+          68
+        ],
+        "val_prefixes": [
+          537,
+          68
+        ],
+        "test_dev": [
+          203,
+          78
+        ],
+        "test_test": [
+          46,
+          18
+        ]
+      }
+    },
+    {
+      "fold": "priv_abuse",
+      "test": [
+        "banking_priv_abuse",
+        "banking_teller_routine"
+      ],
+      "val": [
+        "banking_teller_pii_dump",
+        "banking_compliance_audit"
+      ],
+      "train": [
+        "banking_alter_role_esc",
+        "banking_compliance_exfil",
+        "banking_dba_shadow_audit",
+        "banking_defense_impair",
+        "banking_etl_exfil_mal",
+        "banking_etl_internal",
+        "banking_etl_repl_ben",
+        "banking_manager_eod",
+        "banking_multi_apt"
+      ],
+      "counts": {
+        "train_full": [
+          541,
+          280
+        ],
+        "train_prefixes": [
+          1623,
+          280
+        ],
+        "val_full": [
+          180,
+          67
+        ],
+        "val_prefixes": [
+          540,
+          67
+        ],
+        "test_dev": [
+          179,
+          68
+        ],
+        "test_test": [
+          47,
+          16
+        ]
+      }
+    },
+    {
+      "fold": "teller_pii_dump",
+      "test": [
+        "banking_teller_pii_dump",
+        "banking_compliance_audit"
+      ],
+      "val": [
+        "banking_alter_role_esc",
+        "banking_dba_shadow_audit"
+      ],
+      "train": [
+        "banking_compliance_exfil",
+        "banking_defense_impair",
+        "banking_etl_exfil_mal",
+        "banking_etl_internal",
+        "banking_etl_repl_ben",
+        "banking_manager_eod",
+        "banking_multi_apt",
+        "banking_priv_abuse",
+        "banking_teller_routine"
+      ],
+      "counts": {
+        "train_full": [
+          661,
+          316
+        ],
+        "train_prefixes": [
+          1983,
+          316
+        ],
+        "val_full": [
+          59,
+          32
+        ],
+        "val_prefixes": [
+          177,
+          32
+        ],
+        "test_dev": [
+          180,
+          67
+        ],
+        "test_test": [
+          46,
+          14
+        ]
+      }
+    }
+  ]
+}

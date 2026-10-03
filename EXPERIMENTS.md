@@ -14,6 +14,8 @@ All commands use the system `python3` (torch 2.11, torch_geometric 2.8, scikit-l
 | H1-live | Holdout model on the 5b_mixed live capture (replay) | Run Oct 2 | `live_runs/5b_mixed/daemon_holdout_priv_abuse/`, `live_runs/5b_mixed/eval_holdout_priv_abuse.txt` |
 | S | Seed variance for v2 and H1 (original seed 42 + retrained seeds 1, 2) | Run Oct 2 | `models_seeds/*.report.json`, `models_seeds/seed_summary.json` |
 | L | Train/test overlap diagnostics | Run Oct 2 | `eval_test_report_v2/leakage_report.json` |
+| **T** | **Template-disjoint evaluation (LOTO)**: 7 folds × 3 seeds, each testing on a malicious and a benign template never seen in training or validation | Run Oct 2–3, all 21 runs complete | `loto/folds.json`, `loto/*_s*.report.json`, `loto/loto_summary.json`, `loto/INTERIM_RESULTS.md` |
+| 4D | Live test on attacks/benign traffic that are not datagen templates | **Environment ready and verified (Oct 3, `live_runs/4d_smoke`); the out-of-distribution workload itself has not been run yet** | `live_runs/4d_smoke/` |
 
 ## Data and splits
 
@@ -136,7 +138,12 @@ Test results at θ = 0.55, single seed (42):
 - **Dropped edges.** `('Query','spawns','Process')` and `('Query','accesses','Role')` are missing from `FORWARD_EDGE_TYPES` and are dropped at load (`algorithm_4_hybrid.py` ~466). As a result, Process and Role nodes receive no messages from queries.
 - **Recency feature.** It mixes kernel nanosecond timestamps with Postgres epoch seconds.
 - **Rules that never fire.** ACCOUNT_MANIPULATION, OS_CREDENTIAL_DUMPING and INDICATOR_REMOVAL never fire, because Algorithm 2 never emits `modifies` edges or Configuration nodes.
-- **Untuned defaults.** `realtime_daemon.py` and `evaluate_live.py` default θ to 0.40, and `--feature-version` defaults to 1. Always pass θ = 0.55 and use the model sidecar.
+- **Threshold defaults (fixed Oct 2).** `--mode tune` now writes θ_A into the model's sidecar JSON. `--mode evaluate`, `realtime_daemon.py` and `evaluate_live.py` read it and refuse to run without one, so v1's 0.40 can no longer be applied to v2 by accident. `--feature-version` still defaults to 1 for training; pass 2.
+- **4D environment (set up Oct 3).** The local `casce_environment` container now runs the repo's current telemetry. All earlier files were archived, not deleted:
+  - `pg_telemetry.c` is built and installed. It needed `libkrb5-dev` for the GSSAPI headers. The old August build is kept at `/root/pg_telemetry.so.aug28.bak`.
+  - The current `logger.sh` and `ebpf_telemetry/kernel_telemetry.py` are installed in `~/Desktop/Projects/CASCE_DATASET`. The old August capture and logger are in its `archive/aug28_old_capture/`.
+  - `pgbench_history` was recreated, and `iproute2` was installed.
+  - **Verified end to end** (`live_runs/4d_smoke`): one labelled benign `COPY … TO PROGRAM gzip` session plus 22 pgbench sessions. The kernel trace linked `gzip` to its backend through the ppid. All 23 sessions were scored by the v2 replay, giving FPR 0. θ was read from the model sidecar.
 - **Stale scripts.** These target an old data layout and naming scheme. Do not use them for results:
   - `evaluate_holdout_experiment.py`: v1 features, a nonexistent `datagen/generated/banking_1000`, and early stopping on the held-out family.
   - `test_zeroday_holdout.py`.
@@ -171,3 +178,49 @@ What the seed runs show:
 **Reportable claims, revised.**
 - Known templates: test F1 0.985 ± 0.017, precision 1.0, FPR 0, ROC-AUC 1.0 (3 seeds). Live capture reproduces synthetic scores. The single-seed 1.0 should not be quoted on its own.
 - Unseen priv_abuse template: recall 0.85 ± 0.25 at the validation-tuned θ, with zero false positives and ROC-AUC ≥ 0.96. The kept templates cover the same SQL patterns (see above).
+
+## T: template-disjoint evaluation (leave-one-template-out)
+This is the test of whether the model detects **behaviour it has never seen**, rather than new seeds of templates it was trained on.
+- **Fold design.** `make_template_folds.py` builds 7 folds (`loto/folds.json`), one per malicious template. Each fold has:
+  - **Test:** that malicious template plus one benign template, neither seen in training or validation. All of their sessions from `dataset_dev` and `dataset_test` are used.
+  - **Validation:** a *different* malicious template plus a different benign template. It drives early stopping and θ.
+  - **Training:** the remaining 5 malicious and 4 benign templates, with prefix graphs and pgbench, using the same method and settings as v2.
+- **Runs:** each fold was run with 3 seeds. `./run_loto.sh <fold> <seed>` does one run; `loto/run_all.sh` resumes whatever is missing; `python3 loto_summary.py` produces the table.
+
+| Unseen attack template | Recall | FPR (unseen benign) | F1 | ROC-AUC | F1 on seen templates |
+|---|---|---|---|---|---|
+| alter_role_esc | 1.000 ± 0.000 | 0.000 ± 0.000 | 1.000 ± 0.000 | 1.000 | 0.725 ± 0.072 |
+| priv_abuse | 1.000 ± 0.000 | 0.157 ± 0.176 | 0.892 ± 0.110 | 0.964 ± 0.063 | 1.000 |
+| compliance_exfil | 0.667 ± 0.577 | 0.000 ± 0.000 | 0.667 ± 0.577 | 1.000 | 0.946 ± 0.093 |
+| teller_pii_dump | 0.951 ± 0.049 | 0.667 ± 0.577 | 0.664 ± 0.270 | 0.667 ± 0.577 | 0.939 ± 0.094 |
+| etl_exfil_mal | 1.000 ± 0.000 | 1.000 ± 0.000 | 0.667 ± 0.000 | 0.000 (degenerate) | 0.878 ± 0.022 |
+| defense_impair | 1.000 ± 0.000 | 1.000 ± 0.000 | 0.654 ± 0.000 | 0.000 (degenerate) | 1.000 |
+| multi_apt | 0.111 ± 0.192 | 0.000 ± 0.000 | 0.167 ± 0.289 | 0.667 | 0.845 ± 0.036 |
+| **Macro (3 seeds)** | **0.818 ± 0.104** | **0.403 ± 0.058** | **0.673 ± 0.128** | **0.614 ± 0.078** | |
+
+Pooled confusion matrices (unseen test, all folds):
+
+| Seed | TN | FP | FN | TP |
+|---|---|---|---|---|
+| 1 | 475 | 288 | 182 | 326 |
+| 2 | 574 | 189 | 68 | 440 |
+| 3 | 469 | 294 | 96 | 412 |
+
+### What T shows
+1. **Generalization to unseen behaviour is weak.** F1 falls from 0.985 on seen templates (E1, 3 seeds) to **0.673 ± 0.128**. ROC-AUC falls to **0.61**.
+2. **The false-positive rate on unseen benign behaviour is 0.40.** This is the largest problem. Benign templates that move data out or read sensitive data in bulk are flagged when they were absent from training: ETL replication, internal ETL and compliance audit.
+   - In the ETL and defense_impair folds the GAT saturates (0 or 1) for both classes. The rule score alone then orders the sessions, which gives the degenerate ROC-AUC of 0.0.
+   - In one teller_pii_dump run the benign audit scored *above* the attack (GAT ROC-AUC 0.0). That is a true inversion.
+3. **Unseen attacks that share key steps with training attacks are detected.** These are `alter_role_esc` and `priv_abuse` (`CREATE/ALTER ROLE … SUPERUSER`, `pg_authid`). The unseen multi-stage APT is mostly missed (recall 0.11).
+4. **θ does not transfer between unseen templates.** `compliance_exfil` is ranked perfectly in every seed, yet one seed missed all 78 attacks because θ, tuned on another unseen template, sat above them. Calibrating on validation cannot fix a scale shift that differs by template.
+5. **Validation loss rises from epoch 1–2** in most folds. Fitting the training templates harder makes unseen templates worse: shortcut learning.
+6. **Results vary strongly across seeds** (std up to 0.58). Single-seed unseen-template numbers are not reliable.
+
+## Final reportable claims (as of Oct 3)
+- **Seen templates:** F1 0.985 ± 0.017, precision 1.0, FPR 0, ROC-AUC 1.0 (3 seeds). These are new instances of the 13 training templates.
+- **Live capture:** reproduces the synthetic scores (226/226 identical verdicts) with 0 false alarms over 1158 benign live sessions, including pgbench load. These sessions also use the same templates.
+- **Unseen templates (T):** recall 0.82 ± 0.10, FPR 0.40 ± 0.06, F1 0.67 ± 0.13, ROC-AUC 0.61 ± 0.08 (7 folds × 3 seeds).
+  - **This is the honest generalization result.** The detector recognises known attack patterns well but does not reliably generalize to unseen behaviour. In particular it mistakes unseen benign data-movement for attacks.
+- **Priv_abuse held out:** recall 1.0, FPR 0.16 ± 0.18 on unseen benign `teller_routine` (T fold). The template is unseen, but its key SQL steps occur in other training attacks.
+- **Next step (P3, a method change; decide before implementing):** run a feature ablation that masks SQL literals, paths and role names, fixes the recency units and adds the dropped edge types. Evaluate it on these same folds, so any change in the T numbers can be attributed to the features.
+

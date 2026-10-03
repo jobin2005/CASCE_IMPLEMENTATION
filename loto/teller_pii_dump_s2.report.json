@@ -1,0 +1,193 @@
+{
+  "fold": "teller_pii_dump",
+  "test_templates": [
+    "banking_teller_pii_dump",
+    "banking_compliance_audit"
+  ],
+  "val_templates": [
+    "banking_alter_role_esc",
+    "banking_dba_shadow_audit"
+  ],
+  "model": "loto/teller_pii_dump_s2.pt",
+  "theta": 0.4,
+  "unseen": {
+    "n": 226,
+    "n_malicious": 81,
+    "tp": 77,
+    "fp": 0,
+    "fn": 4,
+    "tn": 145,
+    "precision": 1.0,
+    "recall": 0.9506,
+    "f1": 0.9747,
+    "accuracy": 0.9823,
+    "fpr": 0.0,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "min_malicious_score": 0.3771,
+    "max_benign_score": 0.0041,
+    "margin": 0.373
+  },
+  "unseen_gat_only": {
+    "n": 226,
+    "n_malicious": 81,
+    "tp": 70,
+    "fp": 0,
+    "fn": 11,
+    "tn": 145,
+    "precision": 1.0,
+    "recall": 0.8642,
+    "f1": 0.9272,
+    "accuracy": 0.9513,
+    "fpr": 0.0,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "min_malicious_score": 0.169,
+    "max_benign_score": 0.0055,
+    "margin": 0.1635
+  },
+  "seen_test": {
+    "n": 164,
+    "n_malicious": 76,
+    "tp": 54,
+    "fp": 0,
+    "fn": 22,
+    "tn": 88,
+    "precision": 1.0,
+    "recall": 0.7105,
+    "f1": 0.8308,
+    "accuracy": 0.8659,
+    "fpr": 0.0,
+    "roc_auc": 0.9306,
+    "pr_auc": 0.9372,
+    "min_malicious_score": 0.0883,
+    "max_benign_score": 0.2962,
+    "margin": -0.2079
+  },
+  "per_template_unseen": {
+    "banking_compliance_audit": {
+      "n": 145,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.003,
+      "risk_median": 0.0036,
+      "risk_max": 0.0041
+    },
+    "banking_teller_pii_dump": {
+      "n": 81,
+      "label": 1,
+      "detected": 77,
+      "risk_min": 0.3771,
+      "risk_median": 0.6619,
+      "risk_max": 0.7853
+    }
+  },
+  "per_template_seen_test": {
+    "banking_compliance_exfil": {
+      "n": 16,
+      "label": 1,
+      "detected": 16,
+      "risk_min": 0.8178,
+      "risk_median": 0.8226,
+      "risk_max": 0.8228
+    },
+    "banking_defense_impair": {
+      "n": 12,
+      "label": 1,
+      "detected": 12,
+      "risk_min": 0.8023,
+      "risk_median": 0.8023,
+      "risk_max": 0.8023
+    },
+    "banking_etl_exfil_mal": {
+      "n": 14,
+      "label": 1,
+      "detected": 14,
+      "risk_min": 0.8174,
+      "risk_median": 0.8212,
+      "risk_max": 0.822
+    },
+    "banking_etl_internal": {
+      "n": 15,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.2927,
+      "risk_median": 0.2927,
+      "risk_max": 0.2928
+    },
+    "banking_etl_repl_ben": {
+      "n": 14,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.2962,
+      "risk_median": 0.2962,
+      "risk_max": 0.2962
+    },
+    "banking_manager_eod": {
+      "n": 28,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0
+    },
+    "banking_multi_apt": {
+      "n": 18,
+      "label": 1,
+      "detected": 12,
+      "risk_min": 0.2977,
+      "risk_median": 0.4767,
+      "risk_max": 0.8228
+    },
+    "banking_priv_abuse": {
+      "n": 16,
+      "label": 1,
+      "detected": 0,
+      "risk_min": 0.0883,
+      "risk_median": 0.2,
+      "risk_max": 0.2786
+    },
+    "banking_teller_routine": {
+      "n": 31,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0
+    }
+  },
+  "unseen_errors": [
+    {
+      "graph": "enriched_run_020_20038_Malicious.graphml",
+      "template": "banking_teller_pii_dump",
+      "source": "dataset_dev",
+      "risk": 0.3857,
+      "gat": 0.1852,
+      "rule": 0.3822
+    },
+    {
+      "graph": "enriched_run_034_20030_Malicious.graphml",
+      "template": "banking_teller_pii_dump",
+      "source": "dataset_dev",
+      "risk": 0.3771,
+      "gat": 0.169,
+      "rule": 0.3822
+    },
+    {
+      "graph": "enriched_run_037_20034_Malicious.graphml",
+      "template": "banking_teller_pii_dump",
+      "source": "dataset_dev",
+      "risk": 0.3771,
+      "gat": 0.169,
+      "rule": 0.3822
+    },
+    {
+      "graph": "enriched_run_005_20036_Malicious.graphml",
+      "template": "banking_teller_pii_dump",
+      "source": "dataset_test",
+      "risk": 0.3857,
+      "gat": 0.1852,
+      "rule": 0.3822
+    }
+  ]
+}

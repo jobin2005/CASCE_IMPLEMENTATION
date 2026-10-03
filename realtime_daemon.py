@@ -344,7 +344,8 @@ def main():
                     help="folder with postgres_events.json and kernel_events.json")
     ap.add_argument("--out-dir", type=Path, default=Path("realtime_out"))
     ap.add_argument("--model-path", default="casce_gat.pt")
-    ap.add_argument("--theta-a", type=float, default=0.40, help="alert threshold (tuned on validation)")
+    ap.add_argument("--theta-a", type=float, default=None,
+                    help="alert threshold (default: the θ_A tuned on validation for --model-path)")
     ap.add_argument("--theta-r", type=float, default=algorithm_4_hybrid.THETA_R)
     ap.add_argument("--idle-timeout", type=float, default=60.0,
                     help="fallback: final score after this many seconds without events "
@@ -360,6 +361,7 @@ def main():
                          "seconds of event time (fills alerts.jsonl like a live run)")
     args = ap.parse_args()
 
+    args.theta_a = algorithm_4_hybrid.resolve_theta(args.theta_a, args.model_path)
     model = algorithm_4_hybrid.load_model(args.model_path)
     if model is None:
         sys.exit("torch/torch_geometric not available -- run with the project .venv")

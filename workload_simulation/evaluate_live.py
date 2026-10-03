@@ -69,12 +69,15 @@ def main():
     ap.add_argument("--scores", type=Path, default=PROJECT_ROOT / "realtime_out" / "session_scores.jsonl")
     ap.add_argument("--alerts", type=Path, default=None,
                     help="daemon alerts.jsonl (default: next to --scores)")
-    ap.add_argument("--theta", type=float, default=0.40)
+    ap.add_argument("--theta", type=float, default=None,
+                    help="alert threshold (default: the θ_A tuned on validation for --model-path)")
     ap.add_argument("--compare-synthetic", action="store_true")
     ap.add_argument("--model-path", default=str(PROJECT_ROOT / "casce_gat.pt"))
     ap.add_argument("--write-labels-csv", action="store_true",
                     help="also write <run-dir>/labels.csv (session_id,label) for main.py")
     args = ap.parse_args()
+    import algorithm_4_hybrid
+    args.theta = algorithm_4_hybrid.resolve_theta(args.theta, args.model_path)
 
     scores = {}
     for r in read_jsonl(args.scores):
