@@ -332,3 +332,18 @@ Each stage's results are in `loto_<config>/loto_summary.txt`.
 
 ## Results per attack type
 `python3 per_attack_table.py` → `results_per_attack.md`. It gives one row per scenario template: detection rate for attacks and false-alarm rate for benign workloads. Columns: seen offline (E1, v2, 3 seeds); seen live (5b, v2, with alert latency); unseen offline (template-disjoint, v2 with 3 seeds and v3 with 1 seed); and 4D (pending). It is built from existing result files only.
+
+## v3 single model on E1 and the live captures (Oct 3)
+`run_v3_full.sh` trains `casce_gat_v3.pt` exactly like `casce_gat_v2` (same train/val data, seed 42, settings; only `--feature-version 3`). It then tunes θ on the E1 validation set with the original f1 rule: θ = 0.55, recorded in the sidecar. Early stopping fired at epoch 33. It then repeats v2's evaluations: the E1 test set, plus replays of the live captures through the real-time daemon (`--replay --replay-realtime`). Outputs are in `live_eval_v3/` and `eval_test_report_v3/`.
+
+| Evaluation | v2 | **v3** |
+|---|---|---|
+| E1 synthetic test (226; 93 attacks) | P = R = F1 = 1.0, FPR 0 | P = R = F1 = 1.0, FPR 0, ROC-AUC 1.0 |
+| 4a live, pgbench only (331) | FPR 0 | **FPR 0** |
+| 4b live, benign scenarios (133) | FPR 0 | **FPR 0** |
+| 4c live, benign + pgbench (312) | FPR 0 | **FPR 0** |
+| 5a live, attacks (93) | 93/93 | **93/93** |
+| 5b live mixed (1,251) | TP 93, FP 0, FN 0, TN 1,158 | **TP 93, FP 0, FN 0, TN 1,158**; real-time view identical; no partial-session false alerts |
+| Live vs synthetic verdicts | 226/226 | **226/226** (mean \|Δrisk\| 0.001) |
+
+**Reading.** On seen templates v3 matches v2 exactly, offline and live, so masking identifiers costs nothing on known attacks. v3's advantage is on unseen templates (section T, F1 0.83 vs 0.67, provisional, 1 seed). The v2 live rows for 4a–5a are replays of the same captures, like v3's. 5b was scored live by v2 and replayed for v3; replay reproduces live verdicts.

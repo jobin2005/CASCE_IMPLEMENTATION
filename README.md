@@ -36,7 +36,7 @@ postgres_events.json (SQL hook) + kernel_events.json (eBPF)
 | `make_template_folds.py`, `run_loto.sh`, `fold_report.py`, `loto_summary.py`, `loto/` | **Template-disjoint evaluation**: 7 folds, each testing on attack and benign templates never seen in training |
 | `make_holdout_labels.py`, `holdout_report.py`, `leakage_report.py`, `run_seed.sh`, `seed_summary.py` | priv_abuse holdout, train/test overlap diagnostics, seed variance |
 | `realtime_daemon.py`, `workload_simulation/` | Real-time detection; live capture (`pg_telemetry.c`, `kernel_telemetry.py`, `logger.sh`), live scenario runner, live evaluation |
-| `casce_gat_v2.pt` (+ `.json`) | Current model (feature v2, θ = 0.55). `casce_gat.pt` is the legacy v1 baseline |
+| `casce_gat_v2.pt`, `casce_gat_v3.pt` (+ `.json`) | Deployment models, feature v2 and v3 (θ = 0.55 each, in the sidecar). `casce_gat.pt` is the legacy v1 baseline |
 | `loto*/`, `models_seeds/`, `eval_test_report_*/`, `tune_out_*/` | Result files referenced in EXPERIMENTS.md |
 
 ## Quick start
@@ -71,6 +71,7 @@ All data is synthetic banking traffic. Full tables, per-template results and cav
 | **Live, mixed traffic** (5b) | 1,251 live sessions: 1,025 pgbench + 133 benign + 93 attacks, same templates | TP 93, FP 0, FN 0, TN 1,158; alerts after a median 1.7 s; live verdicts identical to synthetic for 226/226 sessions |
 | **Unseen templates**, v2 (T) | 7 folds × 3 seeds; test templates never seen in training | Recall 0.82, FPR 0.40, F1 **0.67 ± 0.13**, ROC-AUC 0.61 |
 | **Unseen templates**, v3 features (provisional) | Same folds, 1 seed | Recall 0.91, FPR 0.29, F1 **0.83**. 4 of 7 unseen attack templates are perfect. **Still to be confirmed** on more seeds and the live 4D test |
+| **v3, seen templates + live** | Single v3 model trained like v2; E1 test and replays of live runs 4a–5b | Identical to v2: F1 1.0 offline; 5b TP 93, FP 0, FN 0, TN 1,158; live = synthetic for 226/226 |
 
 **What these numbers mean.** On attack types it was trained on, CASCE is near-perfect, offline and live, with no false alarms. On attack types it has never seen, it generalises only partly. The main failure is mistaking unseen *legitimate* data movement (ETL replication, audits) for attacks. Feature v3, which describes behaviour instead of exact SQL strings, paths and names, is the most promising fix so far.
 
