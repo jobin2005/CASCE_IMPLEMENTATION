@@ -71,10 +71,41 @@ own classification ("similar to training") and the sample's note.
 
 ## Still open — not decided here
 
-**8 legacy scripts the original task brief never named** are not adapted and not in
-`manifest.jsonl`: `attack_concurrent_dual_malicious.sh`, `attack_concurrent_mixed.sh`,
-`attack_db_unauthorized_read.sh`, `attack_exfiltration.sh`,
-`attack_exfiltration_alt_process.sh`, `attack_exfiltration_delayed_2s.sh`,
-`attack_exfiltration_delayed_30s.sh`, `attack_multi_stage_apt.sh`. All 8 touch the
-database (unlike `attack_os_priv_escalation.sh` above) and don't map cleanly onto a
-named group. Pending a decision on whether to include them.
+**8 legacy scripts the original task brief never named** are deliberately left out of
+this folder and `manifest.jsonl` — not adapted "just in case." Default is exclude,
+because adding one later is a few lines; pulling a script's sessions and labels back out
+after Adithyan has already captured and scored a live run is not. One line per script,
+with a proposed group and the specific reason it wasn't just mechanically adapted like
+the 30 above — each needs a yes/no from Adithyan19, who scoped and will run this:
+
+| Script | Would map to | Why it's not a mechanical adaptation |
+|---|---|---|
+| `attack_exfiltration.sh` | exfiltration | Near-identical to `exfil_gzip_curl` (same gzip+curl, LIMIT 500 vs 10) — likely the base case the 20 `_var_*` variants were derived from. Confirmed it did **not** feed training (`EXPERIMENTS.md`: "`attack_workload/*.sh` ... were not used in any recorded run"), so it's not an OOD-contamination risk. Left out only because it's redundant with a variant already included, not for a correctness reason. |
+| `attack_db_unauthorized_read.sh` | — (no group fits) | Pure SQL read, no OS-layer activity at all — closer to a different test ("can SQL alone trigger a CASCE alert, with zero cross-layer corroboration") than to any attack group in the brief. Trivial to adapt if that's a question worth asking, but it's a different question. |
+| `attack_concurrent_dual_malicious.sh` | — (no group fits) | Two attacks fired in parallel, backgrounded (`&`/`wait`), hitting the DB at the same instant. Whether `algorithm_1.py`'s ppid-chain correlator attributes each spawned OS process back to the right one of two concurrently-open backends is an open question about the correlator, not something a label change settles. |
+| `attack_concurrent_mixed.sh` | — (no group fits) | Same concern as above, one benign session and one malicious session overlapping instead of two malicious ones. |
+| `attack_exfiltration_delayed_2s.sh` | exfiltration (maybe) | Script's own comment: "test temporal similarity algorithms." Same gzip+curl payload as `exfil_gzip_curl`, with a 2s `sleep` spliced in before the network call. Tests the correlator's time window, not whether the classifier generalizes to a new attack type — a different experiment from 4D's stated purpose. |
+| `attack_exfiltration_delayed_30s.sh` | exfiltration (maybe) | Same as above, 30s delay — "stress-test temporal linkages" per its own comment. |
+| `attack_exfiltration_alt_process.sh` | exfiltration (maybe) | Script's own comment: "Tests semantic similarity algorithms against structural signatures." Same exfil, but via a `python3 -c` one-liner instead of gzip+curl — tests process-attribution/representation robustness, not attack-type generalization. |
+| `attack_multi_stage_apt.sh` | multi_stage (maybe) | Not a duplicate of the in-scope `attack_multi_session_apt.sh` — it's the same recon → escalate → exfil sequence packed into **one continuous psql session** (a heredoc of 4 statements) instead of three separate reconnects. That's a structurally different test (can one session's graph alone carry the whole APT story?) from the in-scope script (can three separate sessions be linked across reconnects?). Worth doing, but as its own thing, not folded into the 3 multi-stage sessions already in `manifest.jsonl`. |
+
+**Training-data provenance — resolved, not an open question.** The concern that any of
+these 8 (or the 30 already adapted) might have fed the model's training data and so
+inflate the "unseen attack" claim is checked against `EXPERIMENTS.md` directly: the
+synthetic training corpus comes entirely from `datagen/generate_batch.py`'s 13 YAML
+templates, and the legacy `attack_workload/*.sh` scripts — all 44, named and unnamed —
+"were not used in any recorded run." Some of the 30 already-adapted scripts resemble a
+training template in technique (plain curl exfiltration, backdoor `CREATE ROLE`) — that's
+exactly what `new_technique: false` already flags for those sessions — but none of the 44
+scripts is a training *source*.
+
+**Open methodological question, not resolved here: can the report tell "role denied, the
+attack never ran" apart from "ran and the model missed it"?** Several adapted sessions
+(the SQLi-copy/role, sabotage and privilege-abuse steps) are expected to be denied by
+Postgres before any OS-layer activity happens. `session_labels.jsonl` records ground
+truth as Malicious regardless of whether the statement succeeded, and `manifest.jsonl`'s
+schema (fixed by `sample_sessions.sh`) has no field for the expected outcome. Unless the
+per-attack scoring already distinguishes a denied statement from a missed detection by
+inspecting `postgres_events.json` for the error response, a denial will read as either a
+catch or a miss in the results table without anyone intending that. This needs an answer
+from whoever builds the 4D scoring, before the results table is read as final.
