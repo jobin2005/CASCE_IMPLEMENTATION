@@ -9,6 +9,14 @@ Every script takes `REPEAT` as an env var (default 1) — run the same script th
 with `REPEAT=1`, `REPEAT=2`, `REPEAT=3` for the task's three repeats, rather than three
 copies of each file. `manifest.jsonl` already has all three repeats' entries.
 
+**Validated so far: static checks only, nothing live.**
+`bash -n` on all 30 scripts (all pass); all 102 `manifest.jsonl` lines parse as JSON;
+grepped all 30 scripts for every `psql` invocation having a `PGAPPNAME=` prefix on the
+preceding line (34 invocations found, 34 labelled, 0 missing). None of this has been run
+against a live Postgres instance — no proof yet that a statement behaves as expected once
+it reaches `casce_banking`, only that the scripts are syntactically sound and every
+session is labelled. The live run on Adithyan's machine is what actually tests this.
+
 ## What's here
 
 34 distinct attack sessions (102 manifest lines across 3 repeats), covering every group
@@ -24,8 +32,16 @@ and script named in the original task brief:
 | `backdoor_role` | `attack_privilege_abuse` (3 psql calls = 3 sessions) | 3 | dba, hacker×2 | no |
 | `multi_stage` | `attack_multi_session_apt` (3 of its 4 stages) | 3 | dba | no |
 
-`new_technique: false` only for the backdoor-role/multi-stage group, matching the task's
-own classification ("similar to training") and the sample's note.
+**Rule used to set `new_technique`:** applied at whole-script granularity, matching the
+task brief's own per-script group list, not per-statement. `false` only for the
+`backdoor_role`/`multi_stage` group (`attack_privilege_abuse`, `attack_multi_session_apt`),
+because the brief classifies that whole group "similar to training" and the sample's note
+narrows the carve-out to the same two techniques: backdoor `CREATE ROLE` and plain-curl
+exfiltration. Every other session here is `true`. One known rough edge from applying this
+per-script rather than per-statement: `attack_sqli_role.sh`'s payload is itself a backdoor
+`CREATE ROLE`, but it's filed under `sql_injection`/`true` because the brief's script list
+puts all four `attack_sqli_*` scripts there — see the note on it below. Audit point: if
+Adithyan's scoring needs this finer-grained, it isn't captured by the current manifest.
 
 ## Judgment calls made without asking (documented here so they're easy to revise)
 
@@ -99,13 +115,24 @@ training template in technique (plain curl exfiltration, backdoor `CREATE ROLE`)
 exactly what `new_technique: false` already flags for those sessions — but none of the 44
 scripts is a training *source*.
 
-**Open methodological question, not resolved here: can the report tell "role denied, the
-attack never ran" apart from "ran and the model missed it"?** Several adapted sessions
-(the SQLi-copy/role, sabotage and privilege-abuse steps) are expected to be denied by
-Postgres before any OS-layer activity happens. `session_labels.jsonl` records ground
-truth as Malicious regardless of whether the statement succeeded, and `manifest.jsonl`'s
-schema (fixed by `sample_sessions.sh`) has no field for the expected outcome. Unless the
-per-attack scoring already distinguishes a denied statement from a missed detection by
-inspecting `postgres_events.json` for the error response, a denial will read as either a
-catch or a miss in the results table without anyone intending that. This needs an answer
-from whoever builds the 4D scoring, before the results table is read as final.
+**Pre-run question for Adithyan — not something scoring can fix after the fact.**
+Several adapted sessions (SQLi-copy/role, sabotage, the privilege-abuse steps) are
+expected to be denied by Postgres before any OS-layer activity happens.
+`session_labels.jsonl` records ground truth as Malicious regardless of whether the
+statement succeeded. Checked `pg_telemetry.c` directly: `casce_ProcessUtility` and
+`casce_ExecutorStart` both log the statement (event_type `ProcessUtility` /
+`ExecutorStart`) *before* calling into Postgres's own execution path, so a denied
+statement still gets one log line — but the hook never records the error, the SQLSTATE
+(e.g. `42501 insufficient_privilege`), or any outcome field, and there's no matching
+`ExecutorEnd`/second event when the statement aborts. So a denied session and a session
+that ran fully and was simply missed are indistinguishable in `postgres_events.json`
+after the fact — there is no field to recover this from once the run is over.
+
+If this distinction matters for the 4D results table, it has to be captured **at run
+time**, not patched into scoring later. The cheapest fix: have whatever runs these
+scripts capture each `psql` call's own exit code (and ideally stderr) and write it
+alongside the manifest, keyed by `key`+`repeat` — `psql -c` returns nonzero when the
+server returns an error for that statement, so this needs no hook change. Not built into
+these 30 scripts pre-emptively: adding it is a legitimate design choice (per-script
+capture here vs. a shared wrapper vs. changing the hook itself) that's Adithyan's call,
+not mine to make by default.
