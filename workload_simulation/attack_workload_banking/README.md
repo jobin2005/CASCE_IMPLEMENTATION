@@ -10,7 +10,8 @@ with `REPEAT=1`, `REPEAT=2`, `REPEAT=3` for the task's three repeats, rather tha
 copies of each file. `manifest.jsonl` already has all three repeats' entries.
 
 **Validated so far: static checks only, nothing live.**
-`bash -n` on all 30 scripts (all pass); all 102 `manifest.jsonl` lines parse as JSON;
+`bash -n` on all 30 scripts (all pass); all 102 `manifest.jsonl` lines parse as JSON
+(34 distinct sessions × 3 repeats = 102, confirmed by count, not just asserted);
 grepped all 30 scripts for every `psql` invocation having a `PGAPPNAME=` prefix on the
 preceding line (34 invocations found, 34 labelled, 0 missing). None of this has been run
 against a live Postgres instance — no proof yet that a statement behaves as expected once
@@ -128,11 +129,23 @@ statement still gets one log line — but the hook never records the error, the 
 that ran fully and was simply missed are indistinguishable in `postgres_events.json`
 after the fact — there is no field to recover this from once the run is over.
 
+There's a second consequence beyond just missing data: the hook logs the statement
+*before* checking whether it's allowed, so a denied attack still leaves SQL-layer
+activity in `postgres_events.json`. If the rule engine or GAT flags that activity anyway,
+the results table counts it as a catch — even though the attack never actually ran.
+Detection-rate numbers are biased upward until denied sessions can be told apart from the
+ones that executed.
+
 If this distinction matters for the 4D results table, it has to be captured **at run
-time**, not patched into scoring later. The cheapest fix: have whatever runs these
-scripts capture each `psql` call's own exit code (and ideally stderr) and write it
-alongside the manifest, keyed by `key`+`repeat` — `psql -c` returns nonzero when the
-server returns an error for that statement, so this needs no hook change. Not built into
-these 30 scripts pre-emptively: adding it is a legitimate design choice (per-script
-capture here vs. a shared wrapper vs. changing the hook itself) that's Adithyan's call,
-not mine to make by default.
+time**, not patched into scoring later. The exit code of `psql -c` (what every script
+here uses) is nonzero on a denied statement, and that's reliable for all 30 scripts as
+written — none of them feed multiple statements through a heredoc or `-f`. It is **not**
+reliable in general: a script that pipes several statements into `psql -f`/`<<EOF`
+(e.g. the excluded `attack_multi_stage_apt.sh`, if it's ever adapted) keeps running past
+an error and exits 0 unless `-v ON_ERROR_STOP=1` is set — and setting that changes the
+attack itself, since later statements then never run. So the fix, stated precisely:
+**capture each `psql` call's exit code *and* stderr**, keyed by `key`+`repeat`, and treat
+`ON_ERROR_STOP` as its own decision, not a default. Not built into these 30 scripts
+pre-emptively: adding it is a legitimate design choice (per-script capture here vs. a
+shared wrapper vs. changing the hook itself) that's Adithyan's call, not mine to make by
+default.
