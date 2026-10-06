@@ -32,6 +32,65 @@ Thresholds: each model's validation-tuned θ (v2 0.55; per-fold θ for the templ
 | teller_routine | 0.00 ± 0.00 | 0.00 (0/31) | 0.16 ± 0.18 | 0.00 (0/142) | _pending_ |
 | pgbench (background load) | – | 0.00 (0/1025) | – | – | _pending_ |
 
+## Live attacks: attempted vs executed
+
+Some live attack sessions were **refused by Postgres** ("permission denied", recorded per session in `live_manifest.jsonl`): the attack was attempted but never took effect.
+The Postgres hook logs a statement *before* Postgres checks permissions, so the detector still sees the attempt.
+*Attempted* counts every attack session; *executed* only those with no refused statement.
+Failed outbound `curl` calls are not refusals: the statement and its OS process ran, only the network connection was refused by design.
+
+**5a (attacks only), v2**
+
+| Attack template | Attempted (caught/all) | Refused by Postgres | Executed |
+|---|---|---|---|
+| alter_role_esc | 3/3 | 3/3 | – |
+| compliance_exfil | 16/16 | – | 16/16 |
+| defense_impair | 12/12 | 12/12 | – |
+| etl_exfil_mal | 14/14 | – | 14/14 |
+| multi_apt | 18/18 | 6/6 | 12/12 |
+| priv_abuse | 16/16 | 16/16 | – |
+| teller_pii_dump | 14/14 | – | 14/14 |
+| **all attacks** | **93/93** | **37/37** | **56/56** |
+
+**5a (attacks only), v3**
+
+| Attack template | Attempted (caught/all) | Refused by Postgres | Executed |
+|---|---|---|---|
+| alter_role_esc | 3/3 | 3/3 | – |
+| compliance_exfil | 16/16 | – | 16/16 |
+| defense_impair | 12/12 | 12/12 | – |
+| etl_exfil_mal | 14/14 | – | 14/14 |
+| multi_apt | 18/18 | 6/6 | 12/12 |
+| priv_abuse | 16/16 | 16/16 | – |
+| teller_pii_dump | 14/14 | – | 14/14 |
+| **all attacks** | **93/93** | **37/37** | **56/56** |
+
+**5b (mixed), v2**
+
+| Attack template | Attempted (caught/all) | Refused by Postgres | Executed |
+|---|---|---|---|
+| alter_role_esc | 3/3 | 3/3 | – |
+| compliance_exfil | 16/16 | – | 16/16 |
+| defense_impair | 12/12 | 12/12 | – |
+| etl_exfil_mal | 14/14 | – | 14/14 |
+| multi_apt | 18/18 | 6/6 | 12/12 |
+| priv_abuse | 16/16 | 16/16 | – |
+| teller_pii_dump | 14/14 | – | 14/14 |
+| **all attacks** | **93/93** | **37/37** | **56/56** |
+
+**5b (mixed), v3**
+
+| Attack template | Attempted (caught/all) | Refused by Postgres | Executed |
+|---|---|---|---|
+| alter_role_esc | 3/3 | 3/3 | – |
+| compliance_exfil | 16/16 | – | 16/16 |
+| defense_impair | 12/12 | 12/12 | – |
+| etl_exfil_mal | 14/14 | – | 14/14 |
+| multi_apt | 18/18 | 6/6 | 12/12 |
+| priv_abuse | 16/16 | 16/16 | – |
+| teller_pii_dump | 14/14 | – | 14/14 |
+| **all attacks** | **93/93** | **37/37** | **56/56** |
+
 ## Reading the table
 - **Seen attacks** (offline and live) are detected almost perfectly. Live alerts arrive within about 2 s.
 - **Unseen attacks.** Detection depends on how close the attack is to a trained one. v3 improves several templates over v2.

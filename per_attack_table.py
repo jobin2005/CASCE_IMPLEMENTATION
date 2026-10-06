@@ -66,6 +66,32 @@ def live_5b():
     return out
 
 
+def live_split(run, daemon):
+    """Attack sessions of a live run, split by whether Postgres refused a statement
+    ("permission denied" in the runner's per-session stderr, live_manifest.jsonl).
+    template -> {attempted: [hits, n], denied: [...], executed: [...]}.
+    A refused session never did what it attempted, but the hook logged the
+    statement before Postgres refused it, so the detector still saw it."""
+    read = lambda p: [json.loads(l) for l in open(p) if l.strip()]
+    d = Path("live_runs") / run
+    scores = {}
+    for r in read(d / daemon / "session_scores.jsonl"):
+        scores[r["session_id"]] = r
+    manifest = {r["key"]: r for r in read(d / "live_manifest.jsonl")}
+    out = defaultdict(lambda: {"attempted": [0, 0], "denied": [0, 0], "executed": [0, 0]})
+    for lab in read(d / "session_labels.jsonl"):
+        cls, _, key = lab["label"].partition(":")
+        sc = scores.get(lab["session_id"])
+        if cls != "Malicious" or key not in manifest or sc is None:
+            continue
+        denied = any("permission denied" in e for e in manifest[key].get("errors", []))
+        hit = int(sc["risk"] >= sc["theta_a"])
+        for part in ("attempted", "denied" if denied else "executed"):
+            out[tpl(manifest[key]["scenario_id"])][part][0] += hit
+            out[tpl(manifest[key]["scenario_id"])][part][1] += 1
+    return out
+
+
 def loto(folder, seeds):
     """template -> list of (hits, n), one per seed, summed over the folds where it was a
     test template (a benign template can be the test template of two folds)."""
@@ -117,6 +143,24 @@ def main():
         rows[labels[t]].append(cells)
     pg = live.get("pgbench", {"hits": 0, "n": 0})
 
+    split_md = []
+    for run, label in (("5a_attacks", "5a (attacks only)"), ("5b_mixed", "5b (mixed)")):
+        for daemon, model in (("daemon_v2", "v2"), ("daemon_v3", "v3")):
+            if not (Path("live_runs") / run / daemon / "session_scores.jsonl").exists():
+                continue
+            sp = live_split(run, daemon)
+            cell = lambda h, n: f"{h}/{n}" if n else "–"
+            split_md += [f"**{label}, {model}**", "",
+                         "| Attack template | Attempted (caught/all) | Refused by Postgres | Executed |",
+                         "|---|---|---|---|"]
+            tot = {"attempted": [0, 0], "denied": [0, 0], "executed": [0, 0]}
+            for t in sorted(sp):
+                split_md.append(f"| {t} | " + " | ".join(cell(*sp[t][k]) for k in tot) + " |")
+                for k in tot:
+                    tot[k][0] += sp[t][k][0]
+                    tot[k][1] += sp[t][k][1]
+            split_md += ["| **all attacks** | " + " | ".join(f"**{cell(*tot[k])}**" for k in tot) + " |", ""]
+
     md = [
         "# Results per attack type",
         "",
@@ -141,6 +185,14 @@ def main():
         *["| " + " | ".join(r) + " |" for r in rows["benign"]],
         f"| pgbench (background load) | – | {pg['hits'] / pg['n']:.2f} ({pg['hits']}/{pg['n']}) | – | – | _pending_ |" if pg["n"] else "",
         "",
+        "## Live attacks: attempted vs executed",
+        "",
+        "Some live attack sessions were **refused by Postgres** (\"permission denied\", recorded per session in `live_manifest.jsonl`): the attack was attempted but never took effect.",
+        "The Postgres hook logs a statement *before* Postgres checks permissions, so the detector still sees the attempt.",
+        "*Attempted* counts every attack session; *executed* only those with no refused statement.",
+        "Failed outbound `curl` calls are not refusals: the statement and its OS process ran, only the network connection was refused by design.",
+        "",
+        *split_md,
         "## Reading the table",
         "- **Seen attacks** (offline and live) are detected almost perfectly. Live alerts arrive within about 2 s.",
         "- **Unseen attacks.** Detection depends on how close the attack is to a trained one. v3 improves several templates over v2.",
