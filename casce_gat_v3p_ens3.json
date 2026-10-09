@@ -1,4 +1,15 @@
 {
-  "ensemble": ["casce_gat_v3p.pt", "casce_gat_v3p_s7.pt", "casce_gat_v3p_s13.pt"],
-  "note": "v3P ensemble: mean GAT probability of seeds 42, 7 and 13 (same data and settings, run_v3p.sh)"
+  "ensemble": [
+    "casce_gat_v3p.pt",
+    "casce_gat_v3p_s7.pt",
+    "casce_gat_v3p_s13.pt"
+  ],
+  "note": "v3P ensemble: mean GAT probability of seeds 42, 7 and 13 (same data and settings, run_v3p.sh)",
+  "theta_a": 0.55,
+  "theta_tuned_on": "dataset_dev/algo4_splits/val_labels.json,training_v2/dev_val_prefixes/labels.json,training_v2/pgbench_val/labels.json,training_v3p/benign_extra_val.json",
+  "theta_tied_range": [
+    0.35,
+    0.75
+  ],
+  "theta_mode": "f1"
 }

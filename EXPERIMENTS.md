@@ -502,3 +502,19 @@ Seeds 2 and 3 ran overnight. Seed 3 had two folds trained twice by a duplicated 
 **Conclusion.** On fresh live traffic, v3P and its ensemble detect every attack with no false alarms, alerting within about 1.6 s. The ensemble adds about 0.1 s of latency and removes the per-seed blind spots seen on 8_final. **Recommended deployment: `casce_gat_v3p_ens2`.**
 
 **Scope, unchanged.** These are new instances of templates the deployed models were trained on. Detection of *unseen* attack techniques is measured by the template-disjoint folds (v3: F1 0.73 ± 0.12) and will be measured live by 4D.
+
+### 3-model ensemble and the final recommendation (Oct 9, 09:50)
+A third v3P model (seed 13, early stop at epoch 14) was added as `casce_gat_v3p_ens3.json` and evaluated the same way (`live_eval_ensemble/casce_gat_v3p_ens3/`).
+
+| | v3P seed 42 | v3P seed 7 | ens2 (42 + 7) | ens3 (42 + 7 + 13) |
+|---|---|---|---|---|
+| Offline (706) | F1 0.984 | – | F1 1.0 | F1 1.0 |
+| 8_final: attacks attempted / executed, FP | 93/93, 56/56, 3 FP | 81/93, 56/56, 0 FP | 93/93, 56/56, 0 FP | 81/93, 56/56, 0 FP |
+| 10_confirm: attacks attempted / executed, FP | 57/57, 31/31, 0 FP | – | 57/57, 31/31, 0 FP | 43/57, 31/31, 0 FP |
+
+- **Every configuration detects every executed attack**, with 0 false alarms in the fresh confirmation run (seed 42 alone had 3 on 8_final).
+- **The differences are all in the defense_impair sessions that Postgres refused.** Each model's GAT is all-or-nothing on them (1.0 or 0.0), and only seed 42 flags them. In the ensembles the average is therefore a vote: ens2 reaches 0.5 (risk 0.61, just above θ); ens3 reaches 0.33 (risk 0.53, below).
+- **ens2's perfect live scores are therefore a narrow margin, not robustness.** Choosing ens2 over ens3 because it scored better on these test runs would be selection on test data.
+- The live and synthetic graphs of this scenario are not identical. This synthetic-vs-live coverage gap needs investigating before the refused-attempt numbers can be relied on.
+
+**Recommendation.** Deploy a v3P ensemble for its zero false alarms and full detection of executed attacks, and report detection of *refused* defense-impairment attempts as **seed-dependent / not yet reliable**. ens3 is the principled choice (more seeds, decided in advance). ens2's extra detections come from a 1-of-2 vote.

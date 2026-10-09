@@ -36,7 +36,7 @@ postgres_events.json (SQL hook) + kernel_events.json (eBPF)
 | `make_template_folds.py`, `run_loto.sh`, `fold_report.py`, `loto_summary.py`, `loto/` | **Template-disjoint evaluation**: 7 folds, each testing on attack and benign templates never seen in training |
 | `make_holdout_labels.py`, `holdout_report.py`, `leakage_report.py`, `run_seed.sh`, `seed_summary.py` | priv_abuse holdout, train/test overlap diagnostics, seed variance |
 | `realtime_daemon.py`, `workload_simulation/` | Real-time detection; live capture (`pg_telemetry.c`, `kernel_telemetry.py`, `logger.sh`), live scenario runner, live evaluation |
-| `casce_gat_v3p_ens2.json` | **Recommended deployment model**: ensemble of two v3P models (`casce_gat_v3p.pt`, `casce_gat_v3p_s7.pt`; average of their GAT probabilities). Use it as `--model-path casce_gat_v3p_ens2.pt` (θ = 0.55, in the json) |
+| `casce_gat_v3p_ens3.json`, `casce_gat_v3p_ens2.json` | Ensembles of v3P models (average of GAT probabilities; use as `--model-path casce_gat_v3p_ens3.pt`). All v3P variants detect every executed attack with ~0 false alarms; detection of *refused* defense-impairment attempts is seed-dependent (see EXPERIMENTS.md, "3-model ensemble") |
 | `casce_gat_v3p.pt`, `casce_gat_v3p_s7.pt` (+ `.json`) | v3P: feature v3, trained with the extra benign templates and live-captured benign traffic (two seeds) |
 | `casce_gat_v2.pt`, `casce_gat_v3.pt` (+ `.json`) | Models trained on the E1 split only, feature v2 and v3. v3 is the model evaluated for generalization. `casce_gat.pt` is the legacy v1 baseline |
 | `workload_simulation/run_full_live.sh`, `workload_simulation/live_compare.py` | One complete live experiment (capture + workload + one or more daemons scoring in real time) and a side-by-side comparison of the daemons |
@@ -89,7 +89,7 @@ All data is synthetic banking traffic. Full tables, per-template results and cav
 
 ## Open work
 
-- **3-model ensemble:** a third v3P seed (13) is evaluated automatically when its training finishes (`live_eval_ensemble/casce_gat_v3p_ens3/`).
+- **Refused defense-impairment attempts:** detected by only 1 of 3 v3P seeds live; the live and synthetic graphs of this scenario differ. Investigate before relying on attempted-attack recall.
 - **Live 4D:** run unseen attacks and benign workload on the live database. The environment is ready and verified.
 - **Unsolved case:** distinguishing malicious from benign ETL replication when neither was seen in training.
 - **Known limitations** (see EXPERIMENTS.md): three rule types can never fire; single banking domain only.
