@@ -36,7 +36,8 @@ postgres_events.json (SQL hook) + kernel_events.json (eBPF)
 | `make_template_folds.py`, `run_loto.sh`, `fold_report.py`, `loto_summary.py`, `loto/` | **Template-disjoint evaluation**: 7 folds, each testing on attack and benign templates never seen in training |
 | `make_holdout_labels.py`, `holdout_report.py`, `leakage_report.py`, `run_seed.sh`, `seed_summary.py` | priv_abuse holdout, train/test overlap diagnostics, seed variance |
 | `realtime_daemon.py`, `workload_simulation/` | Real-time detection; live capture (`pg_telemetry.c`, `kernel_telemetry.py`, `logger.sh`), live scenario runner, live evaluation |
-| `casce_gat_v3p.pt` (+ `.json`) | **Recommended deployment model**: feature v3, trained with the extra benign templates and live-captured benign traffic (θ = 0.55, in the sidecar) |
+| `casce_gat_v3p_ens2.json` | **Recommended deployment model**: ensemble of two v3P models (`casce_gat_v3p.pt`, `casce_gat_v3p_s7.pt`; average of their GAT probabilities). Use it as `--model-path casce_gat_v3p_ens2.pt` (θ = 0.55, in the json) |
+| `casce_gat_v3p.pt`, `casce_gat_v3p_s7.pt` (+ `.json`) | v3P: feature v3, trained with the extra benign templates and live-captured benign traffic (two seeds) |
 | `casce_gat_v2.pt`, `casce_gat_v3.pt` (+ `.json`) | Models trained on the E1 split only, feature v2 and v3. v3 is the model evaluated for generalization. `casce_gat.pt` is the legacy v1 baseline |
 | `workload_simulation/run_full_live.sh`, `workload_simulation/live_compare.py` | One complete live experiment (capture + workload + one or more daemons scoring in real time) and a side-by-side comparison of the daemons |
 | `loto*/`, `models_seeds/`, `eval_test_report_*/`, `tune_out_*/` | Result files referenced in EXPERIMENTS.md |
@@ -82,12 +83,13 @@ All data is synthetic banking traffic. Full tables, per-template results and cav
 | **Live, unseen benign workloads** (6_full) | 2,801 live sessions incl. 240 of 6 benign templates no model had seen; v3 scoring live | False alarms on the unseen templates: v2 **94/240**, v3 **17/240** (all 17 = benign data sent to non-approved external hosts); attacks 93/93 for both |
 | **Final live run, real time** (8_final) | 1,999 live sessions; v2, v3, v3P all scoring live, same traffic | Attacks 93/93 (56/56 executed) for all; FPR v2 2.4%, v3 0.42%, **v3P 0.16%**; F1 0.80 / 0.96 / **0.98**; alert latency median **1.6 s**, max 3.1 s |
 | **Load test** (9_load) | 4,868 pgbench sessions at 8/s for 10 min, v3P live | All scored, 0 false alarms, final-score lag p99 6.9 s, stable memory (~800 MB) |
+| **Fresh live confirmation** (10_confirm) | 1,115 live sessions of fresh, never-used scenario instances; v3, v3P, ensemble scoring live | Ensemble and v3P: attacks **57/57**, false alarms **0/1,058**, F1 **1.0**, latency median 1.66 s (ensemble), max 3.2 s; v3: 2 false alarms |
 
-**What these numbers mean.** On attack types it was trained on, CASCE is near-perfect, offline and live, with no false alarms. On attack types it has never seen, it generalises only partly. The main failure is mistaking unseen *legitimate* data movement (ETL replication, audits) for attacks. Feature v3, which describes behaviour instead of exact SQL strings, paths and names, helps: modestly on unseen *templates* offline (F1 0.67 → 0.73), and strongly on unseen *benign workloads* live (false alarms 94 → 17 of 240). Adding the bank's normal workloads to training (v3P) brings live false alarms to 0.16% with every attack detected.
+**What these numbers mean.** On attack types it was trained on, CASCE is near-perfect, offline and live, with no false alarms. On attack types it has never seen, it generalises only partly. The main failure is mistaking unseen *legitimate* data movement (ETL replication, audits) for attacks. Feature v3, which describes behaviour instead of exact SQL strings, paths and names, helps: modestly on unseen *templates* offline (F1 0.67 → 0.73), and strongly on unseen *benign workloads* live (false alarms 94 → 17 of 240). Adding the bank's normal workloads to training (v3P), and averaging two v3P models, gives every attack detected with no false alarms on fresh live traffic.
 
 ## Open work
 
-- **Ensemble / seeds for v3P:** check whether v3P's 3 teller_routine false alarms in 8_final are seed-specific (a seed-7 v3P was still training at 07:20).
+- **3-model ensemble:** a third v3P seed (13) is evaluated automatically when its training finishes (`live_eval_ensemble/casce_gat_v3p_ens3/`).
 - **Live 4D:** run unseen attacks and benign workload on the live database. The environment is ready and verified.
 - **Unsolved case:** distinguishing malicious from benign ETL replication when neither was seen in training.
 - **Known limitations** (see EXPERIMENTS.md): three rule types can never fire; single banking domain only.
