@@ -347,3 +347,127 @@ Each stage's results are in `loto_<config>/loto_summary.txt`.
 | Live vs synthetic verdicts | 226/226 | **226/226** (mean \|Δrisk\| 0.001) |
 
 **Reading.** On seen templates v3 matches v2 exactly, offline and live, so masking identifiers costs nothing on known attacks. v3's advantage is on unseen templates (section T, F1 0.83 vs 0.67, provisional, 1 seed). The v2 live rows for 4a–5a are replays of the same captures, like v3's. 5b was scored live by v2 and replayed for v3; replay reproduces live verdicts.
+
+## Overnight run, Oct 8–9: live real-time evaluation and production hardening
+Local branch `overnight-realtime`, not pushed. Everything below was run on this machine's `casce_environment` container.
+
+### 6_full: fresh live capture, v3 scoring in real time (follow mode)
+`workload_simulation/run_full_live.sh 6_full casce_gat_v3.pt --class all --pgbench --specs 'dataset_test/run_*/specs/*.yaml' 'dataset_benign_extra/run_*/specs/*.yaml'`
+- Capture: 2,801 labelled live sessions over 39 min.
+  - All 226 `dataset_test` scenario sessions (133 benign, 93 attacks; seen templates).
+  - 240 sessions of the 6 `benign_extra` templates, **never seen by v2 or v3**.
+  - 2,335 pgbench sessions.
+- Daemon: v3, θ = 0.55 (from its sidecar), running live during the capture. v2 and v3 were also replayed on the same capture (`--replay --replay-realtime`).
+
+| Final verdict | v2 (replay) | **v3 (live)** | v3 (replay) |
+|---|---|---|---|
+| Attacks (93) | 93/93 | **93/93** | 93/93 |
+| pgbench (2,335) | 0 FP | **0 FP** | 0 FP |
+| Seen benign scenarios (133) | 0 FP | **0 FP** | 0 FP |
+| **Unseen benign templates (240)** | **94 FP (39%)**: audit_archive 43/43, bi_export 35/35, replica_health 16/43 | **17 FP (7%)**: replica_health 17/43 only | 17 FP |
+| Overall precision / recall / F1 | 0.497 / 1.0 / 0.664 | **0.845 / 1.0 / 0.916** | 0.845 / 1.0 / 0.916 |
+| Real-time view: alerts on sessions whose final verdict is benign | 0 | 35 (user_provisioning) | 35 |
+
+- **v3 replay reproduces v3 live exactly**, the same 17 FP and 35 transient alerts, so replay is a valid stand-in for live scoring.
+- **The live result on unseen benign workloads confirms the offline template-disjoint result:** v3 generalizes much better than v2.
+- **Remaining v3 errors:**
+  - `replica_health`, the benign `curl` of a row count to internal monitoring, at 40%.
+  - Transient mid-session alerts on `user_provisioning`: right after its `CREATE ROLE … LOGIN PASSWORD`, the partial session resembles priv_abuse. Its final verdict is benign.
+
+### Real-time latency: torch threads
+- Live 6_full latency was poor: attacks alerted after a median 5.5 s (p90 8.5 s, max 12.8 s), and one scoring pass took a median 424 ms.
+- **Breakdown:** Algorithm 2 1.4 ms, Algorithm 3 16.5 ms, GraphML round trip 4.4 ms, **Algorithm 4 393 ms**.
+- **Cause:** PyTorch's default of one thread per core (12 here) on graphs of about 20 nodes, under CPU contention (two fold trainings ran at the same time).
+- **Benchmark** (120 test graphs, same load): `detect()` median **103.5 ms at the default, 22.4 ms with 1 thread**, 23.5 ms with 2, 79.1 ms with 4.
+- **Fix:** `realtime_daemon.py --threads` (default 1) sets `torch.set_num_threads`. Also, the daemon's `evicted` table is now trimmed, so it no longer grows by one entry per session forever.
+- **Why `replica_health` is flagged.** The destination of each session's `curl` comes from the live kernel `connect` events, classed with v3's endpoint rule. All **17** flagged sessions sent to an **external, non-approved** address; all **26** sent to an approved destination scored benign. The generator deliberately sends 30% of benign transfers to the external pool (`_DEST_CROSS_PROB`) and still labels them benign. v3 alerts on "data sent to a non-approved external host", which is arguably the intended security policy. These 17 are label convention, not detector confusion.
+
+### Alert confirmation (`--confirm N`): no benefit, default kept at 1
+Re-scoring 6_full with v3 at `--confirm 1` reproduces the earlier replay exactly: 93/93 attacks, 52 benign alerts, 35 of them transient. At `--confirm 2` (alert a running session only after two consecutive scorings ≥ θ) the result is still **35 transient alerts**. The user_provisioning partial sessions stay above θ for several 2-s rescorings, because the GRANT that makes them benign arrives 2–6 s after the CREATE ROLE. A longer hold-off would only delay real alerts. The option remains available, but the remedy for transient alerts is the model knowing the benign workload (v3P below), not an alert delay.
+
+### Sandbox hygiene
+`user_provisioning` scenarios create logins (`teller_NNN`, `analyst_NNN`, `auditor_NNN`) that persist. Replaying the same specs again then fails with "role already exists" (12 sessions in 7_train_benign; harmless for training). The 35 such logins were dropped from `casce_banking` before the final live run. Drop them between live runs that replay the same specs.
+
+### v3P: production candidate (more benign coverage, live-captured benign traffic)
+`run_v3p.sh` produces `casce_gat_v3p.pt`. The model, features (v3), settings, seed and θ rule are the same as `casce_gat_v3`. The training data adds what v3 lacked:
+1. **The 6 extra benign templates:** `dataset_benign_extra` runs 101–105 for training and run 106 for validation. **Runs 107–112 are held out for testing.**
+2. **Live-captured benign traffic with real eBPF kernel events**, captured for training only (`live_runs/7_train_benign`, 21 min). It covers the benign scenarios of `dataset_dev` runs 1–10 plus `benign_extra` runs 101–105: 228 scenario sessions, plus pgbench (100 of 1,349 sessions sampled). That gives 1,312 graphs including prefixes. Until now the model had seen real kernel events only at test time.
+
+Training set: 3,184 graphs (2,824 benign, 360 malicious). Validation: 588. Early stopping fired at epoch 35. θ = 0.55 (the validation F1 = 1.0 range was 0.30–0.75, middle chosen).
+
+| Test (offline) | n (malicious) | P | R | F1 | FPR | ROC-AUC |
+|---|---|---|---|---|---|---|
+| E1 test + held-out benign_extra runs 107–112 | 706 (93) | 0.969 | 1.000 | 0.984 | 0.0049 | 0.9995 |
+
+**Caveat.** For v3P the extra benign templates are *seen* (new instances only). v3P therefore measures **coverage of the bank's known workloads**, not generalization. Generalization evidence remains the template-disjoint folds (T) and v3's live result on the unseen templates (6_full).
+
+### 8_final: final live run, v2 / v3 / v3P all scoring in real time (Oct 9, 05:13–05:43)
+`run_full_live.sh 8_final casce_gat_v2.pt,casce_gat_v3.pt,casce_gat_v3p.pt --class all --pgbench --specs 'dataset_test/run_*/specs/*.yaml' 'dataset_benign_extra/run_10[7-9]/specs/*.yaml' 'dataset_benign_extra/run_11[0-2]/specs/*.yaml'`
+- **Three daemons followed the same live logs at once**, each with `--threads 1`, while three fold trainings were also running on the machine.
+- **Traffic:** all 226 `dataset_test` scenario sessions, the held-out `benign_extra` runs 107–112 (120 sessions, never used for any training), and 1,654 pgbench sessions.
+- The provisioning logins left by earlier runs were dropped first.
+- Comparison: `workload_simulation/live_compare.py live_runs/8_final daemon_v2_live daemon_v3_live daemon_v3p_live`.
+
+| Group | daemon_v2_live | daemon_v3_live | daemon_v3p_live |
+|---|---|---|---|
+| Attacks: all attempted | 93/93 | 93/93 | 93/93 |
+| Attacks: executed | 56/56 | 56/56 | 56/56 |
+| Attacks: refused by Postgres | 37/37 | 37/37 | 37/37 |
+| Benign scenarios (dataset_test) | 0/133 | 0/133 | 3/133 |
+| Benign extra templates | 46/120 | 8/120 | 0/120 |
+| pgbench | 0/1654 | 0/1654 | 0/1654 |
+| Precision / recall / F1 | 0.669 / 1.000 / 0.802 | 0.921 / 1.000 / 0.959 | 0.969 / 1.000 / 0.984 |
+| FPR (all benign) | 0.0241 (46/1907) | 0.0042 (8/1907) | 0.0016 (3/1907) |
+| Real-time alerts on sessions finally benign | 0 | 19 | 0 |
+| Attack alert latency median / p90 / max (s) | 1.61 / 2.50 / 3.03 | 1.63 / 2.43 / 3.14 | 1.61 / 2.43 / 3.09 |
+
+| Benign template (false alarms) | v2 | v3 | v3P |
+|---|---|---|---|
+| audit_archive | 25/25 | 0/25 | 0/25 |
+| bi_export | 14/14 | 0/14 | 0/14 |
+| replica_health | 7/16 | 8/16 | 0/16 |
+| teller_routine | 0/31 | 0/31 | 3/31 |
+| all other benign templates and pgbench | 0 | 0 | 0 |
+
+**Reading.**
+- **All three models detect every attack**: 93/93 attempted and 56/56 executed. They do it **in real time**, with a median of 1.6 s and a maximum of 3.1 s from the attack's last event to the alert. Before `--threads 1` it was 5.5 s and 12.8 s.
+- **v2 → v3 → v3P, false alarms on all benign traffic: 2.4% → 0.42% → 0.16%.**
+  - v3's gain is generalization: the extra templates are unseen for v3.
+  - v3P's further gain is coverage: those templates are known to v3P, with new instances.
+  - v3P also removes v3's 19 transient mid-session alerts.
+- **v3P's 3 false alarms are on `teller_routine`**, a template v3 handles perfectly (scores of 0). All 3 sessions repeat one identical lookup twice. The repeat collapses into one Query node with two edges, a shape rare in training, and v3P's GAT saturates at 1.0 on it. It is single-model fragility, not a systematic error (28/31 teller sessions are fine). Seeds or ensembling would show whether it is stable.
+- **Recommended deployment model: v3P**, with **v3** as the evaluated generalization model.
+
+### 9_load: throughput and stability (Oct 9, 05:45–05:57)
+`run_full_live.sh 9_load casce_gat_v3p.pt --pgbench-only 600 --pgbench-rate 8 --pgbench-clients 4`: a 10-minute load test. pgbench opened a new session for every transaction, at 8.1 sessions/s, with the v3P daemon live (`--threads 1`). A fold training ran on the same machine at the same time.
+
+| Measure | Result |
+|---|---|
+| Sessions captured / scored | 4,868 / 4,868 |
+| False alarms | 0 |
+| Final score lag after a session's last event | median 2.0 s, p90 5.4 s, p99 6.9 s, max 7.3 s (stable, no backlog growth) |
+| Scoring pass (Alg 2–4) | median 106 ms, p99 112 ms, max 158 ms |
+| Daemon CPU | ≈ 78% of one core throughout |
+| Daemon memory (RSS) | 794 MB → 798 MB over 10 min (mostly the torch runtime; no leak) |
+
+**Capacity.** One single-threaded daemon handles about 8–9 new sessions/s, and it is near saturation at 8/s. Beyond that, sessions can be sharded across daemons by backend pid, or `--rescore-every` raised to trade alert latency for throughput. Neither is implemented.
+
+### T, v3 confirmed on 3 seeds (`loto_v3_f1/`, original θ rule)
+Seeds 2 and 3 ran overnight. Seed 3 had two folds trained twice by a duplicated queue; they were re-tuned and re-reported from their final checkpoints, and the numbers were unchanged.
+
+| Config (7 folds × 3 seeds) | Recall | FPR | F1 | ROC-AUC |
+|---|---|---|---|---|
+| v2 | 0.818 ± 0.104 | 0.403 ± 0.058 | 0.673 ± 0.128 | 0.614 ± 0.078 |
+| **v3** | 0.794 ± 0.153 | 0.333 ± 0.083 | **0.729 ± 0.121** | 0.662 ± 0.136 |
+
+- **Per fold, v3 (3 seeds):**
+  - **Perfect in all 3 seeds:** alter_role_esc, compliance_exfil, priv_abuse.
+  - teller_pii_dump is perfect in 2 seeds; in seed 3 the unseen benign compliance_audit scores above the attack (recall 0, FPR 1).
+  - defense_impair and etl_exfil_mal have FPR 1.0 in every seed: the unseen benign ETL is always flagged.
+  - multi_apt recall is 0.22.
+- **Conclusion.** The single-seed F1 of 0.83 was optimistic. v3's offline generalization gain over v2 is real but modest (+0.06 F1, about half a standard deviation). The live unseen-benign result (6_full: 94 → 17 false alarms of 240) shows a larger effect. That is because those unseen templates differ from attacks mainly in the identifiers v3 masks, while the failing offline folds (ETL, audit) are designed hard negatives.
+
+### Open after the overnight run
+- `casce_gat_v3p_s7.pt`, a second v3P with seed 7 started at 06:00, was still training at 07:20. Its replay on 8_final will show whether v3P's 3 teller_routine false alarms are seed-specific. If they are, ensembling v3P seeds is the next step.
+- **4D (unseen attack techniques, live)** still needs the adapted attack scripts (`4d-live-attack-workload` branch).
+- **Daemon throughput** is about 8 sessions/s per single-threaded daemon. Sharding by backend pid is the scaling path.

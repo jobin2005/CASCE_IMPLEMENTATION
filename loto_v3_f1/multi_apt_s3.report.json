@@ -1,0 +1,673 @@
+{
+  "fold": "multi_apt",
+  "test_templates": [
+    "banking_multi_apt",
+    "banking_manager_eod"
+  ],
+  "val_templates": [
+    "banking_priv_abuse",
+    "banking_teller_routine"
+  ],
+  "model": "loto_v3_f1/multi_apt_s3.pt",
+  "theta": 0.75,
+  "unseen": {
+    "n": 249,
+    "n_malicious": 96,
+    "tp": 32,
+    "fp": 0,
+    "fn": 64,
+    "tn": 153,
+    "precision": 1.0,
+    "recall": 0.3333,
+    "f1": 0.5,
+    "accuracy": 0.743,
+    "fpr": 0.0,
+    "roc_auc": 0.6667,
+    "pr_auc": 0.5904,
+    "min_malicious_score": 0.0,
+    "max_benign_score": 0.0,
+    "margin": 0.0
+  },
+  "unseen_gat_only": {
+    "n": 249,
+    "n_malicious": 96,
+    "tp": 32,
+    "fp": 0,
+    "fn": 64,
+    "tn": 153,
+    "precision": 1.0,
+    "recall": 0.3333,
+    "f1": 0.5,
+    "accuracy": 0.743,
+    "fpr": 0.0,
+    "roc_auc": 0.6667,
+    "pr_auc": 0.5904,
+    "min_malicious_score": 0.0,
+    "max_benign_score": 0.0,
+    "margin": 0.0
+  },
+  "seen_test": {
+    "n": 133,
+    "n_malicious": 59,
+    "tp": 59,
+    "fp": 0,
+    "fn": 0,
+    "tn": 74,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "accuracy": 1.0,
+    "fpr": 0.0,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "min_malicious_score": 0.7908,
+    "max_benign_score": 0.2994,
+    "margin": 0.4914
+  },
+  "per_template_unseen": {
+    "banking_manager_eod": {
+      "n": 153,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0
+    },
+    "banking_multi_apt": {
+      "n": 96,
+      "label": 1,
+      "detected": 32,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.8114
+    }
+  },
+  "per_template_seen_test": {
+    "banking_alter_role_esc": {
+      "n": 3,
+      "label": 1,
+      "detected": 3,
+      "risk_min": 0.8217,
+      "risk_median": 0.8217,
+      "risk_max": 0.8217
+    },
+    "banking_compliance_audit": {
+      "n": 32,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0
+    },
+    "banking_compliance_exfil": {
+      "n": 16,
+      "label": 1,
+      "detected": 16,
+      "risk_min": 0.8232,
+      "risk_median": 0.8232,
+      "risk_max": 0.8232
+    },
+    "banking_dba_shadow_audit": {
+      "n": 13,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0
+    },
+    "banking_defense_impair": {
+      "n": 12,
+      "label": 1,
+      "detected": 12,
+      "risk_min": 0.8023,
+      "risk_median": 0.8023,
+      "risk_max": 0.8023
+    },
+    "banking_etl_exfil_mal": {
+      "n": 14,
+      "label": 1,
+      "detected": 14,
+      "risk_min": 0.7908,
+      "risk_median": 0.8183,
+      "risk_max": 0.8183
+    },
+    "banking_etl_internal": {
+      "n": 15,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.2945,
+      "risk_median": 0.2945,
+      "risk_max": 0.2994
+    },
+    "banking_etl_repl_ben": {
+      "n": 14,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.2962,
+      "risk_median": 0.2962,
+      "risk_max": 0.2962
+    },
+    "banking_teller_pii_dump": {
+      "n": 14,
+      "label": 1,
+      "detected": 14,
+      "risk_min": 0.8217,
+      "risk_median": 0.8217,
+      "risk_max": 0.8217
+    }
+  },
+  "unseen_errors": [
+    {
+      "graph": "enriched_run_001_20034_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_001_20036_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_004_20026_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_004_20028_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_005_20022_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_005_20024_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_006_20028_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_006_20030_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_009_20030_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_009_20032_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_012_20028_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_012_20030_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_014_20028_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_014_20030_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_015_20028_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_015_20030_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_015_20034_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_015_20036_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_017_20028_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_017_20030_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_018_20024_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_018_20026_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_020_20030_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_020_20032_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_021_20024_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_021_20026_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_021_20030_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_021_20032_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_022_20032_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_022_20034_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_022_20038_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_022_20040_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_022_20044_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_022_20046_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_023_20034_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_023_20036_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_024_20030_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_024_20032_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_028_20024_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_028_20026_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_028_20030_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_028_20032_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_030_20020_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_030_20022_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_035_20032_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_035_20034_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_037_20022_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_037_20024_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_038_20022_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_038_20024_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_038_20028_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_038_20030_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_dev",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_004_20036_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_test",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_004_20038_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_test",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_006_20030_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_test",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_006_20032_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_test",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_006_20036_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_test",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_006_20038_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_test",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_008_20038_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_test",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_008_20040_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_test",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_008_20044_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_test",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_008_20046_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_test",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_009_20026_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_test",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    },
+    {
+      "graph": "enriched_run_009_20028_Malicious.graphml",
+      "template": "banking_multi_apt",
+      "source": "dataset_test",
+      "risk": 0.0,
+      "gat": 0.0,
+      "rule": 0.0
+    }
+  ]
+}

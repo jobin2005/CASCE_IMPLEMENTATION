@@ -1,0 +1,160 @@
+{
+  "fold": "compliance_exfil",
+  "test_templates": [
+    "banking_compliance_exfil",
+    "banking_dba_shadow_audit"
+  ],
+  "val_templates": [
+    "banking_defense_impair",
+    "banking_etl_internal"
+  ],
+  "model": "loto_v3_f1/compliance_exfil_s2.pt",
+  "theta": 0.4,
+  "unseen": {
+    "n": 118,
+    "n_malicious": 78,
+    "tp": 78,
+    "fp": 0,
+    "fn": 0,
+    "tn": 40,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "accuracy": 1.0,
+    "fpr": 0.0,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "min_malicious_score": 0.8231,
+    "max_benign_score": 0.0,
+    "margin": 0.8231
+  },
+  "unseen_gat_only": {
+    "n": 118,
+    "n_malicious": 78,
+    "tp": 78,
+    "fp": 0,
+    "fn": 0,
+    "tn": 40,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "accuracy": 1.0,
+    "fpr": 0.0,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "min_malicious_score": 0.9999,
+    "max_benign_score": 0.0,
+    "margin": 0.9999
+  },
+  "seen_test": {
+    "n": 170,
+    "n_malicious": 65,
+    "tp": 65,
+    "fp": 0,
+    "fn": 0,
+    "tn": 105,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "accuracy": 1.0,
+    "fpr": 0.0,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "min_malicious_score": 0.75,
+    "max_benign_score": 0.2962,
+    "margin": 0.4538
+  },
+  "per_template_unseen": {
+    "banking_compliance_exfil": {
+      "n": 78,
+      "label": 1,
+      "detected": 78,
+      "risk_min": 0.8231,
+      "risk_median": 0.8232,
+      "risk_max": 0.8232
+    },
+    "banking_dba_shadow_audit": {
+      "n": 40,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0
+    }
+  },
+  "per_template_seen_test": {
+    "banking_alter_role_esc": {
+      "n": 3,
+      "label": 1,
+      "detected": 3,
+      "risk_min": 0.8217,
+      "risk_median": 0.8217,
+      "risk_max": 0.8217
+    },
+    "banking_compliance_audit": {
+      "n": 32,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0
+    },
+    "banking_etl_exfil_mal": {
+      "n": 14,
+      "label": 1,
+      "detected": 14,
+      "risk_min": 0.8232,
+      "risk_median": 0.8232,
+      "risk_max": 0.8232
+    },
+    "banking_etl_repl_ben": {
+      "n": 14,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.2962,
+      "risk_median": 0.2962,
+      "risk_max": 0.2962
+    },
+    "banking_manager_eod": {
+      "n": 28,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0
+    },
+    "banking_multi_apt": {
+      "n": 18,
+      "label": 1,
+      "detected": 18,
+      "risk_min": 0.75,
+      "risk_median": 0.75,
+      "risk_max": 0.8232
+    },
+    "banking_priv_abuse": {
+      "n": 16,
+      "label": 1,
+      "detected": 16,
+      "risk_min": 0.75,
+      "risk_median": 0.75,
+      "risk_max": 0.75
+    },
+    "banking_teller_pii_dump": {
+      "n": 14,
+      "label": 1,
+      "detected": 14,
+      "risk_min": 0.8217,
+      "risk_median": 0.8217,
+      "risk_max": 0.8217
+    },
+    "banking_teller_routine": {
+      "n": 31,
+      "label": 0,
+      "false_alarms": 0,
+      "risk_min": 0.0,
+      "risk_median": 0.0,
+      "risk_max": 0.0
+    }
+  },
+  "unseen_errors": []
+}

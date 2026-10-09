@@ -1,0 +1,19 @@
+== 00:40 graphs from the live training capture
+live benign graphs selected: 1312 (pgbench sessions kept 100 of 1349)
+== 00:42 train v3P
+[train] Training set: 3184 graphs (2824 normal, 360 malicious)
+[train] Validation set: 588 graphs (536 normal, 52 malicious)
+[train] Early stopping at epoch 35 (val_loss not improving for 5 epochs)
+== 05:10 tune θ on validation (original f1 rule)
+  Best F1 reached at 10 thresholds, θ_A = 0.30 … 0.75; using the middle one
+  ★ Best F1 = 1.0000 at θ_A = 0.55
+    Recorded θ_A = 0.55 in casce_gat_v3p.json
+== 05:11 E1 synthetic test set + held-out extra benign runs 107-112
+[algo4] using θ_A = 0.55 tuned for casce_gat_v3p.pt
+  Samples:   706 (93 malicious, 613 normal)
+  Precision: 0.9688
+  Recall:    1.0000
+  F1-Score:  0.9841
+  FPR / FNR: 0.0049 / 0.0000
+  ROC-AUC:   0.9995   PR-AUC: 0.9937   (GAT alone ROC-AUC 0.9984)
+== 05:12 done

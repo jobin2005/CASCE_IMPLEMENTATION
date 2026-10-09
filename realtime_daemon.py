@@ -106,7 +106,7 @@ class JsonlFollower:
 # --------------------------------------------------------------------------
 
 class Session:
-    __slots__ = ("events", "last_event_wall", "last_event_ts", "dirty", "alerted", "final")
+    __slots__ = ("events", "last_event_wall", "last_event_ts", "dirty", "alerted", "final", "above")
 
     def __init__(self):
         self.events = []            # attributed events, as loader.load_attributed_events builds them
@@ -115,10 +115,12 @@ class Session:
         self.dirty = False          # new events since last scoring
         self.alerted = False
         self.final = False
+        self.above = 0              # consecutive scorings with risk >= theta_A
 
 
 class Engine:
-    def __init__(self, model, theta_a, theta_r, out_dir: Path, templates):
+    def __init__(self, model, theta_a, theta_r, out_dir: Path, templates, confirm=1):
+        self.confirm = max(1, confirm)  # alert after this many consecutive scorings >= theta_A
         self.model = model
         self.theta_a = theta_a
         self.theta_r = theta_r
@@ -234,7 +236,10 @@ class Engine:
                   "theta_a": self.theta_a, "n_events": len(s.events),
                   "behaviors": [b["label"] for b in behaviors],
                   "last_event_ts": s.last_event_ts, "scored_at": wall}
-        if a["status"] != "benign" and not s.alerted:
+        s.above = s.above + 1 if a["status"] != "benign" else 0
+        # partial (running) sessions must stay above theta_A for --confirm consecutive
+        # scorings before alerting; a final score above theta_A always alerts
+        if a["status"] != "benign" and not s.alerted and (final or s.above >= self.confirm):
             s.alerted = True
             alert = {**result, "message": a.get("message", ""),
                      "detection_latency_s": wall - s.last_event_ts}
@@ -262,6 +267,11 @@ class Engine:
             self.sessions.pop(pid, None)
             self.active_sessions.pop(pid, None)
             self.evicted[pid] = end_ts
+        # evicted only serves the late-event warning (events up to 5 s after
+        # SESSION_END); without trimming it grows by one entry per session forever
+        if len(self.evicted) > 10000:
+            horizon = max(self.evicted.values()) - 600
+            self.evicted = {p: t for p, t in self.evicted.items() if t >= horizon}
         for sk, s in list(self.sessions.items()):
             if s.final:
                 continue
@@ -355,6 +365,13 @@ def main():
     ap.add_argument("--reorder-delay", type=float, default=1.0,
                     help="hold events this long so both logs merge in timestamp order")
     ap.add_argument("--poll-interval", type=float, default=0.05)
+    ap.add_argument("--confirm", type=int, default=1,
+                    help="alert on a running session only after this many consecutive scorings "
+                         "at or above theta_A (1 = first one, the original behaviour); a session's "
+                         "final score at or above theta_A always alerts")
+    ap.add_argument("--threads", type=int, default=1,
+                    help="torch CPU threads for scoring (graphs are tiny; the torch default of one "
+                         "thread per core only competes with the database for CPU)")
     ap.add_argument("--replay", action="store_true", help="process a finished capture and exit")
     ap.add_argument("--replay-realtime", action="store_true",
                     help="with --replay: also rescore running sessions every --rescore-every "
@@ -362,11 +379,13 @@ def main():
     args = ap.parse_args()
 
     args.theta_a = algorithm_4_hybrid.resolve_theta(args.theta_a, args.model_path)
+    if algorithm_4_hybrid.TORCH_AVAILABLE and args.threads > 0:
+        algorithm_4_hybrid.torch.set_num_threads(args.threads)
     model = algorithm_4_hybrid.load_model(args.model_path)
     if model is None:
         sys.exit("torch/torch_geometric not available -- run with the project .venv")
     engine = Engine(model, args.theta_a, args.theta_r, args.out_dir,
-                    algorithm_3_abstract.initialize_templates())
+                    algorithm_3_abstract.initialize_templates(), confirm=args.confirm)
     if args.replay:
         run_replay(engine, args.log_dir, args.rescore_every if args.replay_realtime else 0.0)
     else:

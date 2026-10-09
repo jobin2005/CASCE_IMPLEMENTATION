@@ -19,7 +19,7 @@ postgres_events.json (SQL hook) + kernel_events.json (eBPF)
         ▼  Algorithm 4  algorithm_4_hybrid.py     rules + HeteroGATv2 → risk = 1 − (1 − 0.75·rule)(1 − 0.75·gat); alert if risk ≥ θ
 ```
 
-- **Real-time daemon.** `realtime_daemon.py` follows the two log files live, re-scores running sessions every 2 s and writes `alerts.jsonl` / `session_scores.jsonl`. With `--replay` it re-scores a recorded capture.
+- **Real-time daemon.** `realtime_daemon.py` follows the two log files live, re-scores running sessions every 2 s and writes `alerts.jsonl` / `session_scores.jsonl`. With `--replay` it re-scores a recorded capture; replay reproduces live verdicts exactly. Scoring is single-threaded (`--threads 1`, the default), which matters: torch's default of one thread per core made scoring about 5× slower. One daemon handles about 8 new sessions/s; alert latency is a median 1.6 s.
 - **Threshold.** θ is tuned on validation data and stored in each model's sidecar JSON. Evaluation and the daemon read it from there.
 
 ## Repository layout
@@ -36,7 +36,9 @@ postgres_events.json (SQL hook) + kernel_events.json (eBPF)
 | `make_template_folds.py`, `run_loto.sh`, `fold_report.py`, `loto_summary.py`, `loto/` | **Template-disjoint evaluation**: 7 folds, each testing on attack and benign templates never seen in training |
 | `make_holdout_labels.py`, `holdout_report.py`, `leakage_report.py`, `run_seed.sh`, `seed_summary.py` | priv_abuse holdout, train/test overlap diagnostics, seed variance |
 | `realtime_daemon.py`, `workload_simulation/` | Real-time detection; live capture (`pg_telemetry.c`, `kernel_telemetry.py`, `logger.sh`), live scenario runner, live evaluation |
-| `casce_gat_v2.pt`, `casce_gat_v3.pt` (+ `.json`) | Deployment models, feature v2 and v3 (θ = 0.55 each, in the sidecar). `casce_gat.pt` is the legacy v1 baseline |
+| `casce_gat_v3p.pt` (+ `.json`) | **Recommended deployment model**: feature v3, trained with the extra benign templates and live-captured benign traffic (θ = 0.55, in the sidecar) |
+| `casce_gat_v2.pt`, `casce_gat_v3.pt` (+ `.json`) | Models trained on the E1 split only, feature v2 and v3. v3 is the model evaluated for generalization. `casce_gat.pt` is the legacy v1 baseline |
+| `workload_simulation/run_full_live.sh`, `workload_simulation/live_compare.py` | One complete live experiment (capture + workload + one or more daemons scoring in real time) and a side-by-side comparison of the daemons |
 | `loto*/`, `models_seeds/`, `eval_test_report_*/`, `tune_out_*/` | Result files referenced in EXPERIMENTS.md |
 
 ## Quick start
@@ -52,6 +54,11 @@ python3 algorithm_4_hybrid.py --mode evaluate --model-path casce_gat_v2.pt \
 # one template-disjoint fold (train → tune θ on validation templates → test on unseen templates)
 ./run_loto.sh priv_abuse 1                 # v2 features
 FV=3 OUT=loto_v3_f1 ./run_loto.sh priv_abuse 1   # v3 features
+
+# a complete live experiment: capture on, daemons for several models scoring in real time, workload, capture off
+bash workload_simulation/run_full_live.sh my_run casce_gat_v3p.pt,casce_gat_v3.pt --class all --pgbench \
+    --specs 'dataset_test/run_*/specs/*.yaml'
+python3 workload_simulation/live_compare.py live_runs/my_run daemon_v3p_live daemon_v3_live
 
 # score a recorded live capture with the real-time daemon, then evaluate it against its labels
 python3 realtime_daemon.py --replay --log-dir live_runs/<run> --model-path casce_gat_v2.pt --out-dir live_runs/<run>/daemon
@@ -70,14 +77,17 @@ All data is synthetic banking traffic. Full tables, per-template results and cav
 | **Seen templates** (E1) | New instances of the 13 training templates | F1 **0.985 ± 0.017** (3 seeds), precision 1.0, FPR 0 |
 | **Live, mixed traffic** (5b) | 1,251 live sessions: 1,025 pgbench + 133 benign + 93 attacks, same templates | TP 93, FP 0, FN 0, TN 1,158; alerts after a median 1.7 s; live verdicts identical to synthetic for 226/226 sessions |
 | **Unseen templates**, v2 (T) | 7 folds × 3 seeds; test templates never seen in training | Recall 0.82, FPR 0.40, F1 **0.67 ± 0.13**, ROC-AUC 0.61 |
-| **Unseen templates**, v3 features (provisional) | Same folds, 1 seed | Recall 0.91, FPR 0.29, F1 **0.83**. 4 of 7 unseen attack templates are perfect. **Still to be confirmed** on more seeds and the live 4D test |
+| **Unseen templates**, v3 features (T) | Same folds, 3 seeds | Recall 0.79, FPR 0.33, F1 **0.73 ± 0.12**, ROC-AUC 0.66. A modest gain over v2 (the 1-seed 0.83 was optimistic); 4 of 7 unseen attack templates perfect in most seeds; unseen benign ETL/audit jobs remain the main error |
 | **v3, seen templates + live** | Single v3 model trained like v2; E1 test and replays of live runs 4a–5b | Identical to v2: F1 1.0 offline; 5b TP 93, FP 0, FN 0, TN 1,158; live = synthetic for 226/226 |
+| **Live, unseen benign workloads** (6_full) | 2,801 live sessions incl. 240 of 6 benign templates no model had seen; v3 scoring live | False alarms on the unseen templates: v2 **94/240**, v3 **17/240** (all 17 = benign data sent to non-approved external hosts); attacks 93/93 for both |
+| **Final live run, real time** (8_final) | 1,999 live sessions; v2, v3, v3P all scoring live, same traffic | Attacks 93/93 (56/56 executed) for all; FPR v2 2.4%, v3 0.42%, **v3P 0.16%**; F1 0.80 / 0.96 / **0.98**; alert latency median **1.6 s**, max 3.1 s |
+| **Load test** (9_load) | 4,868 pgbench sessions at 8/s for 10 min, v3P live | All scored, 0 false alarms, final-score lag p99 6.9 s, stable memory (~800 MB) |
 
-**What these numbers mean.** On attack types it was trained on, CASCE is near-perfect, offline and live, with no false alarms. On attack types it has never seen, it generalises only partly. The main failure is mistaking unseen *legitimate* data movement (ETL replication, audits) for attacks. Feature v3, which describes behaviour instead of exact SQL strings, paths and names, is the most promising fix so far.
+**What these numbers mean.** On attack types it was trained on, CASCE is near-perfect, offline and live, with no false alarms. On attack types it has never seen, it generalises only partly. The main failure is mistaking unseen *legitimate* data movement (ETL replication, audits) for attacks. Feature v3, which describes behaviour instead of exact SQL strings, paths and names, helps: modestly on unseen *templates* offline (F1 0.67 → 0.73), and strongly on unseen *benign workloads* live (false alarms 94 → 17 of 240). Adding the bank's normal workloads to training (v3P) brings live false alarms to 0.16% with every attack detected.
 
 ## Open work
 
-- **Confirm v3:** seeds 2–3 for the template-disjoint folds.
+- **Ensemble / seeds for v3P:** check whether v3P's 3 teller_routine false alarms in 8_final are seed-specific (a seed-7 v3P was still training at 07:20).
 - **Live 4D:** run unseen attacks and benign workload on the live database. The environment is ready and verified.
 - **Unsolved case:** distinguishing malicious from benign ETL replication when neither was seen in training.
 - **Known limitations** (see EXPERIMENTS.md): three rule types can never fire; single banking domain only.
