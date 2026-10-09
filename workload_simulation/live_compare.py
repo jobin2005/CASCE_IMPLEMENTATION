@@ -27,7 +27,7 @@ def group_of(m, key):
     tpl = re.sub(r"_\d+$", "", m["scenario_id"]).replace("banking_", "")
     if m["class"] == "malicious":
         return "attack"
-    return "benign_extra" if m.get("dataset") == "dataset_benign_extra" else "benign_seen"
+    return "benign_extra" if m.get("dataset", "").startswith("dataset_benign") else "benign_seen"
 
 
 def main():
@@ -81,7 +81,7 @@ def main():
     print("|---|" + "---|" * len(rows))
     for grp, name in (("attack", "Attacks: all attempted"), ("attack_executed", "Attacks: executed"),
                       ("attack_refused", "Attacks: refused by Postgres"),
-                      ("benign_seen", "Benign scenarios (dataset_test)"),
+                      ("benign_seen", "Benign scenarios (13 standard templates)"),
                       ("benign_extra", "Benign extra templates"), ("pgbench", "pgbench")):
         print(f"| {name} | " + " | ".join(cell(r[1][grp]) for r in rows) + " |")
     print("| Precision / recall / F1 | " + " | ".join(

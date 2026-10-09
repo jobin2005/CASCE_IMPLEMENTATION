@@ -474,3 +474,31 @@ Seeds 2 and 3 ran overnight. Seed 3 had two folds trained twice by a duplicated 
   - Each v3P seed has a different blind spot. **Averaging several seeds (an ensemble) is the next step** before choosing a single deployment checkpoint.
 - **4D (unseen attack techniques, live)** still needs the adapted attack scripts (`4d-live-attack-workload` branch).
 - **Daemon throughput** is about 8 sessions/s per single-threaded daemon. Sharding by backend pid is the scaling path.
+
+### v3P ensemble (Oct 9 morning)
+- **Ensemble support** (`algorithm_4_hybrid.load_model`). A model sidecar holding `{"ensemble": [member .pt files]}` loads its members and averages their GAT probabilities (`EnsembleGAT`). Tuning, evaluation and the daemon use it unchanged through `--model-path <name>.pt`; no `.pt` of its own is needed. `casce_gat_v3p_ens2.json` combines v3P seeds 42 and 7.
+- **Evaluation:** `run_ensemble_eval.sh casce_gat_v3p_ens2` runs θ tuning on the v3P validation set (θ = 0.55), the offline test, and a replay of 8_final. Results are in `live_eval_ensemble/`.
+
+| | v3P seed 42 | v3P seed 7 | **ensemble (42 + 7)** |
+|---|---|---|---|
+| Offline: E1 test + held-out benign_extra 107–112 (706) | F1 0.984, FPR 0.49% | – | **F1 1.000, FPR 0, ROC-AUC 1.0** |
+| 8_final replay: attacks attempted / executed | 93/93, 56/56 | 81/93, 56/56 | **93/93, 56/56** |
+| 8_final replay: false alarms (1,907 benign) | 3 | 0 | **0** |
+
+**Caveat.** The ensemble was tried *after* seeing the single models' errors on 8_final, so 8_final flatters it. Confirmation therefore uses **fresh instances never used for any model or decision** (10_confirm below).
+
+### 10_confirm: fresh live confirmation (Oct 9, 09:17–09:33)
+- **Fresh scenario instances never used for any model or decision:** `dataset_confirm`, 5 runs of the 13 standard templates (`generate_batch.py --seed 2026`, 118 sessions: 61 benign, 57 attacks), and `dataset_benign_confirm`, 3 runs of the extra benign templates (`--template-set benign_extra --seed 999`, renumbered run_201–203, 60 sessions). All runs pass `validate_run.py`.
+- **Live run:** v3, v3P and the 2-model ensemble all scored in real time (`run_full_live.sh 10_confirm casce_gat_v3.pt,casce_gat_v3p.pt,casce_gat_v3p_ens2.pt …`), with 937 pgbench sessions as background load.
+
+| Live, fresh instances | v3 | v3P | **ensemble (42 + 7)** |
+|---|---|---|---|
+| Attacks: attempted / executed / refused | 57/57, 31/31, 26/26 | 57/57, 31/31, 26/26 | **57/57, 31/31, 26/26** |
+| False alarms: standard benign / extra benign / pgbench | 0/61, 2/60, 0/937 | 0/61, 0/60, 0/937 | **0/61, 0/60, 0/937** |
+| Precision / recall / F1 | 0.966 / 1.0 / 0.983 | 1.0 / 1.0 / 1.0 | **1.0 / 1.0 / 1.0** |
+| Transient alerts (final verdict benign) | 7 | 0 | **0** |
+| Attack alert latency median / p90 / max | 1.59 / 2.63 / 2.92 s | 1.56 / 2.58 / 3.01 s | **1.66 / 2.59 / 3.15 s** |
+
+**Conclusion.** On fresh live traffic, v3P and its ensemble detect every attack with no false alarms, alerting within about 1.6 s. The ensemble adds about 0.1 s of latency and removes the per-seed blind spots seen on 8_final. **Recommended deployment: `casce_gat_v3p_ens2`.**
+
+**Scope, unchanged.** These are new instances of templates the deployed models were trained on. Detection of *unseen* attack techniques is measured by the template-disjoint folds (v3: F1 0.73 ± 0.12) and will be measured live by 4D.

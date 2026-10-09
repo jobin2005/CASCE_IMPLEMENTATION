@@ -652,6 +652,17 @@ if TORCH_AVAILABLE:
             graph_repr = torch.cat(pooled_parts, dim=0)
             return self.classifier(graph_repr).squeeze(-1)
 
+    class EnsembleGAT(nn.Module):
+        """Average of several trained models' attack probabilities. forward()
+        returns the logit of that average, so gat_score's sigmoid gives the mean."""
+        def __init__(self, members):
+            super().__init__()
+            self.members = nn.ModuleList(members)
+
+        def forward(self, data):
+            p = torch.stack([torch.sigmoid(m(data)) for m in self.members]).mean(dim=0)
+            return torch.logit(p.clamp(1e-6, 1 - 1e-6))
+
     def gat_score(G, model):
         data = build_hetero_data(G)
         model.eval()
@@ -821,6 +832,12 @@ def resolve_theta(theta_a, model_path):
 
 
 def load_model(model_path):
+    """Load a checkpoint, using its sidecar JSON for the feature version.
+
+    Ensemble: if the sidecar has an "ensemble" list of member checkpoints (and no
+    .pt of its own is needed), the members are loaded and their GAT
+    probabilities averaged. All members must use the same feature version.
+    """
     global FEATURE_VERSION
     if not TORCH_AVAILABLE:
         return None
@@ -828,6 +845,14 @@ def load_model(model_path):
     if model_path and os.path.exists(_meta_path(model_path)):
         with open(_meta_path(model_path)) as f:
             meta = json.load(f)
+    if meta.get("ensemble"):
+        members = [load_model(m) for m in meta["ensemble"]]
+        versions = {int(json.load(open(_meta_path(m))).get("feature_version", 1)) for m in meta["ensemble"]}
+        if len(versions) != 1:
+            raise SystemExit(f"ensemble members use different feature versions: {versions}")
+        FEATURE_VERSION = versions.pop()
+        print(f"[algo4] Ensemble of {len(members)} models (feature version {FEATURE_VERSION})")
+        return EnsembleGAT(members)
     FEATURE_VERSION = int(meta.get("feature_version", 1))
     model = CasceHeteroGAT()
     if model_path and os.path.exists(model_path):
