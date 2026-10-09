@@ -468,6 +468,9 @@ Seeds 2 and 3 ran overnight. Seed 3 had two folds trained twice by a duplicated 
 - **Conclusion.** The single-seed F1 of 0.83 was optimistic. v3's offline generalization gain over v2 is real but modest (+0.06 F1, about half a standard deviation). The live unseen-benign result (6_full: 94 → 17 false alarms of 240) shows a larger effect. That is because those unseen templates differ from attacks mainly in the identifiers v3 masks, while the failing offline folds (ETL, audit) are designed hard negatives.
 
 ### Open after the overnight run
-- `casce_gat_v3p_s7.pt`, a second v3P with seed 7 started at 06:00, was still training at 07:20. Its replay on 8_final will show whether v3P's 3 teller_routine false alarms are seed-specific. If they are, ensembling v3P seeds is the next step.
+- **v3P seed check (done 08:50).** `casce_gat_v3p_s7.pt` was trained exactly like v3P with seed 7 (early stop at epoch 34, θ 0.55) and replayed on the 8_final capture (`live_eval_overnight/8_final/compare_v3p_seeds.md`).
+  - **0 false alarms on all 1,907 benign sessions**, so seed 42's 3 teller_routine false alarms are seed-specific.
+  - **It misses all 12 `defense_impair` sessions** (risk 0.376). All 12 were refused by Postgres; every *executed* attack is caught (56/56), but attempted recall is 81/93.
+  - Each v3P seed has a different blind spot. **Averaging several seeds (an ensemble) is the next step** before choosing a single deployment checkpoint.
 - **4D (unseen attack techniques, live)** still needs the adapted attack scripts (`4d-live-attack-workload` branch).
 - **Daemon throughput** is about 8 sessions/s per single-threaded daemon. Sharding by backend pid is the scaling path.
