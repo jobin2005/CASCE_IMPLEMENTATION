@@ -1,0 +1,276 @@
+{
+  "category": "Class 3: Multi-Stage APT Scenarios",
+  "folder": "class_3_multistage_apt",
+  "total_sessions": 13,
+  "attacks_total": 6,
+  "benign_total": 7,
+  "TP": 5,
+  "FN": 1,
+  "FP": 0,
+  "TN": 7,
+  "Recall_TPR": 0.8333,
+  "Recall_CI95": [
+    0.4365,
+    0.9699
+  ],
+  "Precision": 1.0,
+  "FPR": 0.0,
+  "FPR_CI95": [
+    0.0,
+    0.3543
+  ],
+  "F1_Score": 0.9091,
+  "ROC_AUC": 0.9048,
+  "PR_AUC": 0.9103,
+  "Latency_p50_s": 0.0257,
+  "Latency_p90_s": 0.0279,
+  "threshold_sweep": {
+    "0.45": {
+      "TP": 5,
+      "FN": 1,
+      "FP": 0,
+      "TN": 7,
+      "Recall": 0.8333,
+      "Precision": 1.0,
+      "FPR": 0.0,
+      "F1": 0.9091
+    },
+    "0.5": {
+      "TP": 5,
+      "FN": 1,
+      "FP": 0,
+      "TN": 7,
+      "Recall": 0.8333,
+      "Precision": 1.0,
+      "FPR": 0.0,
+      "F1": 0.9091
+    },
+    "0.55": {
+      "TP": 5,
+      "FN": 1,
+      "FP": 0,
+      "TN": 7,
+      "Recall": 0.8333,
+      "Precision": 1.0,
+      "FPR": 0.0,
+      "F1": 0.9091
+    },
+    "0.6": {
+      "TP": 5,
+      "FN": 1,
+      "FP": 0,
+      "TN": 7,
+      "Recall": 0.8333,
+      "Precision": 1.0,
+      "FPR": 0.0,
+      "F1": 0.9091
+    }
+  },
+  "sessions": [
+    {
+      "session_id": 43743,
+      "label": "Benign:teller_select",
+      "category": "Class 3: Multi-Stage APT Scenarios",
+      "is_attack": false,
+      "risk_score": 0.0,
+      "rule_score": 0.0,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 4,
+      "edge_count": 4,
+      "behaviors": [
+        "DATA_ACCESS"
+      ],
+      "latency_s": 0.027
+    },
+    {
+      "session_id": 43774,
+      "label": "Benign:teller_tx",
+      "category": "Class 3: Multi-Stage APT Scenarios",
+      "is_attack": false,
+      "risk_score": 0.0,
+      "rule_score": 0.0,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 5,
+      "edge_count": 4,
+      "behaviors": [],
+      "latency_s": 0.0257
+    },
+    {
+      "session_id": 43834,
+      "label": "Benign:dba_vacuum",
+      "category": "Class 3: Multi-Stage APT Scenarios",
+      "is_attack": false,
+      "risk_score": 0.0,
+      "rule_score": 0.0,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 2,
+      "edge_count": 1,
+      "behaviors": [],
+      "latency_s": 0.0249
+    },
+    {
+      "session_id": 43866,
+      "label": "Benign:user_provision",
+      "category": "Class 3: Multi-Stage APT Scenarios",
+      "is_attack": false,
+      "risk_score": 0.0,
+      "rule_score": 0.0,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 5,
+      "edge_count": 4,
+      "behaviors": [],
+      "latency_s": 0.0253
+    },
+    {
+      "session_id": 43897,
+      "label": "Benign:backup_gzip",
+      "category": "Class 3: Multi-Stage APT Scenarios",
+      "is_attack": false,
+      "risk_score": 0.0,
+      "rule_score": 0.0,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 8,
+      "edge_count": 12,
+      "behaviors": [
+        "DATA_ACCESS",
+        "UNIX_SHELL_EXECUTION",
+        "DATA_PACKAGING"
+      ],
+      "latency_s": 0.0294
+    },
+    {
+      "session_id": 43929,
+      "label": "Benign:metric_curl",
+      "category": "Class 3: Multi-Stage APT Scenarios",
+      "is_attack": false,
+      "risk_score": 0.3271,
+      "rule_score": 0.3848,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 8,
+      "edge_count": 12,
+      "behaviors": [
+        "UNIX_SHELL_EXECUTION",
+        "EXTERNAL_TRANSFER",
+        "POTENTIAL_INGRESS_TOOL_TRANSFER"
+      ],
+      "latency_s": 0.0276
+    },
+    {
+      "session_id": 43963,
+      "label": "Benign:branch_analytics",
+      "category": "Class 3: Multi-Stage APT Scenarios",
+      "is_attack": false,
+      "risk_score": 0.0,
+      "rule_score": 0.0,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 4,
+      "edge_count": 3,
+      "behaviors": [],
+      "latency_s": 0.0236
+    },
+    {
+      "session_id": 43998,
+      "label": "Malicious:multistage_apt_recon_r1",
+      "category": "Class 3: Multi-Stage APT Scenarios",
+      "is_attack": true,
+      "risk_score": 0.0,
+      "rule_score": 0.0,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 3,
+      "edge_count": 2,
+      "behaviors": [],
+      "latency_s": 0.0233
+    },
+    {
+      "session_id": 44003,
+      "label": "Malicious:multistage_apt_escalate_r1",
+      "category": "Class 3: Multi-Stage APT Scenarios",
+      "is_attack": true,
+      "risk_score": 0.75,
+      "rule_score": 0.0,
+      "gat_score": 1.0,
+      "status": "response",
+      "node_count": 3,
+      "edge_count": 2,
+      "behaviors": [],
+      "latency_s": 0.0232
+    },
+    {
+      "session_id": 44007,
+      "label": "Malicious:multistage_apt_exfil_r1",
+      "category": "Class 3: Multi-Stage APT Scenarios",
+      "is_attack": true,
+      "risk_score": 0.8308,
+      "rule_score": 0.3802,
+      "gat_score": 1.0,
+      "status": "response",
+      "node_count": 10,
+      "edge_count": 16,
+      "behaviors": [
+        "DATA_ACCESS",
+        "UNIX_SHELL_EXECUTION",
+        "EXTERNAL_TRANSFER",
+        "POTENTIAL_INGRESS_TOOL_TRANSFER"
+      ],
+      "latency_s": 0.0274
+    },
+    {
+      "session_id": 44042,
+      "label": "Malicious:reverse_shell_r1",
+      "category": "Class 3: Multi-Stage APT Scenarios",
+      "is_attack": true,
+      "risk_score": 0.75,
+      "rule_score": 0.0,
+      "gat_score": 1.0,
+      "status": "response",
+      "node_count": 4,
+      "edge_count": 4,
+      "behaviors": [
+        "UNIX_SHELL_EXECUTION"
+      ],
+      "latency_s": 0.0247
+    },
+    {
+      "session_id": 44078,
+      "label": "Malicious:os_remote_bash_r1",
+      "category": "Class 3: Multi-Stage APT Scenarios",
+      "is_attack": true,
+      "risk_score": 0.841,
+      "rule_score": 0.428,
+      "gat_score": 1.0,
+      "status": "response",
+      "node_count": 10,
+      "edge_count": 14,
+      "behaviors": [
+        "UNIX_SHELL_EXECUTION",
+        "EXTERNAL_TRANSFER",
+        "POTENTIAL_INGRESS_TOOL_TRANSFER"
+      ],
+      "latency_s": 0.0276
+    },
+    {
+      "session_id": 44145,
+      "label": "Malicious:os_enum_system_r1",
+      "category": "Class 3: Multi-Stage APT Scenarios",
+      "is_attack": true,
+      "risk_score": 0.75,
+      "rule_score": 0.0,
+      "gat_score": 1.0,
+      "status": "response",
+      "node_count": 8,
+      "edge_count": 8,
+      "behaviors": [
+        "UNIX_SHELL_EXECUTION"
+      ],
+      "latency_s": 0.0279
+    }
+  ]
+}

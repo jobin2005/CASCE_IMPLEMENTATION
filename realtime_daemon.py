@@ -125,6 +125,8 @@ class Engine:
         self.theta_a = theta_a
         self.theta_r = theta_r
         self.templates = templates
+        self.graph_dir = out_dir / "graphs"
+        self.graph_dir.mkdir(parents=True, exist_ok=True)
         # Algorithm 1 state (exactly what algorithm_1.run_one keeps)
         self.active_sessions = {}
         self.parent_map = {}
@@ -218,6 +220,8 @@ class Engine:
         nx.write_graphml(G_enriched, buf)
         buf.seek(0)
         G_model = nx.read_graphml(buf)
+        graph_path = self.graph_dir / f"{session_key}.graphml"
+        nx.write_graphml(G_model, graph_path)
         t3 = time.perf_counter()
         a = algorithm_4_hybrid.detect(G_model, self.model, session_id=session_key,
                                       theta_a=self.theta_a, theta_r=self.theta_r)

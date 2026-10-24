@@ -1,0 +1,222 @@
+{
+  "category": "Class 3: SQL Injection & Sabotage",
+  "folder": "class_3_sqli_sabotage",
+  "total_sessions": 10,
+  "attacks_total": 3,
+  "benign_total": 7,
+  "TP": 0,
+  "FN": 3,
+  "FP": 1,
+  "TN": 6,
+  "Recall_TPR": 0.0,
+  "Recall_CI95": [
+    0.0,
+    0.5615
+  ],
+  "Precision": 0.0,
+  "FPR": 0.1429,
+  "FPR_CI95": [
+    0.0257,
+    0.5131
+  ],
+  "F1_Score": 0.0,
+  "ROC_AUC": 0.5714,
+  "PR_AUC": 0.3667,
+  "Latency_p50_s": 0.0242,
+  "Latency_p90_s": 0.0267,
+  "threshold_sweep": {
+    "0.45": {
+      "TP": 0,
+      "FN": 3,
+      "FP": 1,
+      "TN": 6,
+      "Recall": 0.0,
+      "Precision": 0.0,
+      "FPR": 0.1429,
+      "F1": 0.0
+    },
+    "0.5": {
+      "TP": 0,
+      "FN": 3,
+      "FP": 1,
+      "TN": 6,
+      "Recall": 0.0,
+      "Precision": 0.0,
+      "FPR": 0.1429,
+      "F1": 0.0
+    },
+    "0.55": {
+      "TP": 0,
+      "FN": 3,
+      "FP": 1,
+      "TN": 6,
+      "Recall": 0.0,
+      "Precision": 0.0,
+      "FPR": 0.1429,
+      "F1": 0.0
+    },
+    "0.6": {
+      "TP": 0,
+      "FN": 3,
+      "FP": 1,
+      "TN": 6,
+      "Recall": 0.0,
+      "Precision": 0.0,
+      "FPR": 0.1429,
+      "F1": 0.0
+    }
+  },
+  "sessions": [
+    {
+      "session_id": 31720,
+      "label": "Benign:teller_select",
+      "category": "Class 3: SQL Injection & Sabotage",
+      "is_attack": false,
+      "risk_score": 0.0,
+      "rule_score": 0.0,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 4,
+      "edge_count": 4,
+      "behaviors": [
+        "DATA_ACCESS"
+      ],
+      "latency_s": 0.0249
+    },
+    {
+      "session_id": 31752,
+      "label": "Benign:teller_tx",
+      "category": "Class 3: SQL Injection & Sabotage",
+      "is_attack": false,
+      "risk_score": 0.0,
+      "rule_score": 0.0,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 5,
+      "edge_count": 4,
+      "behaviors": [],
+      "latency_s": 0.0239
+    },
+    {
+      "session_id": 31816,
+      "label": "Benign:dba_vacuum",
+      "category": "Class 3: SQL Injection & Sabotage",
+      "is_attack": false,
+      "risk_score": 0.0,
+      "rule_score": 0.0,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 2,
+      "edge_count": 1,
+      "behaviors": [],
+      "latency_s": 0.0238
+    },
+    {
+      "session_id": 31851,
+      "label": "Benign:user_provision",
+      "category": "Class 3: SQL Injection & Sabotage",
+      "is_attack": false,
+      "risk_score": 0.0,
+      "rule_score": 0.0,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 5,
+      "edge_count": 4,
+      "behaviors": [],
+      "latency_s": 0.0242
+    },
+    {
+      "session_id": 31883,
+      "label": "Benign:backup_gzip",
+      "category": "Class 3: SQL Injection & Sabotage",
+      "is_attack": false,
+      "risk_score": 0.0,
+      "rule_score": 0.0,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 6,
+      "edge_count": 8,
+      "behaviors": [
+        "UNIX_SHELL_EXECUTION",
+        "DATA_PACKAGING"
+      ],
+      "latency_s": 0.0265
+    },
+    {
+      "session_id": 31921,
+      "label": "Benign:metric_curl",
+      "category": "Class 3: SQL Injection & Sabotage",
+      "is_attack": false,
+      "risk_score": 0.8221,
+      "rule_score": 0.3848,
+      "gat_score": 1.0,
+      "status": "response",
+      "node_count": 7,
+      "edge_count": 11,
+      "behaviors": [
+        "UNIX_SHELL_EXECUTION",
+        "EXTERNAL_TRANSFER",
+        "POTENTIAL_INGRESS_TOOL_TRANSFER"
+      ],
+      "latency_s": 0.0267
+    },
+    {
+      "session_id": 31956,
+      "label": "Benign:branch_analytics",
+      "category": "Class 3: SQL Injection & Sabotage",
+      "is_attack": false,
+      "risk_score": 0.0,
+      "rule_score": 0.0,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 4,
+      "edge_count": 3,
+      "behaviors": [],
+      "latency_s": 0.0238
+    },
+    {
+      "session_id": 31989,
+      "label": "Malicious:sqli_copy_r1",
+      "category": "Class 3: SQL Injection & Sabotage",
+      "is_attack": true,
+      "risk_score": 0.0,
+      "rule_score": 0.0,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 2,
+      "edge_count": 1,
+      "behaviors": [],
+      "latency_s": 0.0236
+    },
+    {
+      "session_id": 32020,
+      "label": "Malicious:sqli_time_r1",
+      "category": "Class 3: SQL Injection & Sabotage",
+      "is_attack": true,
+      "risk_score": 0.0,
+      "rule_score": 0.0,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 2,
+      "edge_count": 1,
+      "behaviors": [],
+      "latency_s": 0.0239
+    },
+    {
+      "session_id": 32091,
+      "label": "Malicious:sabotage_drop_transactions_r1",
+      "category": "Class 3: SQL Injection & Sabotage",
+      "is_attack": true,
+      "risk_score": 0.2381,
+      "rule_score": 0.3175,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 4,
+      "edge_count": 4,
+      "behaviors": [
+        "DESTRUCTIVE_DB_OPERATION"
+      ],
+      "latency_s": 0.0253
+    }
+  ]
+}

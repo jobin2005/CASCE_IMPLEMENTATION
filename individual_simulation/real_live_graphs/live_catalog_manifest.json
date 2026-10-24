@@ -1,0 +1,294 @@
+[
+  {
+    "case_id": "attack_defense_impair",
+    "session_key": 85839,
+    "label": "Malicious:s0126_0",
+    "data_source": "live_eval_run_8_final (Real Postgres Hook + eBPF Kernel)",
+    "database": "casce_banking",
+    "scenario_id": "banking_defense_impair_0017",
+    "role": "teller",
+    "node_count": 18,
+    "edge_count": 28,
+    "detected_behaviors": [
+      "DATA_ACCESS",
+      "DATA_ACCESS",
+      "DESTRUCTIVE_DB_OPERATION",
+      "DEFENSE_IMPAIRMENT",
+      "UNIX_SHELL_EXECUTION",
+      "INDICATOR_REMOVAL_FILE"
+    ],
+    "graph_file": "attack_defense_impair_session_85839.graphml",
+    "png_file": "graph.png"
+  },
+  {
+    "case_id": "attack_etl_exfiltration",
+    "session_key": 85914,
+    "label": "Malicious:s0127_0",
+    "data_source": "live_eval_run_8_final (Real Postgres Hook + eBPF Kernel)",
+    "database": "casce_banking",
+    "scenario_id": "banking_etl_exfil_mal_0001",
+    "role": "batch_etl_service",
+    "node_count": 11,
+    "edge_count": 15,
+    "detected_behaviors": [
+      "UNIX_SHELL_EXECUTION",
+      "EXTERNAL_TRANSFER",
+      "POTENTIAL_INGRESS_TOOL_TRANSFER"
+    ],
+    "graph_file": "attack_etl_exfiltration_session_85914.graphml",
+    "png_file": "graph.png"
+  },
+  {
+    "case_id": "attack_privilege_abuse",
+    "session_key": 86212,
+    "label": "Malicious:s0131_0",
+    "data_source": "live_eval_run_8_final (Real Postgres Hook + eBPF Kernel)",
+    "database": "casce_banking",
+    "scenario_id": "banking_priv_abuse_0003",
+    "role": "teller",
+    "node_count": 13,
+    "edge_count": 15,
+    "detected_behaviors": [
+      "DATA_ACCESS",
+      "DATA_ACCESS"
+    ],
+    "graph_file": "attack_privilege_abuse_session_86212.graphml",
+    "png_file": "graph.png"
+  },
+  {
+    "case_id": "attack_pii_dump",
+    "session_key": 86316,
+    "label": "Malicious:s0132_0",
+    "data_source": "live_eval_run_8_final (Real Postgres Hook + eBPF Kernel)",
+    "database": "casce_banking",
+    "scenario_id": "banking_teller_pii_dump_0010",
+    "role": "teller",
+    "node_count": 16,
+    "edge_count": 24,
+    "detected_behaviors": [
+      "DATA_ACCESS",
+      "DATA_ACCESS",
+      "UNIX_SHELL_EXECUTION",
+      "EXTERNAL_TRANSFER",
+      "POTENTIAL_INGRESS_TOOL_TRANSFER"
+    ],
+    "graph_file": "attack_pii_dump_session_86316.graphml",
+    "png_file": "graph.png"
+  },
+  {
+    "case_id": "attack_alter_role_escalate",
+    "session_key": 86769,
+    "label": "Malicious:s0141_0",
+    "data_source": "live_eval_run_8_final (Real Postgres Hook + eBPF Kernel)",
+    "database": "casce_banking",
+    "scenario_id": "banking_alter_role_esc_0012",
+    "role": "teller",
+    "node_count": 18,
+    "edge_count": 26,
+    "detected_behaviors": [
+      "DATA_ACCESS",
+      "DATA_ACCESS",
+      "UNIX_SHELL_EXECUTION",
+      "EXTERNAL_TRANSFER",
+      "POTENTIAL_INGRESS_TOOL_TRANSFER"
+    ],
+    "graph_file": "attack_alter_role_escalate_session_86769.graphml",
+    "png_file": "graph.png"
+  },
+  {
+    "case_id": "attack_compliance_exfil",
+    "session_key": 87000,
+    "label": "Malicious:s0145_0",
+    "data_source": "live_eval_run_8_final (Real Postgres Hook + eBPF Kernel)",
+    "database": "casce_banking",
+    "scenario_id": "banking_compliance_exfil_0009",
+    "role": "compliance_officer",
+    "node_count": 13,
+    "edge_count": 19,
+    "detected_behaviors": [
+      "UNIX_SHELL_EXECUTION",
+      "EXTERNAL_TRANSFER",
+      "POTENTIAL_INGRESS_TOOL_TRANSFER",
+      "DATA_ACCESS"
+    ],
+    "graph_file": "attack_compliance_exfil_session_87000.graphml",
+    "png_file": "graph.png"
+  },
+  {
+    "case_id": "attack_multistage_apt",
+    "session_key": 91276,
+    "label": "Malicious:s0201_0",
+    "data_source": "live_eval_run_8_final (Real Postgres Hook + eBPF Kernel)",
+    "database": "casce_banking",
+    "scenario_id": "banking_multi_apt_0020",
+    "role": "teller",
+    "node_count": 16,
+    "edge_count": 23,
+    "detected_behaviors": [
+      "DATA_ACCESS",
+      "DATA_ACCESS",
+      "DATA_ACCESS",
+      "UNIX_SHELL_EXECUTION"
+    ],
+    "graph_file": "attack_multistage_apt_session_91276.graphml",
+    "png_file": "graph.png"
+  },
+  {
+    "case_id": "benign_audit_archive",
+    "session_key": 77398,
+    "label": "Benign:s0000_0",
+    "data_source": "live_eval_run_8_final (Real Postgres Hook + eBPF Kernel)",
+    "database": "casce_banking",
+    "scenario_id": "banking_audit_archive_0006",
+    "role": "dba",
+    "node_count": 19,
+    "edge_count": 29,
+    "detected_behaviors": [
+      "UNIX_SHELL_EXECUTION",
+      "DATA_PACKAGING",
+      "DATA_ACCESS",
+      "DESTRUCTIVE_DB_OPERATION",
+      "DEFENSE_IMPAIRMENT",
+      "UNIX_SHELL_EXECUTION"
+    ],
+    "graph_file": "benign_audit_archive_session_77398.graphml",
+    "png_file": "graph.png"
+  },
+  {
+    "case_id": "benign_bi_export",
+    "session_key": 77511,
+    "label": "Benign:s0004_0",
+    "data_source": "live_eval_run_8_final (Real Postgres Hook + eBPF Kernel)",
+    "database": "casce_banking",
+    "scenario_id": "banking_bi_export_0001",
+    "role": "branch_manager",
+    "node_count": 15,
+    "edge_count": 21,
+    "detected_behaviors": [
+      "DATA_ACCESS",
+      "UNIX_SHELL_EXECUTION",
+      "EXTERNAL_TRANSFER",
+      "POTENTIAL_INGRESS_TOOL_TRANSFER"
+    ],
+    "graph_file": "benign_bi_export_session_77511.graphml",
+    "png_file": "graph.png"
+  },
+  {
+    "case_id": "benign_kyc_review",
+    "session_key": 77966,
+    "label": "Benign:s0010_0",
+    "data_source": "live_eval_run_8_final (Real Postgres Hook + eBPF Kernel)",
+    "database": "casce_banking",
+    "scenario_id": "banking_kyc_review_0002",
+    "role": "compliance_officer",
+    "node_count": 17,
+    "edge_count": 27,
+    "detected_behaviors": [
+      "DATA_ACCESS",
+      "DATA_ACCESS",
+      "DATA_ACCESS",
+      "UNIX_SHELL_EXECUTION",
+      "DATA_ACCESS"
+    ],
+    "graph_file": "benign_kyc_review_session_77966.graphml",
+    "png_file": "graph.png"
+  },
+  {
+    "case_id": "benign_pgbench",
+    "session_key": 77400,
+    "label": "Benign:pgbench",
+    "data_source": "live_eval_run_8_final (Real Postgres Hook + eBPF Kernel)",
+    "database": "casce_banking",
+    "scenario_id": "benign_pgbench",
+    "role": "unknown",
+    "node_count": 4,
+    "edge_count": 3,
+    "detected_behaviors": [],
+    "graph_file": "benign_pgbench_session_77400.graphml",
+    "png_file": "graph.png"
+  },
+  {
+    "case_id": "4d_exfil_gzip_curl",
+    "session_id": 59361,
+    "label": "Malicious:exfil_gzip_curl_r1",
+    "data_source": "live_4d_attack_workload (PostgreSQL 17 Hook)",
+    "database": "casce_banking",
+    "node_count": 3,
+    "edge_count": 2,
+    "detected_behaviors": [],
+    "graph_file": "4d_exfil_gzip_curl.graphml",
+    "png_file": "graph.png"
+  },
+  {
+    "case_id": "4d_os_cat_shadow",
+    "session_id": 59940,
+    "label": "Malicious:os_cat_shadow_r1",
+    "data_source": "live_4d_attack_workload (PostgreSQL 17 Hook)",
+    "database": "casce_banking",
+    "node_count": 3,
+    "edge_count": 2,
+    "detected_behaviors": [],
+    "graph_file": "4d_os_cat_shadow.graphml",
+    "png_file": "graph.png"
+  },
+  {
+    "case_id": "4d_os_chmod_tmp",
+    "session_id": 59975,
+    "label": "Malicious:os_chmod_tmp_r1",
+    "data_source": "live_4d_attack_workload (PostgreSQL 17 Hook)",
+    "database": "casce_banking",
+    "node_count": 3,
+    "edge_count": 2,
+    "detected_behaviors": [],
+    "graph_file": "4d_os_chmod_tmp.graphml",
+    "png_file": "graph.png"
+  },
+  {
+    "case_id": "4d_sqli_dump_authid",
+    "session_id": 60151,
+    "label": "Malicious:sqli_copy_r1",
+    "data_source": "live_4d_attack_workload (PostgreSQL 17 Hook)",
+    "database": "casce_banking",
+    "node_count": 2,
+    "edge_count": 1,
+    "detected_behaviors": [],
+    "graph_file": "4d_sqli_dump_authid.graphml",
+    "png_file": "graph.png"
+  },
+  {
+    "case_id": "4d_reverse_shell",
+    "session_id": 60282,
+    "label": "Malicious:reverse_shell_r1",
+    "data_source": "live_4d_attack_workload (PostgreSQL 17 Hook)",
+    "database": "casce_banking",
+    "node_count": 3,
+    "edge_count": 2,
+    "detected_behaviors": [],
+    "graph_file": "4d_reverse_shell.graphml",
+    "png_file": "graph.png"
+  },
+  {
+    "case_id": "4d_sabotage_drop_table",
+    "session_id": 60406,
+    "label": "Malicious:sabotage_drop_transactions_r1",
+    "data_source": "live_4d_attack_workload (PostgreSQL 17 Hook)",
+    "database": "casce_banking",
+    "node_count": 3,
+    "edge_count": 2,
+    "detected_behaviors": [],
+    "graph_file": "4d_sabotage_drop_table.graphml",
+    "png_file": "graph.png"
+  },
+  {
+    "case_id": "4d_benign_teller_query",
+    "session_id": 59300,
+    "label": "Benign:normal_teller_query_1",
+    "data_source": "live_4d_attack_workload (PostgreSQL 17 Hook)",
+    "database": "casce_banking",
+    "node_count": 3,
+    "edge_count": 2,
+    "detected_behaviors": [],
+    "graph_file": "4d_benign_teller_query.graphml",
+    "png_file": "graph.png"
+  }
+]

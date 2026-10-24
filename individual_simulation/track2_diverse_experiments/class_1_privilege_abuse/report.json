@@ -1,0 +1,255 @@
+{
+  "category": "Class 1: Privilege Abuse & Escalation",
+  "folder": "class_1_privilege_abuse",
+  "total_sessions": 12,
+  "attacks_total": 5,
+  "benign_total": 7,
+  "TP": 5,
+  "FN": 0,
+  "FP": 0,
+  "TN": 7,
+  "Recall_TPR": 1.0,
+  "Recall_CI95": [
+    0.5655,
+    1.0
+  ],
+  "Precision": 1.0,
+  "FPR": 0.0,
+  "FPR_CI95": [
+    0.0,
+    0.3543
+  ],
+  "F1_Score": 1.0,
+  "ROC_AUC": 1.0,
+  "PR_AUC": 1.0,
+  "Latency_p50_s": 0.0269,
+  "Latency_p90_s": 0.0764,
+  "threshold_sweep": {
+    "0.45": {
+      "TP": 5,
+      "FN": 0,
+      "FP": 0,
+      "TN": 7,
+      "Recall": 1.0,
+      "Precision": 1.0,
+      "FPR": 0.0,
+      "F1": 1.0
+    },
+    "0.5": {
+      "TP": 5,
+      "FN": 0,
+      "FP": 0,
+      "TN": 7,
+      "Recall": 1.0,
+      "Precision": 1.0,
+      "FPR": 0.0,
+      "F1": 1.0
+    },
+    "0.55": {
+      "TP": 5,
+      "FN": 0,
+      "FP": 0,
+      "TN": 7,
+      "Recall": 1.0,
+      "Precision": 1.0,
+      "FPR": 0.0,
+      "F1": 1.0
+    },
+    "0.6": {
+      "TP": 5,
+      "FN": 0,
+      "FP": 0,
+      "TN": 7,
+      "Recall": 1.0,
+      "Precision": 1.0,
+      "FPR": 0.0,
+      "F1": 1.0
+    }
+  },
+  "sessions": [
+    {
+      "session_id": 42138,
+      "label": "Benign:teller_select",
+      "category": "Class 1: Privilege Abuse & Escalation",
+      "is_attack": false,
+      "risk_score": 0.0,
+      "rule_score": 0.0,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 4,
+      "edge_count": 4,
+      "behaviors": [
+        "DATA_ACCESS"
+      ],
+      "latency_s": 0.0764
+    },
+    {
+      "session_id": 42168,
+      "label": "Benign:teller_tx",
+      "category": "Class 1: Privilege Abuse & Escalation",
+      "is_attack": false,
+      "risk_score": 0.0,
+      "rule_score": 0.0,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 5,
+      "edge_count": 4,
+      "behaviors": [],
+      "latency_s": 0.0782
+    },
+    {
+      "session_id": 42228,
+      "label": "Benign:dba_vacuum",
+      "category": "Class 1: Privilege Abuse & Escalation",
+      "is_attack": false,
+      "risk_score": 0.0,
+      "rule_score": 0.0,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 2,
+      "edge_count": 1,
+      "behaviors": [],
+      "latency_s": 0.0642
+    },
+    {
+      "session_id": 42263,
+      "label": "Benign:user_provision",
+      "category": "Class 1: Privilege Abuse & Escalation",
+      "is_attack": false,
+      "risk_score": 0.0,
+      "rule_score": 0.0,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 5,
+      "edge_count": 4,
+      "behaviors": [],
+      "latency_s": 0.0242
+    },
+    {
+      "session_id": 42296,
+      "label": "Benign:backup_gzip",
+      "category": "Class 1: Privilege Abuse & Escalation",
+      "is_attack": false,
+      "risk_score": 0.0,
+      "rule_score": 0.0,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 8,
+      "edge_count": 12,
+      "behaviors": [
+        "DATA_ACCESS",
+        "UNIX_SHELL_EXECUTION",
+        "DATA_PACKAGING"
+      ],
+      "latency_s": 0.0272
+    },
+    {
+      "session_id": 42329,
+      "label": "Benign:metric_curl",
+      "category": "Class 1: Privilege Abuse & Escalation",
+      "is_attack": false,
+      "risk_score": 0.3271,
+      "rule_score": 0.3848,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 8,
+      "edge_count": 12,
+      "behaviors": [
+        "UNIX_SHELL_EXECUTION",
+        "EXTERNAL_TRANSFER",
+        "POTENTIAL_INGRESS_TOOL_TRANSFER"
+      ],
+      "latency_s": 0.027
+    },
+    {
+      "session_id": 42362,
+      "label": "Benign:branch_analytics",
+      "category": "Class 1: Privilege Abuse & Escalation",
+      "is_attack": false,
+      "risk_score": 0.0,
+      "rule_score": 0.0,
+      "gat_score": 0.0,
+      "status": "benign",
+      "node_count": 4,
+      "edge_count": 3,
+      "behaviors": [],
+      "latency_s": 0.0243
+    },
+    {
+      "session_id": 42394,
+      "label": "Malicious:privabuse_create_role_r1",
+      "category": "Class 1: Privilege Abuse & Escalation",
+      "is_attack": true,
+      "risk_score": 0.75,
+      "rule_score": 0.0,
+      "gat_score": 1.0,
+      "status": "response",
+      "node_count": 3,
+      "edge_count": 2,
+      "behaviors": [],
+      "latency_s": 0.0239
+    },
+    {
+      "session_id": 42429,
+      "label": "Malicious:sqli_role_r1",
+      "category": "Class 1: Privilege Abuse & Escalation",
+      "is_attack": true,
+      "risk_score": 0.75,
+      "rule_score": 0.0,
+      "gat_score": 1.0,
+      "status": "response",
+      "node_count": 3,
+      "edge_count": 2,
+      "behaviors": [],
+      "latency_s": 0.0242
+    },
+    {
+      "session_id": 42460,
+      "label": "Malicious:os_chmod_tmp_r1",
+      "category": "Class 1: Privilege Abuse & Escalation",
+      "is_attack": true,
+      "risk_score": 0.75,
+      "rule_score": 0.0,
+      "gat_score": 1.0,
+      "status": "response",
+      "node_count": 6,
+      "edge_count": 6,
+      "behaviors": [
+        "UNIX_SHELL_EXECUTION"
+      ],
+      "latency_s": 0.0266
+    },
+    {
+      "session_id": 42525,
+      "label": "Malicious:os_cat_passwd_r1",
+      "category": "Class 1: Privilege Abuse & Escalation",
+      "is_attack": true,
+      "risk_score": 0.75,
+      "rule_score": 0.0,
+      "gat_score": 1.0,
+      "status": "response",
+      "node_count": 7,
+      "edge_count": 7,
+      "behaviors": [
+        "UNIX_SHELL_EXECUTION"
+      ],
+      "latency_s": 0.0269
+    },
+    {
+      "session_id": 42558,
+      "label": "Malicious:os_cat_shadow_r1",
+      "category": "Class 1: Privilege Abuse & Escalation",
+      "is_attack": true,
+      "risk_score": 0.75,
+      "rule_score": 0.0,
+      "gat_score": 1.0,
+      "status": "response",
+      "node_count": 6,
+      "edge_count": 6,
+      "behaviors": [
+        "UNIX_SHELL_EXECUTION"
+      ],
+      "latency_s": 0.0266
+    }
+  ]
+}

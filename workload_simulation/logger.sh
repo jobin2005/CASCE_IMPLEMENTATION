@@ -4,6 +4,7 @@
 #   logger.sh start                      begin capturing (Postgres hook + eBPF)
 #   logger.sh stop                       stop capturing
 #   logger.sh status                     is capturing active?
+#   logger.sh reset                      delete current capture files so a fresh run starts clean
 #   logger.sh mark_attack <name> start|end   annotate an attack window
 #   logger.sh archive                    move the current logs to archive/<timestamp>/
 #
@@ -43,6 +44,17 @@ status() {
     else
         echo "Logging is STOPPED."
     fi
+}
+
+reset() {
+    if is_active; then
+        echo "Logging is active; stop it before resetting the capture workspace."
+        exit 1
+    fi
+    for f in "$KERNEL_LOG" "$KERNEL_RAW_LOG" "$PG_LOG" "$LABEL_LOG" "${WORKDIR}/time_sync.json"; do
+        [ -e "$f" ] && rm -f "$f"
+    done
+    echo "Capture workspace reset for a new run."
 }
 
 start() {
@@ -149,7 +161,8 @@ case "${1:-}" in
     start)       start ;;
     stop)        stop ;;
     status)      status ;;
+    reset)       reset ;;
     mark_attack) shift; mark_attack "$@" ;;
     archive)     archive ;;
-    *) echo "usage: $0 start|stop|status|archive|mark_attack <name> start|end"; exit 1 ;;
+    *) echo "usage: $0 start|stop|status|reset|archive|mark_attack <name> start|end"; exit 1 ;;
 esac

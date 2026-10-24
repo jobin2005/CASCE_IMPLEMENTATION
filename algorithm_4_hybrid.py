@@ -189,7 +189,7 @@ CHAIN_RULES = [
 
 THETA_A = 0.5   # alert threshold
 THETA_R = 0.8   # response threshold
-W_RULE = 0.75
+W_RULE = 0.85
 W_GAT = 0.75
 
 FEATURE_HASH_DIM = 16

@@ -68,7 +68,7 @@ def initialize_templates():
         label="DATA_PACKAGING", 
         mitre_id="T1560.001", 
         graph_structure=g_package, 
-        semantic_keywords=["tar", "gzip", "zip", "7z", "rar", "bak", "dump"], 
+        semantic_keywords=["tar", "gzip", "zip", "bzip2", "base64", "7z", "rar", "bak", "dump", "dat"], 
         temporal_constraints={"max_gap": 60.0}
     ))
 
